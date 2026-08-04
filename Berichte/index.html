@@ -283,7 +283,7 @@ table.data-table.clickable tbody tr { cursor: pointer; }
 .empty-hint { color: var(--muted2); font-size: 13px; padding: 16px 0; }
 
 
-/* ---- Seitenspezifisches CSS (von den Seiten-Fragmenten) ---- */
+/* ---- Seitenspezifisches CSS (von den Seiten-Fragmenten, optional) ---- */
 /* ---- page-uebersicht.css ---- */
 /* Seitenspezifisches CSS fuer #page-uebersicht (Dashboard-Startseite).
    Alle Selektoren scoped mit #page-uebersicht, ergaenzt nur styles.css. */
@@ -483,204 +483,6 @@ table.data-table.clickable tbody tr { cursor: pointer; }
 }
 
 
-/* ---- page-teilnehmer.css ---- */
-/* Seitenspezifisches CSS fuer die Teilnehmer-Seite. Alle Selektoren mit
-   #page-teilnehmer gescoped, ergaenzt das gemeinsame Design-System aus
-   Design/styles.css (nutzt dessen Tokens/Variablen). */
-
-#page-teilnehmer .training-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-}
-
-#page-teilnehmer .training-flag {
-  gap: 5px;
-}
-
-#page-teilnehmer .training-flag::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 2px;
-  background: currentColor;
-  box-shadow: 3px 3px 0 -1px currentColor;
-  flex: none;
-}
-
-#page-teilnehmer .training-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-#page-teilnehmer .training-chip {
-  display: inline-block;
-  font-size: 12px;
-  color: var(--text);
-  padding: 2px 0;
-}
-
-#page-teilnehmer .training-chip::before {
-  content: "•";
-  color: var(--muted2);
-  margin-right: 6px;
-}
-
-#page-teilnehmer table.data-table td {
-  vertical-align: top;
-}
-
-#page-teilnehmer .filter-select {
-  min-width: 190px;
-}
-
-
-/* ---- page-kunden.css ---- */
-/* ========================================================================
-   Seite "Kunden" – scoped CSS, nutzt Design-Tokens aus styles.css
-   Alle Selektoren unter #page-kunden gekapselt.
-   ======================================================================== */
-
-#page-kunden .kunden-sort-hint {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  margin: -6px 0 16px 2px;
-}
-#page-kunden .kunden-sort-hint svg { width: 14px; height: 14px; stroke: var(--muted2); flex: none; }
-
-#page-kunden .kunden-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 18px;
-}
-
-#page-kunden .kunden-card {
-  padding: 20px 22px 22px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
-}
-#page-kunden .kunden-card:hover {
-  box-shadow: var(--shadow-pop);
-  transform: translateY(-2px);
-}
-
-#page-kunden .kunden-card-head {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-#page-kunden .kunden-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.2px;
-}
-#page-kunden .kunden-avatar-bestand {
-  background: linear-gradient(135deg, var(--teal), var(--indigo));
-  color: #fff;
-}
-#page-kunden .kunden-avatar-neu {
-  background: var(--card-2);
-  color: var(--muted);
-  border: 1px solid var(--line-strong);
-}
-
-#page-kunden .kunden-name-block { flex: 1; min-width: 0; padding-top: 1px; }
-#page-kunden .kunden-name {
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.28;
-  margin: 0 0 8px 0;
-}
-
-#page-kunden .kunden-kpi {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-#page-kunden .kunden-kpi-value {
-  font-family: var(--font-display);
-  font-size: 30px;
-  font-weight: 800;
-  color: var(--ink);
-  line-height: 1;
-}
-#page-kunden .kunden-kpi-label {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: var(--muted);
-}
-
-#page-kunden .kunden-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-#page-kunden .kunden-breakdown-row {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-#page-kunden .kunden-breakdown-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 12.5px;
-}
-#page-kunden .kunden-breakdown-title {
-  color: var(--text);
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-#page-kunden .kunden-breakdown-count {
-  flex: none;
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-}
-#page-kunden .kunden-bar-track {
-  height: 5px;
-  border-radius: 999px;
-  background: var(--card-2);
-  border: 1px solid var(--line);
-  overflow: hidden;
-}
-#page-kunden .kunden-bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--teal-deep);
-}
-
-@media (max-width: 900px) {
-  #page-kunden .kunden-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-}
-
-
 /* ---- Aussenrahmen fuer die Vorschau (die App selbst ist app-window) ---- */
 body { display: flex; align-items: center; justify-content: center; padding: 18px; background: #e4e8f0; min-height: 100vh; }
 .app-window { width: 1360px; max-width: 100%; height: 860px; }
@@ -707,16 +509,20 @@ body { display: flex; align-items: center; justify-content: center; padding: 18p
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H20v15H5.5A2.5 2.5 0 0 0 3 20.5z"/><path d="M3 5.5A2.5 2.5 0 0 0 5.5 8H20"/></svg>
           Schulungen
         </button>
-        <button class="sidebar-nav-item" data-nav="teilnehmer" onclick="showPage('teilnehmer')">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="8.5" r="2.6"/><path d="M15.8 14.2c2.9.3 4.9 2.3 4.9 5.3"/></svg>
-          Teilnehmer
-        </button>
-        <button class="sidebar-nav-item" data-nav="kunden" onclick="showPage('kunden')">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1.5"/><path d="M8 9V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3"/><path d="M3 13h18"/></svg>
-          Kunden
+        <button class="sidebar-nav-item" data-nav="buchungen" onclick="showPage('buchungen')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5A1.5 1.5 0 0 1 7.5 2h9A1.5 1.5 0 0 1 18 3.5V21l-6-4-6 4z"/></svg>
+          Buchungen
         </button>
       </div>
-      <div class="sidebar-footer">Schulungsplaner · Prototyp<br/>Beispieldaten, Q3 2026</div>
+      <div class="sidebar-footer">
+        <div class="sidebar-tools">
+          <button class="sidebar-tool-btn" onclick="exportiereJSON()">Exportieren</button>
+          <button class="sidebar-tool-btn" onclick="document.getElementById('import-input').click()">Importieren</button>
+          <button class="sidebar-tool-btn" onclick="zuruecksetzenAufBeispieldaten()">Zurücksetzen</button>
+          <input type="file" id="import-input" accept="application/json" style="display:none" />
+        </div>
+        Schulungsplaner<br/>Lokal gespeichert im Browser
+      </div>
     </nav>
 
     <main class="main">
@@ -1447,659 +1253,494 @@ body { display: flex; align-items: center; justify-content: center; padding: 18p
 
       </section>
 
-      <section id="page-teilnehmer" class="page">
-<div class="page-header">
-  <h1>Teilnehmer</h1>
-  <p class="subtitle">33 Teilnehmerinnen und Teilnehmer · schulungsübergreifend, nach Firma und Anmeldestatus filterbar</p>
-</div>
-
-<div class="filter-bar">
-  <input type="text" id="teilnehmer-search" class="filter-input" placeholder="Name oder Firma suchen …" />
-  <select id="teilnehmer-firma-filter" class="filter-select">
-    <option value="">Firma: Alle</option>
-    <option value="Autohaus Meyer &amp; Söhne">Autohaus Meyer &amp; Söhne</option>
-    <option value="Bäckerei Feinbrot GmbH">Bäckerei Feinbrot GmbH</option>
-    <option value="Café Lindenhof">Café Lindenhof</option>
-    <option value="Hotel Vier Jahreszeiten">Hotel Vier Jahreszeiten</option>
-    <option value="IT-Systemhaus Bergmann">IT-Systemhaus Bergmann</option>
-    <option value="Kanzlei Voss &amp; Partner">Kanzlei Voss &amp; Partner</option>
-    <option value="Klinik am Stadtpark">Klinik am Stadtpark</option>
-    <option value="Pflegedienst Sonnenschein">Pflegedienst Sonnenschein</option>
-    <option value="Spedition Nordwind GmbH">Spedition Nordwind GmbH</option>
-    <option value="Steuerberatung Lang">Steuerberatung Lang</option>
-  </select>
-  <select id="teilnehmer-status-filter" class="filter-select">
-    <option value="">Anmeldestatus: Alle</option>
-    <option value="angemeldet">Angemeldet</option>
-    <option value="bestätigt">Bestätigt</option>
-    <option value="abgesagt">Abgesagt</option>
-  </select>
-</div>
-
-<div class="card">
-  <table class="data-table" id="teilnehmer-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Firma</th>
-        <th>E-Mail</th>
-        <th>Anmeldestatus</th>
-        <th>Kundenstatus</th>
-        <th>Schulungen</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr data-name="Sarah Wagner" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
-        <td class="cell-strong">Sarah Wagner</td>
-        <td>Kanzlei Voss &amp; Partner</td>
-        <td>sarah.wagner@kanzlei-voss-und-partner.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Datenschutzbeauftragter Grundlagenschulung</td>
-      </tr>
-      <tr data-name="Paul Koch" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
-        <td class="cell-strong">Paul Koch</td>
-        <td>Kanzlei Voss &amp; Partner</td>
-        <td>paul.koch@kanzlei-voss-und-partner.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Datenschutzbeauftragter Grundlagenschulung</td>
-      </tr>
-      <tr data-name="Leon Krause" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
-        <td class="cell-strong">Leon Krause</td>
-        <td>Kanzlei Voss &amp; Partner</td>
-        <td>leon.krause@kanzlei-voss-und-partner.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Datenschutzbeauftragter Grundlagenschulung</td>
-      </tr>
-      <tr data-name="Lukas Schmidt" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
-        <td class="cell-strong">Lukas Schmidt</td>
-        <td>Kanzlei Voss &amp; Partner</td>
-        <td>lukas.schmidt@kanzlei-voss-und-partner.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>DSGVO Update für Führungskräfte</td>
-      </tr>
-      <tr data-name="Clara Peters" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
-        <td class="cell-strong">Clara Peters</td>
-        <td>Kanzlei Voss &amp; Partner</td>
-        <td>clara.peters@kanzlei-voss-und-partner.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>DSGVO Update für Führungskräfte</td>
-      </tr>
-      <tr data-name="Mia Krause" data-firma="Kanzlei Voss &amp; Partner" data-status="angemeldet">
-        <td class="cell-strong">Mia Krause</td>
-        <td>Kanzlei Voss &amp; Partner</td>
-        <td>mia.krause@kanzlei-voss-und-partner.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Datenschutz-Auffrischung</td>
-      </tr>
-      <tr data-name="Paul Krüger" data-firma="Klinik am Stadtpark" data-status="angemeldet">
-        <td class="cell-strong">Paul Krüger</td>
-        <td>Klinik am Stadtpark</td>
-        <td>paul.krüger@klinik-am-stadtpark.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>
-          <div class="training-cell">
-            <span class="badge badge-amber training-flag">Mehrfach gebucht</span>
-            <div class="training-list">
-              <span class="training-chip">Arbeitssicherheit Basisschulung</span>
-              <span class="training-chip">Gefährdungsbeurteilung Workshop</span>
-            </div>
-          </div>
-        </td>
-      </tr>
-      <tr data-name="Anna Hoffmann" data-firma="Klinik am Stadtpark" data-status="abgesagt">
-        <td class="cell-strong">Anna Hoffmann</td>
-        <td>Klinik am Stadtpark</td>
-        <td>anna.hoffmann@klinik-am-stadtpark.de</td>
-        <td><span class="badge badge-red"><span class="badge-dot"></span>Abgesagt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Arbeitssicherheit Basisschulung</td>
-      </tr>
-      <tr data-name="Lea Becker" data-firma="Klinik am Stadtpark" data-status="bestätigt">
-        <td class="cell-strong">Lea Becker</td>
-        <td>Klinik am Stadtpark</td>
-        <td>lea.becker@klinik-am-stadtpark.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>
-          <div class="training-cell">
-            <span class="badge badge-amber training-flag">Mehrfach gebucht</span>
-            <div class="training-list">
-              <span class="training-chip">Arbeitssicherheit Basisschulung</span>
-              <span class="training-chip">Gefährdungsbeurteilung Workshop</span>
-            </div>
-          </div>
-        </td>
-      </tr>
-      <tr data-name="Hannah Wagner" data-firma="Klinik am Stadtpark" data-status="bestätigt">
-        <td class="cell-strong">Hannah Wagner</td>
-        <td>Klinik am Stadtpark</td>
-        <td>hannah.wagner@klinik-am-stadtpark.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>
-          <div class="training-cell">
-            <span class="badge badge-amber training-flag">Mehrfach gebucht</span>
-            <div class="training-list">
-              <span class="training-chip">Erste-Hilfe-Kurs</span>
-              <span class="training-chip">Brandschutzhelfer Ausbildung</span>
-            </div>
-          </div>
-        </td>
-      </tr>
-      <tr data-name="David Neumann" data-firma="Klinik am Stadtpark" data-status="angemeldet">
-        <td class="cell-strong">David Neumann</td>
-        <td>Klinik am Stadtpark</td>
-        <td>david.neumann@klinik-am-stadtpark.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Erste-Hilfe-Kurs</td>
-      </tr>
-      <tr data-name="Lukas Krüger" data-firma="Klinik am Stadtpark" data-status="angemeldet">
-        <td class="cell-strong">Lukas Krüger</td>
-        <td>Klinik am Stadtpark</td>
-        <td>lukas.krüger@klinik-am-stadtpark.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Brandschutzhelfer Ausbildung</td>
-      </tr>
-      <tr data-name="Finn Neumann" data-firma="Klinik am Stadtpark" data-status="angemeldet">
-        <td class="cell-strong">Finn Neumann</td>
-        <td>Klinik am Stadtpark</td>
-        <td>finn.neumann@klinik-am-stadtpark.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Gefährdungsbeurteilung Workshop</td>
-      </tr>
-      <tr data-name="Lukas Koch" data-firma="IT-Systemhaus Bergmann" data-status="bestätigt">
-        <td class="cell-strong">Lukas Koch</td>
-        <td>IT-Systemhaus Bergmann</td>
-        <td>lukas.koch@it-systemhaus-bergmann.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Hinweisgeberschutz kompakt</td>
-      </tr>
-      <tr data-name="Paul Wagner" data-firma="IT-Systemhaus Bergmann" data-status="angemeldet">
-        <td class="cell-strong">Paul Wagner</td>
-        <td>IT-Systemhaus Bergmann</td>
-        <td>paul.wagner@it-systemhaus-bergmann.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Hinweisgeberschutz kompakt</td>
-      </tr>
-      <tr data-name="Sarah Neumann" data-firma="IT-Systemhaus Bergmann" data-status="bestätigt">
-        <td class="cell-strong">Sarah Neumann</td>
-        <td>IT-Systemhaus Bergmann</td>
-        <td>sarah.neumann@it-systemhaus-bergmann.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>DSGVO Update für Führungskräfte</td>
-      </tr>
-      <tr data-name="Marie Richter" data-firma="IT-Systemhaus Bergmann" data-status="abgesagt">
-        <td class="cell-strong">Marie Richter</td>
-        <td>IT-Systemhaus Bergmann</td>
-        <td>marie.richter@it-systemhaus-bergmann.de</td>
-        <td><span class="badge badge-red"><span class="badge-dot"></span>Abgesagt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>DSGVO Update für Führungskräfte</td>
-      </tr>
-      <tr data-name="Leon Weber" data-firma="Autohaus Meyer &amp; Söhne" data-status="angemeldet">
-        <td class="cell-strong">Leon Weber</td>
-        <td>Autohaus Meyer &amp; Söhne</td>
-        <td>leon.weber@autohaus-meyer-und-soehne.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Brandschutzhelfer Ausbildung</td>
-      </tr>
-      <tr data-name="Jan Koch" data-firma="Autohaus Meyer &amp; Söhne" data-status="bestätigt">
-        <td class="cell-strong">Jan Koch</td>
-        <td>Autohaus Meyer &amp; Söhne</td>
-        <td>jan.koch@autohaus-meyer-und-soehne.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Brandschutzhelfer Ausbildung</td>
-      </tr>
-      <tr data-name="Lea Krause" data-firma="Autohaus Meyer &amp; Söhne" data-status="bestätigt">
-        <td class="cell-strong">Lea Krause</td>
-        <td>Autohaus Meyer &amp; Söhne</td>
-        <td>lea.krause@autohaus-meyer-und-soehne.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Erste-Hilfe-Kurs</td>
-      </tr>
-      <tr data-name="Leon Wolf" data-firma="Spedition Nordwind GmbH" data-status="bestätigt">
-        <td class="cell-strong">Leon Wolf</td>
-        <td>Spedition Nordwind GmbH</td>
-        <td>leon.wolf@spedition-nordwind-gmbh.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Arbeitssicherheit Basisschulung</td>
-      </tr>
-      <tr data-name="Lukas Wolf" data-firma="Spedition Nordwind GmbH" data-status="angemeldet">
-        <td class="cell-strong">Lukas Wolf</td>
-        <td>Spedition Nordwind GmbH</td>
-        <td>lukas.wolf@spedition-nordwind-gmbh.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Arbeitssicherheit Basisschulung</td>
-      </tr>
-      <tr data-name="Marie Werner" data-firma="Spedition Nordwind GmbH" data-status="abgesagt">
-        <td class="cell-strong">Marie Werner</td>
-        <td>Spedition Nordwind GmbH</td>
-        <td>marie.werner@spedition-nordwind-gmbh.de</td>
-        <td><span class="badge badge-red"><span class="badge-dot"></span>Abgesagt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Arbeitssicherheit Basisschulung</td>
-      </tr>
-      <tr data-name="Sarah Braun" data-firma="Spedition Nordwind GmbH" data-status="angemeldet">
-        <td class="cell-strong">Sarah Braun</td>
-        <td>Spedition Nordwind GmbH</td>
-        <td>sarah.braun@spedition-nordwind-gmbh.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Gefährdungsbeurteilung Workshop</td>
-      </tr>
-      <tr data-name="Sarah Krüger" data-firma="Spedition Nordwind GmbH" data-status="bestätigt">
-        <td class="cell-strong">Sarah Krüger</td>
-        <td>Spedition Nordwind GmbH</td>
-        <td>sarah.krüger@spedition-nordwind-gmbh.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Gefährdungsbeurteilung Workshop</td>
-      </tr>
-      <tr data-name="Paul Krause" data-firma="Hotel Vier Jahreszeiten" data-status="angemeldet">
-        <td class="cell-strong">Paul Krause</td>
-        <td>Hotel Vier Jahreszeiten</td>
-        <td>paul.krause@hotel-vier-jahreszeiten.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Erste-Hilfe-Kurs</td>
-      </tr>
-      <tr data-name="Emma Zimmermann" data-firma="Hotel Vier Jahreszeiten" data-status="angemeldet">
-        <td class="cell-strong">Emma Zimmermann</td>
-        <td>Hotel Vier Jahreszeiten</td>
-        <td>emma.zimmermann@hotel-vier-jahreszeiten.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Brandschutzhelfer Ausbildung</td>
-      </tr>
-      <tr data-name="Julia Neumann" data-firma="Bäckerei Feinbrot GmbH" data-status="bestätigt">
-        <td class="cell-strong">Julia Neumann</td>
-        <td>Bäckerei Feinbrot GmbH</td>
-        <td>julia.neumann@baeckerei-feinbrot-gmbh.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-gray">Neukunde</span></td>
-        <td>Datenschutzbeauftragter Grundlagenschulung</td>
-      </tr>
-      <tr data-name="Laura Lehmann" data-firma="Bäckerei Feinbrot GmbH" data-status="angemeldet">
-        <td class="cell-strong">Laura Lehmann</td>
-        <td>Bäckerei Feinbrot GmbH</td>
-        <td>laura.lehmann@baeckerei-feinbrot-gmbh.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-gray">Neukunde</span></td>
-        <td>Datenschutzbeauftragter Grundlagenschulung</td>
-      </tr>
-      <tr data-name="Sophie Fischer" data-firma="Steuerberatung Lang" data-status="bestätigt">
-        <td class="cell-strong">Sophie Fischer</td>
-        <td>Steuerberatung Lang</td>
-        <td>sophie.fischer@steuerberatung-lang.de</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
-        <td><span class="badge badge-gray">Neukunde</span></td>
-        <td>Hinweisgeberschutz kompakt</td>
-      </tr>
-      <tr data-name="Leon Zimmermann" data-firma="Pflegedienst Sonnenschein" data-status="angemeldet">
-        <td class="cell-strong">Leon Zimmermann</td>
-        <td>Pflegedienst Sonnenschein</td>
-        <td>leon.zimmermann@pflegedienst-sonnenschein.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-gray">Neukunde</span></td>
-        <td>Arbeitssicherheit Basisschulung</td>
-      </tr>
-      <tr data-name="Finn Krüger" data-firma="Café Lindenhof" data-status="angemeldet">
-        <td class="cell-strong">Finn Krüger</td>
-        <td>Café Lindenhof</td>
-        <td>finn.krüger@café-lindenhof.de</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
-        <td><span class="badge badge-gray">Neukunde</span></td>
-        <td>Datenschutz-Auffrischung</td>
-      </tr>
-      <tr data-name="Jan Schmidt" data-firma="IT-Systemhaus Bergmann" data-status="abgesagt">
-        <td class="cell-strong">Jan Schmidt</td>
-        <td>IT-Systemhaus Bergmann</td>
-        <td>jan.schmidt@it-systemhaus-bergmann.de</td>
-        <td><span class="badge badge-red"><span class="badge-dot"></span>Abgesagt</span></td>
-        <td><span class="badge badge-green">Bestandskunde</span></td>
-        <td>Datenschutz-Auffrischung</td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="empty-hint" id="teilnehmer-empty-hint" style="display:none;">Keine Teilnehmer gefunden — Suchbegriff oder Filter anpassen.</p>
-</div>
-
-<script>
-(function () {
-  var searchInput = document.getElementById('teilnehmer-search');
-  var firmaFilter = document.getElementById('teilnehmer-firma-filter');
-  var statusFilter = document.getElementById('teilnehmer-status-filter');
-  var rows = Array.prototype.slice.call(document.querySelectorAll('#teilnehmer-table tbody tr'));
-  var emptyHint = document.getElementById('teilnehmer-empty-hint');
-
-  function applyFilters() {
-    var query = searchInput.value.trim().toLowerCase();
-    var firma = firmaFilter.value;
-    var status = statusFilter.value;
-    var visibleCount = 0;
-
-    rows.forEach(function (row) {
-      var name = (row.getAttribute('data-name') || '').toLowerCase();
-      var rowFirma = row.getAttribute('data-firma') || '';
-      var matchesQuery = !query || name.indexOf(query) !== -1 || rowFirma.toLowerCase().indexOf(query) !== -1;
-      var matchesFirma = !firma || rowFirma === firma;
-      var matchesStatus = !status || row.getAttribute('data-status') === status;
-      var visible = matchesQuery && matchesFirma && matchesStatus;
-      row.style.display = visible ? '' : 'none';
-      if (visible) visibleCount++;
-    });
-
-    emptyHint.style.display = visibleCount === 0 ? 'block' : 'none';
-  }
-
-  searchInput.addEventListener('input', applyFilters);
-  firmaFilter.addEventListener('change', applyFilters);
-  statusFilter.addEventListener('change', applyFilters);
-})();
-</script>
-
-      </section>
-
-      <section id="page-kunden" class="page">
-<div class="page-header">
-  <h1>Kunden</h1>
-  <p class="subtitle">Übersicht aller Firmenkunden und ihrer bisherigen Schulungsbuchungen</p>
-</div>
-
-<div class="kpi-row">
-  <div class="kpi-tile">
-    <div class="kpi-label">Firmenkunden gesamt</div>
-    <div class="kpi-value">10</div>
-    <div class="kpi-sub">6 Bestandskunden · 4 Neukunden</div>
-  </div>
-  <div class="kpi-tile">
-    <div class="kpi-label">Buchungen gesamt</div>
-    <div class="kpi-value">36</div>
-    <div class="kpi-sub">über alle Firmen hinweg</div>
-  </div>
-  <div class="kpi-tile">
-    <div class="kpi-label">Top-Kunde</div>
-    <div class="kpi-value">10</div>
-    <div class="kpi-sub">Klinik am Stadtpark</div>
-  </div>
-</div>
-
-<div class="kunden-sort-hint">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
-  Sortiert nach Buchungshäufigkeit
-</div>
-
-<div class="kunden-grid">
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-bestand">KS</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Klinik am Stadtpark</h3>
-        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">10</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Arbeitssicherheit Basisschulung</span><span class="kunden-breakdown-count">3x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:30%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Gefährdungsbeurteilung Workshop</span><span class="kunden-breakdown-count">3x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:30%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Erste-Hilfe-Kurs</span><span class="kunden-breakdown-count">2x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:20%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Brandschutzhelfer Ausbildung</span><span class="kunden-breakdown-count">2x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:20%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-bestand">KV</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Kanzlei Voss &amp; Partner</h3>
-        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">6</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutzbeauftragter Grundlagenschulung</span><span class="kunden-breakdown-count">3x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:50%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">DSGVO Update für Führungskräfte</span><span class="kunden-breakdown-count">2x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:33%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutz-Auffrischung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:17%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-bestand">IB</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">IT-Systemhaus Bergmann</h3>
-        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">5</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Hinweisgeberschutz kompakt</span><span class="kunden-breakdown-count">2x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:40%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">DSGVO Update für Führungskräfte</span><span class="kunden-breakdown-count">2x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:40%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutz-Auffrischung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:20%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-bestand">SN</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Spedition Nordwind GmbH</h3>
-        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">5</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Arbeitssicherheit Basisschulung</span><span class="kunden-breakdown-count">3x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:60%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Gefährdungsbeurteilung Workshop</span><span class="kunden-breakdown-count">2x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:40%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-bestand">AM</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Autohaus Meyer &amp; Söhne</h3>
-        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">3</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Brandschutzhelfer Ausbildung</span><span class="kunden-breakdown-count">2x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:67%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Erste-Hilfe-Kurs</span><span class="kunden-breakdown-count">1x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:33%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-bestand">HV</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Hotel Vier Jahreszeiten</h3>
-        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">2</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Erste-Hilfe-Kurs</span><span class="kunden-breakdown-count">1x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:50%"></div></div>
-      </div>
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Brandschutzhelfer Ausbildung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:50%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-neu">BF</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Bäckerei Feinbrot GmbH</h3>
-        <span class="badge badge-gray">Neukunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">2</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutzbeauftragter Grundlagenschulung</span><span class="kunden-breakdown-count">2x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:100%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-neu">SL</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Steuerberatung Lang</h3>
-        <span class="badge badge-gray">Neukunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">1</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Hinweisgeberschutz kompakt</span><span class="kunden-breakdown-count">1x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:100%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-neu">PS</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Pflegedienst Sonnenschein</h3>
-        <span class="badge badge-gray">Neukunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">1</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Arbeitssicherheit Basisschulung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:100%"></div></div>
-      </div>
-    </div>
-  </article>
-
-  <article class="card kunden-card">
-    <div class="kunden-card-head">
-      <div class="kunden-avatar kunden-avatar-neu">CL</div>
-      <div class="kunden-name-block">
-        <h3 class="kunden-name">Café Lindenhof</h3>
-        <span class="badge badge-gray">Neukunde</span>
-      </div>
-    </div>
-    <div class="kunden-kpi">
-      <span class="kunden-kpi-value">1</span>
-      <span class="kunden-kpi-label">Buchungen gesamt</span>
-    </div>
-    <div class="kunden-breakdown">
-      <div class="kunden-breakdown-row">
-        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutz-Auffrischung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
-        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:100%"></div></div>
-      </div>
-    </div>
-  </article>
-
-</div>
-
+      <section id="page-buchungen" class="page">
+<div class="page-header"><h1>Buchungen</h1><p class="subtitle">Wird in Task 10 gebaut.</p></div>
       </section>
     </main>
   </div>
 </div>
 
-<script>
-// Eingebettete Beispieldaten (verfuegbar als window.DATA, falls Seiten sie referenzieren)
-window.DATA = {"schulungen": [{"id": "s1", "titel": "Datenschutzbeauftragter Grundlagenschulung", "kategorie": "Datenschutz", "datum": "2026-08-12", "trainer": "Dr. Julia Berg", "format": "Vor Ort", "ort": "Hamburg", "kapazitaet": 10, "status": "geplant"}, {"id": "s2", "titel": "Hinweisgeberschutz kompakt", "kategorie": "Compliance", "datum": "2026-08-19", "trainer": "Markus Feldmann", "format": "Online", "ort": "—", "kapazitaet": 18, "status": "geplant"}, {"id": "s3", "titel": "Arbeitssicherheit Basisschulung", "kategorie": "Arbeitssicherheit", "datum": "2026-07-30", "trainer": "Sabine Kroll", "format": "Vor Ort", "ort": "München", "kapazitaet": 7, "status": "laufend"}, {"id": "s4", "titel": "Brandschutzhelfer Ausbildung", "kategorie": "Arbeitssicherheit", "datum": "2026-09-02", "trainer": "Thomas Weidner", "format": "Vor Ort", "ort": "Köln", "kapazitaet": 5, "status": "geplant"}, {"id": "s5", "titel": "DSGVO Update für Führungskräfte", "kategorie": "Datenschutz", "datum": "2026-06-18", "trainer": "Dr. Julia Berg", "format": "Online", "ort": "—", "kapazitaet": 12, "status": "abgeschlossen"}, {"id": "s6", "titel": "Erste-Hilfe-Kurs", "kategorie": "Arbeitssicherheit", "datum": "2026-09-10", "trainer": "Nina Vogel", "format": "Vor Ort", "ort": "Berlin", "kapazitaet": 8, "status": "geplant"}, {"id": "s7", "titel": "Gefährdungsbeurteilung Workshop", "kategorie": "Arbeitssicherheit", "datum": "2026-05-14", "trainer": "Sabine Kroll", "format": "Vor Ort", "ort": "Stuttgart", "kapazitaet": 8, "status": "abgeschlossen"}, {"id": "s8", "titel": "Datenschutz-Auffrischung", "kategorie": "Datenschutz", "datum": "2026-08-27", "trainer": "Markus Feldmann", "format": "Online", "ort": "—", "kapazitaet": 25, "status": "geplant"}], "teilnehmer": [{"id": "t1", "name": "Sarah Wagner", "firma": "Kanzlei Voss & Partner", "email": "sarah.wagner@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s1"]}, {"id": "t2", "name": "Paul Koch", "firma": "Kanzlei Voss & Partner", "email": "paul.koch@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s1"]}, {"id": "t3", "name": "Leon Krause", "firma": "Kanzlei Voss & Partner", "email": "leon.krause@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s1"]}, {"id": "t4", "name": "Lukas Schmidt", "firma": "Kanzlei Voss & Partner", "email": "lukas.schmidt@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s5"]}, {"id": "t5", "name": "Clara Peters", "firma": "Kanzlei Voss & Partner", "email": "clara.peters@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s5"]}, {"id": "t6", "name": "Mia Krause", "firma": "Kanzlei Voss & Partner", "email": "mia.krause@kanzlei-voss-und-partner.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s8"]}, {"id": "t7", "name": "Paul Krüger", "firma": "Klinik am Stadtpark", "email": "paul.krüger@klinik-am-stadtpark.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s3", "s7"]}, {"id": "t8", "name": "Anna Hoffmann", "firma": "Klinik am Stadtpark", "email": "anna.hoffmann@klinik-am-stadtpark.de", "anmeldestatus": "abgesagt", "bestandskunde": true, "schulungIds": ["s3"]}, {"id": "t9", "name": "Lea Becker", "firma": "Klinik am Stadtpark", "email": "lea.becker@klinik-am-stadtpark.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s3", "s7"]}, {"id": "t10", "name": "Hannah Wagner", "firma": "Klinik am Stadtpark", "email": "hannah.wagner@klinik-am-stadtpark.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s6", "s4"]}, {"id": "t11", "name": "David Neumann", "firma": "Klinik am Stadtpark", "email": "david.neumann@klinik-am-stadtpark.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s6"]}, {"id": "t12", "name": "Lukas Krüger", "firma": "Klinik am Stadtpark", "email": "lukas.krüger@klinik-am-stadtpark.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s4"]}, {"id": "t13", "name": "Finn Neumann", "firma": "Klinik am Stadtpark", "email": "finn.neumann@klinik-am-stadtpark.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s7"]}, {"id": "t14", "name": "Lukas Koch", "firma": "IT-Systemhaus Bergmann", "email": "lukas.koch@it-systemhaus-bergmann.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s2"]}, {"id": "t15", "name": "Paul Wagner", "firma": "IT-Systemhaus Bergmann", "email": "paul.wagner@it-systemhaus-bergmann.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s2"]}, {"id": "t16", "name": "Sarah Neumann", "firma": "IT-Systemhaus Bergmann", "email": "sarah.neumann@it-systemhaus-bergmann.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s5"]}, {"id": "t17", "name": "Marie Richter", "firma": "IT-Systemhaus Bergmann", "email": "marie.richter@it-systemhaus-bergmann.de", "anmeldestatus": "abgesagt", "bestandskunde": true, "schulungIds": ["s5"]}, {"id": "t18", "name": "Leon Weber", "firma": "Autohaus Meyer & Söhne", "email": "leon.weber@autohaus-meyer-und-soehne.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s4"]}, {"id": "t19", "name": "Jan Koch", "firma": "Autohaus Meyer & Söhne", "email": "jan.koch@autohaus-meyer-und-soehne.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s4"]}, {"id": "t20", "name": "Lea Krause", "firma": "Autohaus Meyer & Söhne", "email": "lea.krause@autohaus-meyer-und-soehne.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s6"]}, {"id": "t21", "name": "Leon Wolf", "firma": "Spedition Nordwind GmbH", "email": "leon.wolf@spedition-nordwind-gmbh.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s3"]}, {"id": "t22", "name": "Lukas Wolf", "firma": "Spedition Nordwind GmbH", "email": "lukas.wolf@spedition-nordwind-gmbh.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s3"]}, {"id": "t23", "name": "Marie Werner", "firma": "Spedition Nordwind GmbH", "email": "marie.werner@spedition-nordwind-gmbh.de", "anmeldestatus": "abgesagt", "bestandskunde": true, "schulungIds": ["s3"]}, {"id": "t24", "name": "Sarah Braun", "firma": "Spedition Nordwind GmbH", "email": "sarah.braun@spedition-nordwind-gmbh.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s7"]}, {"id": "t25", "name": "Sarah Krüger", "firma": "Spedition Nordwind GmbH", "email": "sarah.krüger@spedition-nordwind-gmbh.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s7"]}, {"id": "t26", "name": "Paul Krause", "firma": "Hotel Vier Jahreszeiten", "email": "paul.krause@hotel-vier-jahreszeiten.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s6"]}, {"id": "t27", "name": "Emma Zimmermann", "firma": "Hotel Vier Jahreszeiten", "email": "emma.zimmermann@hotel-vier-jahreszeiten.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s4"]}, {"id": "t28", "name": "Julia Neumann", "firma": "Bäckerei Feinbrot GmbH", "email": "julia.neumann@baeckerei-feinbrot-gmbh.de", "anmeldestatus": "bestätigt", "bestandskunde": false, "schulungIds": ["s1"]}, {"id": "t29", "name": "Laura Lehmann", "firma": "Bäckerei Feinbrot GmbH", "email": "laura.lehmann@baeckerei-feinbrot-gmbh.de", "anmeldestatus": "angemeldet", "bestandskunde": false, "schulungIds": ["s1"]}, {"id": "t30", "name": "Sophie Fischer", "firma": "Steuerberatung Lang", "email": "sophie.fischer@steuerberatung-lang.de", "anmeldestatus": "bestätigt", "bestandskunde": false, "schulungIds": ["s2"]}, {"id": "t31", "name": "Leon Zimmermann", "firma": "Pflegedienst Sonnenschein", "email": "leon.zimmermann@pflegedienst-sonnenschein.de", "anmeldestatus": "angemeldet", "bestandskunde": false, "schulungIds": ["s3"]}, {"id": "t32", "name": "Finn Krüger", "firma": "Café Lindenhof", "email": "finn.krüger@café-lindenhof.de", "anmeldestatus": "angemeldet", "bestandskunde": false, "schulungIds": ["s8"]}, {"id": "t33", "name": "Jan Schmidt", "firma": "IT-Systemhaus Bergmann", "email": "jan.schmidt@it-systemhaus-bergmann.de", "anmeldestatus": "abgesagt", "bestandskunde": true, "schulungIds": ["s8"]}], "kunden": [{"firma": "Klinik am Stadtpark", "bestandskunde": true, "gesamtBuchungen": 10, "buchungenJeSchulung": {"Arbeitssicherheit Basisschulung": 3, "Gefährdungsbeurteilung Workshop": 3, "Erste-Hilfe-Kurs": 2, "Brandschutzhelfer Ausbildung": 2}}, {"firma": "Kanzlei Voss & Partner", "bestandskunde": true, "gesamtBuchungen": 6, "buchungenJeSchulung": {"Datenschutzbeauftragter Grundlagenschulung": 3, "DSGVO Update für Führungskräfte": 2, "Datenschutz-Auffrischung": 1}}, {"firma": "IT-Systemhaus Bergmann", "bestandskunde": true, "gesamtBuchungen": 5, "buchungenJeSchulung": {"Hinweisgeberschutz kompakt": 2, "DSGVO Update für Führungskräfte": 2, "Datenschutz-Auffrischung": 1}}, {"firma": "Spedition Nordwind GmbH", "bestandskunde": true, "gesamtBuchungen": 5, "buchungenJeSchulung": {"Arbeitssicherheit Basisschulung": 3, "Gefährdungsbeurteilung Workshop": 2}}, {"firma": "Autohaus Meyer & Söhne", "bestandskunde": true, "gesamtBuchungen": 3, "buchungenJeSchulung": {"Brandschutzhelfer Ausbildung": 2, "Erste-Hilfe-Kurs": 1}}, {"firma": "Hotel Vier Jahreszeiten", "bestandskunde": true, "gesamtBuchungen": 2, "buchungenJeSchulung": {"Erste-Hilfe-Kurs": 1, "Brandschutzhelfer Ausbildung": 1}}, {"firma": "Bäckerei Feinbrot GmbH", "bestandskunde": false, "gesamtBuchungen": 2, "buchungenJeSchulung": {"Datenschutzbeauftragter Grundlagenschulung": 2}}, {"firma": "Steuerberatung Lang", "bestandskunde": false, "gesamtBuchungen": 1, "buchungenJeSchulung": {"Hinweisgeberschutz kompakt": 1}}, {"firma": "Pflegedienst Sonnenschein", "bestandskunde": false, "gesamtBuchungen": 1, "buchungenJeSchulung": {"Arbeitssicherheit Basisschulung": 1}}, {"firma": "Café Lindenhof", "bestandskunde": false, "gesamtBuchungen": 1, "buchungenJeSchulung": {"Datenschutz-Auffrischung": 1}}]};
+<div id="dialog-overlay" class="dialog-overlay" style="display:none">
+  <div id="dialog-container" class="dialog"></div>
+</div>
 
+<script>
+window.SEED_DATA = {"kurse": [{"id": "k1", "titel": "Datenschutzbeauftragter Grundlagenschulung", "kategorie": "Datenschutz", "beschreibung": "Grundlagenschulung für neu bestellte oder angehende Datenschutzbeauftragte. Vermittelt die rechtlichen Grundlagen der DSGVO sowie die praktische Umsetzung im Unternehmensalltag.", "lernziele": ["Rechtliche Grundlagen der DSGVO und des BDSG verstehen", "Rollen und Pflichten des Datenschutzbeauftragten kennen", "Ein Verfahrensverzeichnis eigenständig aufbauen können", "Meldepflichten bei Datenschutzverstößen sicher anwenden"], "zielgruppe": "Neue und angehende Datenschutzbeauftragte", "voraussetzungen": "Keine", "agenda": [{"zeit": "09:00–10:30", "titel": "Rechtliche Grundlagen der DSGVO", "beschreibung": "Überblick über Verordnung, BDSG und Zusammenspiel"}, {"zeit": "10:45–12:00", "titel": "Rollen & Pflichten des DSB", "beschreibung": "Bestellung, Stellung im Unternehmen, Haftung"}, {"zeit": "13:00–14:30", "titel": "Verfahrensverzeichnis in der Praxis", "beschreibung": "Aufbau und Pflege anhand von Beispielen"}, {"zeit": "14:45–16:00", "titel": "Meldepflichten & Vorfallmanagement", "beschreibung": "Ablauf bei Datenschutzverstößen, Fristen"}], "materialien": {"seminarunterlagen": [], "vorlagen": []}, "termine": [{"id": "s1", "datum": "2026-08-12", "trainer": "Dr. Julia Berg", "format": "Vor Ort", "ort": "Hamburg", "kapazitaet": 10, "status": "geplant", "checkliste": [{"label": "Raum gebucht", "erledigt": false}, {"label": "Technik geprüft", "erledigt": false}, {"label": "Unterlagen gedruckt", "erledigt": false}, {"label": "Einladungen versendet", "erledigt": false}, {"label": "Zertifikate vorbereitet", "erledigt": false}]}, {"id": "s1b", "datum": "2026-11-18", "trainer": "Dr. Julia Berg", "format": "Vor Ort", "ort": "Hamburg", "kapazitaet": 10, "status": "geplant", "checkliste": [{"label": "Raum gebucht", "erledigt": false}, {"label": "Technik geprüft", "erledigt": false}, {"label": "Unterlagen gedruckt", "erledigt": false}, {"label": "Einladungen versendet", "erledigt": false}, {"label": "Zertifikate vorbereitet", "erledigt": false}]}]}, {"id": "k2", "titel": "DSGVO Update für Führungskräfte", "kategorie": "Datenschutz", "beschreibung": "Kompaktes Update zu aktuellen DSGVO-Entwicklungen speziell für Führungskräfte mit Personalverantwortung.", "lernziele": ["Aktuelle Rechtsprechung zur DSGVO kennen", "Verantwortung als Führungskraft einschätzen können", "Datenschutzrisiken im eigenen Bereich erkennen"], "zielgruppe": "Führungskräfte", "voraussetzungen": "Grundkenntnisse Datenschutz empfohlen", "agenda": [{"zeit": "09:00–10:30", "titel": "Aktuelle Rechtsprechung", "beschreibung": "Relevante Urteile und deren Praxisfolgen"}, {"zeit": "10:45–12:00", "titel": "Verantwortung der Führungsebene", "beschreibung": "Haftung, Organisationspflichten"}], "materialien": {"seminarunterlagen": [], "vorlagen": []}, "termine": [{"id": "s5", "datum": "2026-06-18", "trainer": "Dr. Julia Berg", "format": "Online", "ort": "—", "kapazitaet": 12, "status": "abgeschlossen", "checkliste": [{"label": "Raum gebucht", "erledigt": true}, {"label": "Technik geprüft", "erledigt": true}, {"label": "Unterlagen gedruckt", "erledigt": true}, {"label": "Einladungen versendet", "erledigt": true}, {"label": "Zertifikate vorbereitet", "erledigt": true}]}]}, {"id": "k3", "titel": "Hinweisgeberschutz kompakt", "kategorie": "Compliance", "beschreibung": "Kompaktschulung zu den Anforderungen des Hinweisgeberschutzgesetzes und dem Aufbau interner Meldestellen.", "lernziele": ["Anforderungen des Hinweisgeberschutzgesetzes kennen", "Interne Meldestelle korrekt aufsetzen", "Meldungen rechtssicher bearbeiten"], "zielgruppe": "Compliance-Verantwortliche, Personalabteilung", "voraussetzungen": "Keine", "agenda": [{"zeit": "09:00–10:15", "titel": "Rechtlicher Rahmen", "beschreibung": "HinSchG im Überblick"}, {"zeit": "10:30–12:00", "titel": "Meldestelle einrichten", "beschreibung": "Organisatorische und technische Anforderungen"}, {"zeit": "13:00–14:30", "titel": "Fallbearbeitung in der Praxis", "beschreibung": "Vom Eingang der Meldung bis zum Abschluss"}], "materialien": {"seminarunterlagen": [], "vorlagen": []}, "termine": [{"id": "s2", "datum": "2026-08-19", "trainer": "Markus Feldmann", "format": "Online", "ort": "—", "kapazitaet": 18, "status": "geplant", "checkliste": [{"label": "Raum gebucht", "erledigt": false}, {"label": "Technik geprüft", "erledigt": false}, {"label": "Unterlagen gedruckt", "erledigt": false}, {"label": "Einladungen versendet", "erledigt": false}, {"label": "Zertifikate vorbereitet", "erledigt": false}]}]}, {"id": "k4", "titel": "Arbeitssicherheit Basisschulung", "kategorie": "Arbeitssicherheit", "beschreibung": "Basisschulung zu den gesetzlichen Grundlagen der Arbeitssicherheit und praktischen Gefahrenprävention am Arbeitsplatz.", "lernziele": ["Gesetzliche Grundlagen des Arbeitsschutzes kennen", "Gefahren am Arbeitsplatz erkennen", "Präventionsmaßnahmen richtig anwenden"], "zielgruppe": "Alle Mitarbeitenden", "voraussetzungen": "Keine", "agenda": [{"zeit": "09:00–10:30", "titel": "Grundlagen des Arbeitsschutzes", "beschreibung": "Gesetze, Verordnungen, Zuständigkeiten"}, {"zeit": "10:45–12:00", "titel": "Gefahrenerkennung", "beschreibung": "Typische Gefahrenquellen im Arbeitsalltag"}, {"zeit": "13:00–14:30", "titel": "Praxisübung Prävention", "beschreibung": "Maßnahmen anhand von Fallbeispielen"}], "materialien": {"seminarunterlagen": [], "vorlagen": []}, "termine": [{"id": "s3", "datum": "2026-07-30", "trainer": "Sabine Kroll", "format": "Vor Ort", "ort": "München", "kapazitaet": 7, "status": "laufend", "checkliste": [{"label": "Raum gebucht", "erledigt": true}, {"label": "Technik geprüft", "erledigt": true}, {"label": "Unterlagen gedruckt", "erledigt": true}, {"label": "Einladungen versendet", "erledigt": true}, {"label": "Zertifikate vorbereitet", "erledigt": true}]}, {"id": "s3b", "datum": "2026-10-15", "trainer": "Sabine Kroll", "format": "Vor Ort", "ort": "München", "kapazitaet": 7, "status": "geplant", "checkliste": [{"label": "Raum gebucht", "erledigt": false}, {"label": "Technik geprüft", "erledigt": false}, {"label": "Unterlagen gedruckt", "erledigt": false}, {"label": "Einladungen versendet", "erledigt": false}, {"label": "Zertifikate vorbereitet", "erledigt": false}]}]}, {"id": "k5", "titel": "Gefährdungsbeurteilung Workshop", "kategorie": "Arbeitssicherheit", "beschreibung": "Praxisworkshop zur Erstellung und Aktualisierung von Gefährdungsbeurteilungen im Unternehmen.", "lernziele": ["Systematik der Gefährdungsbeurteilung anwenden", "Gefährdungen strukturiert erfassen", "Maßnahmen ableiten und dokumentieren"], "zielgruppe": "Führungskräfte, Sicherheitsbeauftragte", "voraussetzungen": "Keine", "agenda": [{"zeit": "09:00–10:30", "titel": "Systematik & Rechtsgrundlagen", "beschreibung": "Ablauf und gesetzliche Vorgaben"}, {"zeit": "10:45–12:30", "titel": "Praxis-Workshop", "beschreibung": "Gefährdungsbeurteilung anhand eigener Arbeitsplätze"}], "materialien": {"seminarunterlagen": [], "vorlagen": []}, "termine": [{"id": "s7", "datum": "2026-05-14", "trainer": "Sabine Kroll", "format": "Vor Ort", "ort": "Stuttgart", "kapazitaet": 8, "status": "abgeschlossen", "checkliste": [{"label": "Raum gebucht", "erledigt": true}, {"label": "Technik geprüft", "erledigt": true}, {"label": "Unterlagen gedruckt", "erledigt": true}, {"label": "Einladungen versendet", "erledigt": true}, {"label": "Zertifikate vorbereitet", "erledigt": true}]}]}, {"id": "k6", "titel": "Brandschutzhelfer Ausbildung", "kategorie": "Arbeitssicherheit", "beschreibung": "Ausbildung zum betrieblichen Brandschutzhelfer nach DGUV Information 205-023, Theorie und Löschübung.", "lernziele": ["Aufgaben des Brandschutzhelfers kennen", "Brandklassen und Löschmittel unterscheiden", "Löschgerät im Ernstfall sicher bedienen"], "zielgruppe": "Benannte Brandschutzhelfer", "voraussetzungen": "Keine", "agenda": [{"zeit": "09:00–10:00", "titel": "Brandschutzgrundlagen", "beschreibung": "Brandklassen, Brandentstehung, Löschmittel"}, {"zeit": "10:15–11:30", "titel": "Verhalten im Brandfall", "beschreibung": "Alarmierung, Evakuierung, Aufgaben des Helfers"}, {"zeit": "11:45–13:00", "titel": "Praktische Löschübung", "beschreibung": "Handhabung von Feuerlöschern im Freien"}], "materialien": {"seminarunterlagen": [], "vorlagen": []}, "termine": [{"id": "s4", "datum": "2026-09-02", "trainer": "Thomas Weidner", "format": "Vor Ort", "ort": "Köln", "kapazitaet": 5, "status": "geplant", "checkliste": [{"label": "Raum gebucht", "erledigt": false}, {"label": "Technik geprüft", "erledigt": false}, {"label": "Unterlagen gedruckt", "erledigt": false}, {"label": "Einladungen versendet", "erledigt": false}, {"label": "Zertifikate vorbereitet", "erledigt": false}]}]}, {"id": "k7", "titel": "Erste-Hilfe-Kurs", "kategorie": "Arbeitssicherheit", "beschreibung": "Betrieblicher Erste-Hilfe-Kurs nach DGUV Grundsatz 304-001 zur Ausbildung betrieblicher Ersthelfer.", "lernziele": ["Grundlagen der Ersten Hilfe anwenden", "Lebensrettende Sofortmaßnahmen sicher durchführen", "Verhalten im Notfall koordinieren"], "zielgruppe": "Benannte Ersthelfer", "voraussetzungen": "Keine", "agenda": [{"zeit": "09:00–10:30", "titel": "Grundlagen der Ersten Hilfe", "beschreibung": "Absicherung, Notruf, Eigenschutz"}, {"zeit": "10:45–12:15", "titel": "Lebensrettende Sofortmaßnahmen", "beschreibung": "Stabile Seitenlage, Reanimation"}, {"zeit": "13:00–14:30", "titel": "Praxisübungen", "beschreibung": "Übungen an Fallbeispielen"}], "materialien": {"seminarunterlagen": [], "vorlagen": []}, "termine": [{"id": "s6", "datum": "2026-09-10", "trainer": "Nina Vogel", "format": "Vor Ort", "ort": "Berlin", "kapazitaet": 8, "status": "geplant", "checkliste": [{"label": "Raum gebucht", "erledigt": false}, {"label": "Technik geprüft", "erledigt": false}, {"label": "Unterlagen gedruckt", "erledigt": false}, {"label": "Einladungen versendet", "erledigt": false}, {"label": "Zertifikate vorbereitet", "erledigt": false}]}]}, {"id": "k8", "titel": "Datenschutz-Auffrischung", "kategorie": "Datenschutz", "beschreibung": "Jährliche Pflicht-Auffrischung der Datenschutzgrundlagen für alle Mitarbeitenden.", "lernziele": ["Datenschutzgrundlagen im Arbeitsalltag anwenden", "Typische Fehlerquellen vermeiden", "Aktuelle Änderungen kennen"], "zielgruppe": "Alle Mitarbeitenden", "voraussetzungen": "Vorherige Datenschutzschulung", "agenda": [{"zeit": "09:00–10:00", "titel": "Auffrischung der Grundlagen", "beschreibung": "Zentrale Prinzipien der DSGVO"}, {"zeit": "10:15–11:00", "titel": "Typische Fehlerquellen", "beschreibung": "Beispiele aus der Praxis"}], "materialien": {"seminarunterlagen": [], "vorlagen": []}, "termine": [{"id": "s8", "datum": "2026-08-27", "trainer": "Markus Feldmann", "format": "Online", "ort": "—", "kapazitaet": 25, "status": "geplant", "checkliste": [{"label": "Raum gebucht", "erledigt": false}, {"label": "Technik geprüft", "erledigt": false}, {"label": "Unterlagen gedruckt", "erledigt": false}, {"label": "Einladungen versendet", "erledigt": false}, {"label": "Zertifikate vorbereitet", "erledigt": false}]}]}], "teilnehmer": [{"id": "t1", "name": "Sarah Wagner", "firma": "Kanzlei Voss & Partner", "email": "sarah.wagner@kanzlei-voss-und-partner.de", "bestandskunde": true}, {"id": "t2", "name": "Paul Koch", "firma": "Kanzlei Voss & Partner", "email": "paul.koch@kanzlei-voss-und-partner.de", "bestandskunde": true}, {"id": "t3", "name": "Leon Krause", "firma": "Kanzlei Voss & Partner", "email": "leon.krause@kanzlei-voss-und-partner.de", "bestandskunde": true}, {"id": "t4", "name": "Lukas Schmidt", "firma": "Kanzlei Voss & Partner", "email": "lukas.schmidt@kanzlei-voss-und-partner.de", "bestandskunde": true}, {"id": "t5", "name": "Clara Peters", "firma": "Kanzlei Voss & Partner", "email": "clara.peters@kanzlei-voss-und-partner.de", "bestandskunde": true}, {"id": "t6", "name": "Mia Krause", "firma": "Kanzlei Voss & Partner", "email": "mia.krause@kanzlei-voss-und-partner.de", "bestandskunde": true}, {"id": "t7", "name": "Paul Krüger", "firma": "Klinik am Stadtpark", "email": "paul.krüger@klinik-am-stadtpark.de", "bestandskunde": true}, {"id": "t8", "name": "Anna Hoffmann", "firma": "Klinik am Stadtpark", "email": "anna.hoffmann@klinik-am-stadtpark.de", "bestandskunde": true}, {"id": "t9", "name": "Lea Becker", "firma": "Klinik am Stadtpark", "email": "lea.becker@klinik-am-stadtpark.de", "bestandskunde": true}, {"id": "t10", "name": "Hannah Wagner", "firma": "Klinik am Stadtpark", "email": "hannah.wagner@klinik-am-stadtpark.de", "bestandskunde": true}, {"id": "t11", "name": "David Neumann", "firma": "Klinik am Stadtpark", "email": "david.neumann@klinik-am-stadtpark.de", "bestandskunde": true}, {"id": "t12", "name": "Lukas Krüger", "firma": "Klinik am Stadtpark", "email": "lukas.krüger@klinik-am-stadtpark.de", "bestandskunde": true}, {"id": "t13", "name": "Finn Neumann", "firma": "Klinik am Stadtpark", "email": "finn.neumann@klinik-am-stadtpark.de", "bestandskunde": true}, {"id": "t14", "name": "Lukas Koch", "firma": "IT-Systemhaus Bergmann", "email": "lukas.koch@it-systemhaus-bergmann.de", "bestandskunde": true}, {"id": "t15", "name": "Paul Wagner", "firma": "IT-Systemhaus Bergmann", "email": "paul.wagner@it-systemhaus-bergmann.de", "bestandskunde": true}, {"id": "t16", "name": "Sarah Neumann", "firma": "IT-Systemhaus Bergmann", "email": "sarah.neumann@it-systemhaus-bergmann.de", "bestandskunde": true}, {"id": "t17", "name": "Marie Richter", "firma": "IT-Systemhaus Bergmann", "email": "marie.richter@it-systemhaus-bergmann.de", "bestandskunde": true}, {"id": "t18", "name": "Leon Weber", "firma": "Autohaus Meyer & Söhne", "email": "leon.weber@autohaus-meyer-und-soehne.de", "bestandskunde": true}, {"id": "t19", "name": "Jan Koch", "firma": "Autohaus Meyer & Söhne", "email": "jan.koch@autohaus-meyer-und-soehne.de", "bestandskunde": true}, {"id": "t20", "name": "Lea Krause", "firma": "Autohaus Meyer & Söhne", "email": "lea.krause@autohaus-meyer-und-soehne.de", "bestandskunde": true}, {"id": "t21", "name": "Leon Wolf", "firma": "Spedition Nordwind GmbH", "email": "leon.wolf@spedition-nordwind-gmbh.de", "bestandskunde": true}, {"id": "t22", "name": "Lukas Wolf", "firma": "Spedition Nordwind GmbH", "email": "lukas.wolf@spedition-nordwind-gmbh.de", "bestandskunde": true}, {"id": "t23", "name": "Marie Werner", "firma": "Spedition Nordwind GmbH", "email": "marie.werner@spedition-nordwind-gmbh.de", "bestandskunde": true}, {"id": "t24", "name": "Sarah Braun", "firma": "Spedition Nordwind GmbH", "email": "sarah.braun@spedition-nordwind-gmbh.de", "bestandskunde": true}, {"id": "t25", "name": "Sarah Krüger", "firma": "Spedition Nordwind GmbH", "email": "sarah.krüger@spedition-nordwind-gmbh.de", "bestandskunde": true}, {"id": "t26", "name": "Paul Krause", "firma": "Hotel Vier Jahreszeiten", "email": "paul.krause@hotel-vier-jahreszeiten.de", "bestandskunde": true}, {"id": "t27", "name": "Emma Zimmermann", "firma": "Hotel Vier Jahreszeiten", "email": "emma.zimmermann@hotel-vier-jahreszeiten.de", "bestandskunde": true}, {"id": "t28", "name": "Julia Neumann", "firma": "Bäckerei Feinbrot GmbH", "email": "julia.neumann@baeckerei-feinbrot-gmbh.de", "bestandskunde": false}, {"id": "t29", "name": "Laura Lehmann", "firma": "Bäckerei Feinbrot GmbH", "email": "laura.lehmann@baeckerei-feinbrot-gmbh.de", "bestandskunde": false}, {"id": "t30", "name": "Sophie Fischer", "firma": "Steuerberatung Lang", "email": "sophie.fischer@steuerberatung-lang.de", "bestandskunde": false}, {"id": "t31", "name": "Leon Zimmermann", "firma": "Pflegedienst Sonnenschein", "email": "leon.zimmermann@pflegedienst-sonnenschein.de", "bestandskunde": false}, {"id": "t32", "name": "Finn Krüger", "firma": "Café Lindenhof", "email": "finn.krüger@café-lindenhof.de", "bestandskunde": false}, {"id": "t33", "name": "Jan Schmidt", "firma": "IT-Systemhaus Bergmann", "email": "jan.schmidt@it-systemhaus-bergmann.de", "bestandskunde": true}], "buchungen": [{"id": "b1", "teilnehmerId": "t1", "terminId": "s1", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-23"}, {"id": "b2", "teilnehmerId": "t2", "terminId": "s1", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-07"}, {"id": "b3", "teilnehmerId": "t3", "terminId": "s1", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-23"}, {"id": "b4", "teilnehmerId": "t4", "terminId": "s5", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-06-04"}, {"id": "b5", "teilnehmerId": "t5", "terminId": "s5", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-04-27"}, {"id": "b6", "teilnehmerId": "t6", "terminId": "s8", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-07-06"}, {"id": "b7", "teilnehmerId": "t7", "terminId": "s3", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-07-14"}, {"id": "b8", "teilnehmerId": "t7", "terminId": "s7", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-04-10"}, {"id": "b9", "teilnehmerId": "t8", "terminId": "s3", "anmeldestatus": "abgesagt", "gebuchtAm": "2026-06-05"}, {"id": "b10", "teilnehmerId": "t9", "terminId": "s3", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-05"}, {"id": "b11", "teilnehmerId": "t9", "terminId": "s7", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-04-30"}, {"id": "b12", "teilnehmerId": "t10", "terminId": "s6", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-16"}, {"id": "b13", "teilnehmerId": "t10", "terminId": "s4", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-16"}, {"id": "b14", "teilnehmerId": "t11", "terminId": "s6", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-08-01"}, {"id": "b15", "teilnehmerId": "t12", "terminId": "s4", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-07-20"}, {"id": "b16", "teilnehmerId": "t13", "terminId": "s7", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-04-05"}, {"id": "b17", "teilnehmerId": "t14", "terminId": "s2", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-06-28"}, {"id": "b18", "teilnehmerId": "t15", "terminId": "s2", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-06-28"}, {"id": "b19", "teilnehmerId": "t16", "terminId": "s5", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-05-27"}, {"id": "b20", "teilnehmerId": "t17", "terminId": "s5", "anmeldestatus": "abgesagt", "gebuchtAm": "2026-06-03"}, {"id": "b21", "teilnehmerId": "t18", "terminId": "s4", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-07-10"}, {"id": "b22", "teilnehmerId": "t19", "terminId": "s4", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-24"}, {"id": "b23", "teilnehmerId": "t20", "terminId": "s6", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-24"}, {"id": "b24", "teilnehmerId": "t21", "terminId": "s3", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-06-19"}, {"id": "b25", "teilnehmerId": "t22", "terminId": "s3", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-07-07"}, {"id": "b26", "teilnehmerId": "t23", "terminId": "s3", "anmeldestatus": "abgesagt", "gebuchtAm": "2026-06-19"}, {"id": "b27", "teilnehmerId": "t24", "terminId": "s7", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-03-28"}, {"id": "b28", "teilnehmerId": "t25", "terminId": "s7", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-04-13"}, {"id": "b29", "teilnehmerId": "t26", "terminId": "s6", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-07-26"}, {"id": "b30", "teilnehmerId": "t27", "terminId": "s4", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-08-04"}, {"id": "b31", "teilnehmerId": "t28", "terminId": "s1", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-25"}, {"id": "b32", "teilnehmerId": "t29", "terminId": "s1", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-07-13"}, {"id": "b33", "teilnehmerId": "t30", "terminId": "s2", "anmeldestatus": "bestätigt", "gebuchtAm": "2026-07-02"}, {"id": "b34", "teilnehmerId": "t31", "terminId": "s3", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-06-23"}, {"id": "b35", "teilnehmerId": "t32", "terminId": "s8", "anmeldestatus": "angemeldet", "gebuchtAm": "2026-07-06"}, {"id": "b36", "teilnehmerId": "t33", "terminId": "s8", "anmeldestatus": "abgesagt", "gebuchtAm": "2026-07-16"}]};
+</script>
+<script>
+// ---- state-engine.js ----
+// Design/state-engine.js
+// Zentraler State: Laden aus localStorage (Fallback: SEED_DATA), Speichern,
+// Reset, Export/Import. Wird von shell-template.html vor den Seiten-Skripten
+// eingebunden. window.SEED_DATA muss vorher gesetzt sein.
+
+const STORAGE_KEY = 'schulungsplaner_state_v2';
+
+function ladeState() {
+  const roh = localStorage.getItem(STORAGE_KEY);
+  if (roh) {
+    try {
+      return JSON.parse(roh);
+    } catch (e) {
+      console.warn('Gespeicherter State ungültig, verwende Beispieldaten.', e);
+    }
+  }
+  return JSON.parse(JSON.stringify(window.SEED_DATA));
+}
+
+window.STATE = ladeState();
+
+function speichereState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(window.STATE));
+  if (typeof window.renderAll === 'function') {
+    window.renderAll();
+  }
+}
+
+function zuruecksetzenAufBeispieldaten() {
+  if (!confirm('Wirklich alle Änderungen verwerfen und auf die Beispieldaten zurücksetzen?')) {
+    return;
+  }
+  window.STATE = JSON.parse(JSON.stringify(window.SEED_DATA));
+  speichereState();
+}
+
+function exportiereJSON() {
+  const inhalt = JSON.stringify(window.STATE, null, 2);
+  const blob = new Blob([inhalt], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const heute = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `schulungsplaner-export-${heute}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function importiereJSON(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const geparst = JSON.parse(reader.result);
+        if (!geparst.kurse || !geparst.teilnehmer || !geparst.buchungen) {
+          throw new Error('Datei enthält nicht die erwarteten Felder (kurse/teilnehmer/buchungen).');
+        }
+        window.STATE = geparst;
+        speichereState();
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file, 'utf-8');
+  });
+}
+
+function naechsteId(praefix, liste) {
+  let hoechste = 0;
+  for (const eintrag of liste) {
+    const match = String(eintrag.id).match(new RegExp(`^${praefix}(\\d+)$`));
+    if (match) {
+      hoechste = Math.max(hoechste, parseInt(match[1], 10));
+    }
+  }
+  return `${praefix}${hoechste + 1}`;
+}
+
+// -- Suche --
+
+function findeKurs(kursId) {
+  return window.STATE.kurse.find(k => k.id === kursId);
+}
+
+function findeTerminMitKurs(terminId) {
+  for (const kurs of window.STATE.kurse) {
+    const termin = kurs.termine.find(t => t.id === terminId);
+    if (termin) return { kurs, termin };
+  }
+  return undefined;
+}
+
+// -- Kurs-CRUD --
+
+function erstelleKurs(felder) {
+  const id = naechsteId('k', window.STATE.kurse);
+  window.STATE.kurse.push({
+    id,
+    titel: felder.titel,
+    kategorie: felder.kategorie,
+    beschreibung: felder.beschreibung || '',
+    lernziele: felder.lernziele || [],
+    zielgruppe: felder.zielgruppe || '',
+    voraussetzungen: felder.voraussetzungen || '',
+    agenda: [],
+    materialien: { seminarunterlagen: [], vorlagen: [] },
+    termine: [],
+  });
+  speichereState();
+  return id;
+}
+
+function aktualisiereKurs(kursId, felder) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  Object.assign(kurs, felder);
+  speichereState();
+}
+
+function loescheKurs(kursId) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  const terminIds = new Set(kurs.termine.map(t => t.id));
+  window.STATE.buchungen = window.STATE.buchungen.filter(b => !terminIds.has(b.terminId));
+  window.STATE.kurse = window.STATE.kurse.filter(k => k.id !== kursId);
+  speichereState();
+}
+
+// -- Termin-CRUD --
+
+const STANDARD_CHECKLISTE = [
+  'Raum gebucht', 'Technik geprüft', 'Unterlagen gedruckt',
+  'Einladungen versendet', 'Zertifikate vorbereitet',
+];
+
+function alleTermine() {
+  return window.STATE.kurse.flatMap(k => k.termine);
+}
+
+function erstelleTermin(kursId, felder) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  const id = naechsteId('tm', alleTermine());
+  kurs.termine.push({
+    id,
+    datum: felder.datum,
+    trainer: felder.trainer,
+    format: felder.format,
+    ort: felder.ort,
+    kapazitaet: felder.kapazitaet,
+    status: felder.status || 'geplant',
+    checkliste: STANDARD_CHECKLISTE.map(label => ({ label, erledigt: false })),
+  });
+  speichereState();
+  return id;
+}
+
+function aktualisiereTermin(terminId, felder) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  Object.assign(gefunden.termin, felder);
+  speichereState();
+}
+
+function loescheTermin(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  gefunden.kurs.termine = gefunden.kurs.termine.filter(t => t.id !== terminId);
+  window.STATE.buchungen = window.STATE.buchungen.filter(b => b.terminId !== terminId);
+  speichereState();
+}
+
+// -- Checkliste (pro Termin) --
+
+function checklistePunktToggeln(terminId, index) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  const punkt = gefunden.termin.checkliste[index];
+  if (!punkt) throw new Error(`Checklistenpunkt ${index} nicht gefunden`);
+  punkt.erledigt = !punkt.erledigt;
+  speichereState();
+}
+
+function checklistePunktHinzufuegen(terminId, label) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  gefunden.termin.checkliste.push({ label, erledigt: false });
+  speichereState();
+}
+
+function checklistePunktEntfernen(terminId, index) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  gefunden.termin.checkliste.splice(index, 1);
+  speichereState();
+}
+
+// -- Agenda (kursweit) --
+
+function agendaPunktHinzufuegen(kursId, punkt) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  kurs.agenda.push(punkt);
+  speichereState();
+}
+
+function agendaPunktEntfernen(kursId, index) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  kurs.agenda.splice(index, 1);
+  speichereState();
+}
+
+// -- Teilnehmer & Buchungen --
+
+function erstelleTeilnehmer(felder) {
+  const id = naechsteId('t', window.STATE.teilnehmer);
+  window.STATE.teilnehmer.push({
+    id,
+    name: felder.name,
+    firma: felder.firma,
+    email: felder.email,
+    bestandskunde: !!felder.bestandskunde,
+  });
+  speichereState();
+  return id;
+}
+
+function erstelleBuchung(felder) {
+  const id = naechsteId('b', window.STATE.buchungen);
+  window.STATE.buchungen.push({
+    id,
+    teilnehmerId: felder.teilnehmerId,
+    terminId: felder.terminId,
+    anmeldestatus: felder.anmeldestatus || 'angemeldet',
+    gebuchtAm: new Date().toISOString().slice(0, 10),
+  });
+  speichereState();
+  return id;
+}
+
+function aktualisiereBuchungStatus(buchungId, neuerStatus) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  buchung.anmeldestatus = neuerStatus;
+  speichereState();
+}
+
+function loescheBuchung(buchungId) {
+  window.STATE.buchungen = window.STATE.buchungen.filter(b => b.id !== buchungId);
+  speichereState();
+}
+
+// -- Abgeleitete Daten --
+
+function terminAuslastung(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  const belegt = window.STATE.buchungen.filter(
+    b => b.terminId === terminId && b.anmeldestatus !== 'abgesagt'
+  ).length;
+  const kapazitaet = gefunden.termin.kapazitaet;
+  return {
+    belegt,
+    kapazitaet,
+    frei: Math.max(0, kapazitaet - belegt),
+    prozent: kapazitaet > 0 ? Math.round((belegt / kapazitaet) * 100) : 0,
+  };
+}
+
+function naechsteZweiTermine(kursId) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  const heute = new Date().toISOString().slice(0, 10);
+  const sortiert = [...kurs.termine].sort((a, b) => a.datum.localeCompare(b.datum));
+  const kommende = sortiert.filter(t => t.datum >= heute);
+  const vergangene = sortiert.filter(t => t.datum < heute).reverse();
+  return [...kommende, ...vergangene].slice(0, 2);
+}
+
+function buchungenFuerTermin(terminId) {
+  return window.STATE.buchungen.filter(b => b.terminId === terminId);
+}
+
+function buchungenSortiertNeuesteZuerst() {
+  return [...window.STATE.buchungen].sort((a, b) => b.gebuchtAm.localeCompare(a.gebuchtAm));
+}
+
+function buchungshistorieFirma(firma) {
+  const zaehlerNachTitel = {};
+  for (const buchung of window.STATE.buchungen) {
+    const teilnehmer = window.STATE.teilnehmer.find(t => t.id === buchung.teilnehmerId);
+    if (!teilnehmer || teilnehmer.firma !== firma) continue;
+    const gefunden = findeTerminMitKurs(buchung.terminId);
+    if (!gefunden) continue;
+    const titel = gefunden.kurs.titel;
+    zaehlerNachTitel[titel] = (zaehlerNachTitel[titel] || 0) + 1;
+  }
+  return Object.entries(zaehlerNachTitel)
+    .map(([titel, anzahl]) => ({ titel, anzahl }))
+    .sort((a, b) => b.anzahl - a.anzahl);
+}
+
+// -- Materialien-Referenzen (Datei-Inhalt liegt in IndexedDB, siehe file-store.js) --
+
+function materialHinzufuegen(kursId, bereich, referenz) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  kurs.materialien[bereich].push(referenz);
+  speichereState();
+}
+
+function materialEntfernen(kursId, bereich, dateiId) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  kurs.materialien[bereich] = kurs.materialien[bereich].filter(d => d.id !== dateiId);
+  speichereState();
+}
+
+
+// ---- file-store.js ----
+// Design/file-store.js
+// IndexedDB-Speicher fuer hochgeladene Materialien-Dateien. Referenzen
+// (Name/Typ/Groesse) leben im normalen State (localStorage), der Blob-Inhalt
+// liegt separat in IndexedDB, da localStorage zu klein fuer Dateien ist.
+
+const DATEI_DB_NAME = 'schulungsplaner_dateien';
+const DATEI_STORE = 'dateien';
+
+function oeffneDateiDB() {
+  return new Promise((resolve, reject) => {
+    const anfrage = indexedDB.open(DATEI_DB_NAME, 1);
+    anfrage.onupgradeneeded = () => {
+      anfrage.result.createObjectStore(DATEI_STORE, { keyPath: 'id' });
+    };
+    anfrage.onsuccess = () => resolve(anfrage.result);
+    anfrage.onerror = () => reject(anfrage.error);
+  });
+}
+
+function neueDateiId() {
+  return `d${Date.now()}${Math.floor(Math.random() * 10000)}`;
+}
+
+async function speichereDatei(datei, { kursId, bereich }) {
+  if (!findeKurs(kursId)) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  const db = await oeffneDateiDB();
+  const id = neueDateiId();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(DATEI_STORE, 'readwrite');
+    tx.objectStore(DATEI_STORE).put({ id, blob: datei });
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+  materialHinzufuegen(kursId, bereich, {
+    id, name: datei.name, typ: datei.type || 'application/octet-stream', groesse: datei.size,
+  });
+  return id;
+}
+
+async function ladeDateiBlob(dateiId) {
+  const db = await oeffneDateiDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DATEI_STORE, 'readonly');
+    const anfrage = tx.objectStore(DATEI_STORE).get(dateiId);
+    anfrage.onsuccess = () => resolve(anfrage.result ? anfrage.result.blob : null);
+    anfrage.onerror = () => reject(anfrage.error);
+  });
+}
+
+async function loescheDateiUndReferenz(dateiId, kursId, bereich) {
+  if (!findeKurs(kursId)) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  const db = await oeffneDateiDB();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(DATEI_STORE, 'readwrite');
+    tx.objectStore(DATEI_STORE).delete(dateiId);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+  materialEntfernen(kursId, bereich, dateiId);
+}
+
+async function herunterladeDatei(dateiId, dateiName) {
+  const blob = await ladeDateiBlob(dateiId);
+  if (!blob) {
+    alert('Datei wurde nicht gefunden (evtl. nach einem Import ohne Dateien).');
+    return;
+  }
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = dateiName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+
+// ---- ui-helpers.js ----
+// Design/ui-helpers.js
+// Generische UI-Helfer: Dialog-Overlay oeffnen/schliessen, Formular auslesen.
+// Destruktive Bestaetigungen (Loeschen) laufen bewusst ueber das native
+// confirm(), nicht ueber einen eigenen Dialog - konsistent mit
+// zuruecksetzenAufBeispieldaten() aus state-engine.js.
+
+function oeffneDialog(innerHtml) {
+  const overlay = document.getElementById('dialog-overlay');
+  const container = document.getElementById('dialog-container');
+  container.innerHTML = innerHtml;
+  overlay.style.display = 'flex';
+}
+
+function schliesseDialog() {
+  const overlay = document.getElementById('dialog-overlay');
+  document.getElementById('dialog-container').innerHTML = '';
+  overlay.style.display = 'none';
+}
+
+function formularWerte(formElement) {
+  return Object.fromEntries(new FormData(formElement).entries());
+}
+
+function formatiereDatum(isoDatum) {
+  const [jahr, monat, tag] = isoDatum.split('-');
+  return `${tag}.${monat}.${jahr}`;
+}
+
+// Einheitliche Status-Farb-Zuordnung app-weit (siehe design-spec.md):
+// Gruen=bestaetigt/aktiv, Amber=angemeldet/geplant, Grau=abgeschlossen,
+// Rot=abgesagt, Indigo=ausgebucht/voll (Indigo wird direkt an den
+// Aufrufstellen mit terminAuslastung() gesetzt, nicht hier).
+
+function statusBadgeHtml(status) {
+  const zuordnung = {
+    geplant: ['badge-amber', 'geplant'],
+    laufend: ['badge-green', 'laufend'],
+    abgeschlossen: ['badge-gray', 'abgeschlossen'],
+  };
+  const [klasse, label] = zuordnung[status] || ['badge-gray', status];
+  return `<span class="badge ${klasse}">${label}</span>`;
+}
+
+function anmeldestatusBadgeHtml(status) {
+  const zuordnung = {
+    angemeldet: ['badge-amber', 'angemeldet'],
+    bestätigt: ['badge-green', 'bestätigt'],
+    abgesagt: ['badge-red', 'abgesagt'],
+  };
+  const [klasse, label] = zuordnung[status] || ['badge-gray', status];
+  return `<span class="badge ${klasse}">${label}</span>`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('dialog-overlay');
+  overlay.addEventListener('click', (ev) => {
+    if (ev.target === overlay) schliesseDialog();
+  });
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') schliesseDialog();
+  });
+});
+
+</script>
+<script>
+
+</script>
+<script>
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
@@ -2109,16 +1750,36 @@ function showPage(id) {
   document.querySelector('.main').scrollTop = 0;
 }
 
-// Von der Schulungen-Liste aufgerufen: navigiert zur Detailseite und zeigt
-// das passende, vorgerenderte Detail-Panel (id="detail-<schulungId>").
-function showSchulungDetail(id) {
+// Von der Schulungen-Liste aufgerufen: navigiert zur Detailseite und rendert
+// den passenden Termin (terminId, nicht kursId).
+function showSchulungDetail(terminId) {
+  window.AKTUELLER_TERMIN_ID = terminId;
   showPage('schulungdetail');
-  document.querySelectorAll('.detail-panel').forEach(el => el.style.display = 'none');
-  var target = document.getElementById('detail-' + id);
-  if (target) target.style.display = 'block';
+  if (typeof renderSchulungdetail === 'function') {
+    renderSchulungdetail(terminId);
+  }
 }
 
-// Deep-Link ueber URL-Hash, z.B. index.html#schulungen oder index.html#detail-s3
+document.getElementById('import-input').addEventListener('change', (ev) => {
+  const datei = ev.target.files[0];
+  if (!datei) return;
+  importiereJSON(datei)
+    .then(() => alert('Import erfolgreich.'))
+    .catch(err => alert('Import fehlgeschlagen: ' + err.message));
+  ev.target.value = '';
+});
+
+function renderAll() {
+  if (typeof renderUebersicht === 'function') renderUebersicht();
+  if (typeof renderSchulungen === 'function') renderSchulungen();
+  if (typeof renderSchulungdetail === 'function') renderSchulungdetail(window.AKTUELLER_TERMIN_ID);
+  if (typeof renderBuchungen === 'function') renderBuchungen();
+}
+window.renderAll = renderAll;
+
+renderAll();
+
+// Deep-Link ueber URL-Hash, z.B. index.html#schulungen oder index.html#detail-s1
 (function () {
   var hash = location.hash.replace('#', '');
   if (!hash) return;
