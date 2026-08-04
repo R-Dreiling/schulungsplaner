@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Fuegt Shell-Template + gemeinsames CSS + Seiten-Fragmente + Beispieldaten
-zu einer einzigen, eigenstaendigen index.html zusammen."""
+"""Fuegt Shell-Template + gemeinsames CSS + JS-Module + Seiten-Fragmente +
+Beispieldaten zu einer einzigen, eigenstaendigen index.html zusammen."""
 import json
 from pathlib import Path
 
@@ -17,19 +17,31 @@ base_css = read(BASE / "styles.css")
 logo_b64 = read(BASE / "logo-invers.b64.txt").strip()
 
 page_css_parts = []
-for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-teilnehmer", "page-kunden"]:
+for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-buchungen"]:
     css = read(FRAGMENTS / f"{name}.css")
     if css.strip():
         page_css_parts.append(f"/* ---- {name}.css ---- */\n{css}")
 page_css = "\n\n".join(page_css_parts)
+
+core_js_parts = []
+for name in ["state-engine", "file-store", "ui-helpers"]:
+    js = read(BASE / f"{name}.js")
+    core_js_parts.append(f"// ---- {name}.js ----\n{js}")
+core_js = "\n\n".join(core_js_parts)
+
+page_js_parts = []
+for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-buchungen"]:
+    js = read(FRAGMENTS / f"{name}.js")
+    if js.strip():
+        page_js_parts.append(f"// ---- {name}.js ----\n{js}")
+page_js = "\n\n".join(page_js_parts)
 
 pages = {}
 for key, fname in [
     ("PAGE_UEBERSICHT", "page-uebersicht.html"),
     ("PAGE_SCHULUNGEN", "page-schulungen.html"),
     ("PAGE_SCHULUNGDETAIL", "page-schulungdetail.html"),
-    ("PAGE_TEILNEHMER", "page-teilnehmer.html"),
-    ("PAGE_KUNDEN", "page-kunden.html"),
+    ("PAGE_BUCHUNGEN", "page-buchungen.html"),
 ]:
     pages[key] = read(FRAGMENTS / fname, f"<p>FEHLT: {fname}</p>")
 
@@ -41,6 +53,8 @@ html = template
 html = html.replace("{{BASE_CSS}}", base_css)
 html = html.replace("{{PAGE_CSS}}", page_css)
 html = html.replace("{{LOGO_B64}}", logo_b64)
+html = html.replace("{{CORE_JS}}", core_js)
+html = html.replace("{{PAGE_JS}}", page_js)
 html = html.replace("{{DATA_JSON}}", data_json_str)
 for key, content in pages.items():
     html = html.replace("{{" + key + "}}", content)
