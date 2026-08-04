@@ -1,17 +1,16 @@
 <div class="page-header">
-  <h1>Schulungen</h1>
-  <p class="subtitle">8 gebuchte Schulungen · Titel anklicken für Details und Teilnehmerliste</p>
+  <div class="page-header-text">
+    <h1>Schulungen</h1>
+    <p class="subtitle">Kurse und ihre Termine verwalten.</p>
+  </div>
+  <div class="page-header-actions">
+    <button class="btn btn-primary" onclick="oeffneNeuerKursDialog()">+ Neuer Kurs</button>
+  </div>
 </div>
 
 <div class="filter-bar">
-  <input type="text" id="schulungen-search" class="filter-input" placeholder="Schulung suchen …" />
-  <select id="schulungen-status-filter" class="filter-select">
-    <option value="">Status: Alle</option>
-    <option value="geplant">Geplant</option>
-    <option value="laufend">Laufend</option>
-    <option value="abgeschlossen">Abgeschlossen</option>
-  </select>
-  <select id="schulungen-kategorie-filter" class="filter-select">
+  <input type="text" id="schulungen-suche" class="filter-input" placeholder="Kurs suchen …" oninput="renderSchulungen()" />
+  <select id="schulungen-kategorie-filter" class="filter-select" onchange="renderSchulungen()">
     <option value="">Kategorie: Alle</option>
     <option value="Datenschutz">Datenschutz</option>
     <option value="Compliance">Compliance</option>
@@ -19,125 +18,6 @@
   </select>
 </div>
 
-<div class="card">
-  <table class="data-table clickable" id="schulungen-table">
-    <thead>
-      <tr>
-        <th>Titel</th>
-        <th>Kategorie</th>
-        <th>Datum</th>
-        <th>Trainer</th>
-        <th>Format / Ort</th>
-        <th>Status</th>
-        <th>Teilnehmer</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr onclick="showSchulungDetail('s1')" data-titel="Datenschutzbeauftragter Grundlagenschulung" data-status="geplant" data-kategorie="Datenschutz">
-        <td class="cell-strong">Datenschutzbeauftragter Grundlagenschulung</td>
-        <td>Datenschutz</td>
-        <td>12.08.2026</td>
-        <td>Dr. Julia Berg</td>
-        <td>Vor Ort · Hamburg</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
-        <td>5 / 10</td>
-      </tr>
-      <tr onclick="showSchulungDetail('s2')" data-titel="Hinweisgeberschutz kompakt" data-status="geplant" data-kategorie="Compliance">
-        <td class="cell-strong">Hinweisgeberschutz kompakt</td>
-        <td>Compliance</td>
-        <td>19.08.2026</td>
-        <td>Markus Feldmann</td>
-        <td>Online</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
-        <td>3 / 18</td>
-      </tr>
-      <tr onclick="showSchulungDetail('s3')" data-titel="Arbeitssicherheit Basisschulung" data-status="laufend" data-kategorie="Arbeitssicherheit">
-        <td class="cell-strong">Arbeitssicherheit Basisschulung</td>
-        <td>Arbeitssicherheit</td>
-        <td>30.07.2026</td>
-        <td>Sabine Kroll</td>
-        <td>Vor Ort · München</td>
-        <td><span class="badge badge-green"><span class="badge-dot"></span>Laufend</span></td>
-        <td>7 / 7 <span class="badge badge-red">Ausgebucht</span></td>
-      </tr>
-      <tr onclick="showSchulungDetail('s4')" data-titel="Brandschutzhelfer Ausbildung" data-status="geplant" data-kategorie="Arbeitssicherheit">
-        <td class="cell-strong">Brandschutzhelfer Ausbildung</td>
-        <td>Arbeitssicherheit</td>
-        <td>02.09.2026</td>
-        <td>Thomas Weidner</td>
-        <td>Vor Ort · Köln</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
-        <td>5 / 5 <span class="badge badge-red">Ausgebucht</span></td>
-      </tr>
-      <tr onclick="showSchulungDetail('s5')" data-titel="DSGVO Update für Führungskräfte" data-status="abgeschlossen" data-kategorie="Datenschutz">
-        <td class="cell-strong">DSGVO Update für Führungskräfte</td>
-        <td>Datenschutz</td>
-        <td>18.06.2026</td>
-        <td>Dr. Julia Berg</td>
-        <td>Online</td>
-        <td><span class="badge badge-gray"><span class="badge-dot"></span>Abgeschlossen</span></td>
-        <td>4 / 12</td>
-      </tr>
-      <tr onclick="showSchulungDetail('s6')" data-titel="Erste-Hilfe-Kurs" data-status="geplant" data-kategorie="Arbeitssicherheit">
-        <td class="cell-strong">Erste-Hilfe-Kurs</td>
-        <td>Arbeitssicherheit</td>
-        <td>10.09.2026</td>
-        <td>Nina Vogel</td>
-        <td>Vor Ort · Berlin</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
-        <td>4 / 8</td>
-      </tr>
-      <tr onclick="showSchulungDetail('s7')" data-titel="Gefährdungsbeurteilung Workshop" data-status="abgeschlossen" data-kategorie="Arbeitssicherheit">
-        <td class="cell-strong">Gefährdungsbeurteilung Workshop</td>
-        <td>Arbeitssicherheit</td>
-        <td>14.05.2026</td>
-        <td>Sabine Kroll</td>
-        <td>Vor Ort · Stuttgart</td>
-        <td><span class="badge badge-gray"><span class="badge-dot"></span>Abgeschlossen</span></td>
-        <td>5 / 8</td>
-      </tr>
-      <tr onclick="showSchulungDetail('s8')" data-titel="Datenschutz-Auffrischung" data-status="geplant" data-kategorie="Datenschutz">
-        <td class="cell-strong">Datenschutz-Auffrischung</td>
-        <td>Datenschutz</td>
-        <td>27.08.2026</td>
-        <td>Markus Feldmann</td>
-        <td>Online</td>
-        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
-        <td>3 / 25</td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="empty-hint" id="schulungen-empty-hint" style="display:none;">Keine Schulungen gefunden — Suchbegriff oder Filter anpassen.</p>
+<div class="card" style="padding:6px 22px;">
+  <div id="schulungen-kursliste"></div>
 </div>
-
-<script>
-(function () {
-  var searchInput = document.getElementById('schulungen-search');
-  var statusFilter = document.getElementById('schulungen-status-filter');
-  var kategorieFilter = document.getElementById('schulungen-kategorie-filter');
-  var rows = Array.prototype.slice.call(document.querySelectorAll('#schulungen-table tbody tr'));
-  var emptyHint = document.getElementById('schulungen-empty-hint');
-
-  function applyFilters() {
-    var query = searchInput.value.trim().toLowerCase();
-    var status = statusFilter.value;
-    var kategorie = kategorieFilter.value;
-    var visibleCount = 0;
-
-    rows.forEach(function (row) {
-      var matchesQuery = !query || row.getAttribute('data-titel').toLowerCase().indexOf(query) !== -1;
-      var matchesStatus = !status || row.getAttribute('data-status') === status;
-      var matchesKategorie = !kategorie || row.getAttribute('data-kategorie') === kategorie;
-      var visible = matchesQuery && matchesStatus && matchesKategorie;
-      row.style.display = visible ? '' : 'none';
-      if (visible) visibleCount++;
-    });
-
-    emptyHint.style.display = visibleCount === 0 ? 'block' : 'none';
-  }
-
-  searchInput.addEventListener('input', applyFilters);
-  statusFilter.addEventListener('change', applyFilters);
-  kategorieFilter.addEventListener('change', applyFilters);
-})();
-</script>
