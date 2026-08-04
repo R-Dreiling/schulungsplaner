@@ -275,3 +275,110 @@ table.data-table.clickable tbody tr { cursor: pointer; }
 .list-row:last-child { border-bottom: none; }
 
 .empty-hint { color: var(--muted2); font-size: 13px; padding: 16px 0; }
+
+/* ========================================================================
+   v2-Ergaenzungen: Kurs/Termin/Buchung-Umbau. Verbindliche Klassen fuer
+   alle Seiten-Fragmente (page-uebersicht/-schulungen/-schulungdetail/
+   -buchungen) - keine seitenspezifischen Abweichungen dieser Muster.
+   ======================================================================== */
+
+/* Seitenkopf mit optionaler primaerer Aktion rechts */
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.page-header-text h1 { font-size: 21px; font-weight: 700; margin: 0 0 4px 0; }
+.page-header-text .subtitle { font-size: 13px; color: var(--muted); margin: 0; }
+.page-header-actions { display: flex; gap: 8px; flex: none; }
+
+/* Sidebar Werkzeuge (Export/Import/Reset) */
+.sidebar-tools { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.sidebar-tool-btn {
+  font-family: var(--font-display); font-size: 11.5px; font-weight: 600;
+  color: #b8bfd6; background: transparent; border: none; text-align: left;
+  padding: 4px 2px; border-radius: 6px; cursor: pointer;
+}
+.sidebar-tool-btn:hover { color: #fff; }
+
+/* Zurueck-Link auf Detailseiten */
+.crumb { font-size: 12.5px; color: var(--indigo-deep); font-weight: 600; font-family: var(--font-display); margin-bottom: 14px; cursor: pointer; background: none; border: none; padding: 0; }
+
+/* Destruktive Sekundaer-Aktion (Loeschen-Buttons) */
+.btn-ghost-red { color: var(--status-red-fg); border-color: #F3D4D1; }
+
+/* Dialoge (Formulare: Neuer Kurs/Termin/Teilnehmer/Buchung) */
+.dialog-overlay { position: fixed; inset: 0; background: rgba(10,16,40,0.45); align-items: center; justify-content: center; z-index: 100; }
+.dialog { width: 480px; max-width: calc(100vw - 40px); background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-pop); overflow: hidden; }
+.dialog-head { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+.dialog-head h3 { margin: 0; font-size: 15px; }
+.dialog-close { color: var(--muted2); font-size: 18px; cursor: pointer; background: none; border: none; }
+.dialog-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; max-height: 60vh; overflow-y: auto; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field label { font-family: var(--font-display); font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.field input, .field select, .field textarea {
+  font-family: var(--font-body); font-size: 13px; padding: 9px 11px;
+  border: 1px solid var(--line-strong); border-radius: 8px; color: var(--ink); background: #fff;
+}
+.dialog-foot { padding: 16px 22px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Schulungsdetail: Sprungmarken-Navigation (Layout-Option B) */
+.detail-layout { display: flex; gap: 24px; align-items: flex-start; }
+.detail-nav { width: 168px; flex: none; position: sticky; top: 0; display: flex; flex-direction: column; gap: 2px; }
+.detail-nav a { font-family: var(--font-display); font-size: 12.5px; font-weight: 600; color: var(--muted); text-decoration: none; padding: 8px 10px; border-radius: 8px; border-left: 2px solid transparent; cursor: pointer; }
+.detail-nav a.active { color: var(--ink); background: var(--card-2); border-left-color: var(--teal-deep); }
+.detail-main { flex: 1; min-width: 0; }
+
+/* Agenda */
+.agenda-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.agenda-item:last-child { border-bottom: none; }
+.agenda-time { font-family: var(--font-display); font-size: 12.5px; font-weight: 700; color: var(--teal-deep); width: 92px; flex: none; }
+.agenda-title { font-weight: 600; color: var(--ink); font-size: 13.5px; margin-bottom: 2px; }
+.agenda-desc { font-size: 12.5px; color: var(--muted); }
+
+/* Lernziele */
+.goal-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.goal-list li { display: flex; gap: 9px; font-size: 13px; align-items: flex-start; }
+.goal-list li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--indigo-deep); margin-top: 6px; flex: none; }
+.pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.pill { font-size: 11.5px; font-family: var(--font-display); font-weight: 600; background: var(--card-2); border: 1px solid var(--line); padding: 4px 10px; border-radius: 8px; color: var(--text); }
+
+/* Materialien */
+.mat-group-label { font-family: var(--font-display); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin: 4px 0 10px 0; }
+.mat-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.mat-row:last-child { border-bottom: none; }
+.mat-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--card-2); display: flex; align-items: center; justify-content: center; flex: none; font-size: 14px; }
+.mat-name { font-weight: 600; color: var(--ink); font-size: 13px; }
+.mat-sub { font-size: 11.5px; color: var(--muted2); }
+.mat-actions { margin-left: auto; display: flex; gap: 6px; }
+
+/* Checkliste */
+.check-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.check-row:last-child { border-bottom: none; }
+.check-box { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--line-strong); flex: none; display: flex; align-items: center; justify-content: center; cursor: pointer; background: none; padding: 0; }
+.check-box.done { background: var(--teal-deep); border-color: var(--teal-deep); color: #fff; font-size: 12px; }
+.check-row.done .lbl { color: var(--muted2); text-decoration: line-through; }
+
+/* Status: ausgebucht/voll (Design-Bereinigung, einheitliche Zuordnung) */
+.badge-indigo { background: #ECEEFF; color: var(--indigo-deep); }
+
+/* Ausklapp-Zeilen (Uebersicht-Kurszeilen, Buchungs-Kundenhistorie) */
+.expand-row { cursor: pointer; }
+.expand-toggle { display: inline-block; transition: transform 0.15s ease; margin-right: 6px; color: var(--muted2); }
+.expand-toggle.open { transform: rotate(90deg); }
+.expand-content { display: none; padding: 10px 14px 14px 14px; background: var(--card-2); border-top: 1px solid var(--line); }
+.expand-content.open { display: block; }
+
+/* Uebersicht: zwei Termine nebeneinander je Kurs */
+.termin-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.termin-col { padding: 12px 14px; background: var(--card-2); border-radius: var(--radius-md); }
+.termin-col-label { font-family: var(--font-display); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--muted); margin-bottom: 6px; }
+
+/* Tabellen: feste Zeilenhoehe + Textkuerzung (Design-Bereinigung) */
+table.data-table.fixed-rows tbody tr { height: 46px; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 1px; }
+
+/* Buchungen: neue/kuerzliche Buchung hervorheben */
+.buchung-neu { box-shadow: inset 3px 0 0 var(--teal-deep); }
+
+/* Uebersicht: zwei Spalten, beide mit gedeckelter Hoehe + eigenem Scroll,
+   damit die Spalten nie unterschiedlich hoch "auslaufen" (v1-Problem) */
+.uebersicht-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; align-items: start; }
+.uebersicht-grid .card { max-height: 560px; overflow-y: auto; }
