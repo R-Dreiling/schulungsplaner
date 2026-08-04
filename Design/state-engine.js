@@ -144,7 +144,7 @@ function alleTermine() {
 function erstelleTermin(kursId, felder) {
   const kurs = findeKurs(kursId);
   if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
-  const id = naechsteId('t', alleTermine());
+  const id = naechsteId('tm', alleTermine());
   kurs.termine.push({
     id,
     datum: felder.datum,
