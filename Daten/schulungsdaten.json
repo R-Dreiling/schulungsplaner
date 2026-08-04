@@ -1,92 +1,593 @@
 {
-  "schulungen": [
+  "kurse": [
     {
-      "id": "s1",
+      "id": "k1",
       "titel": "Datenschutzbeauftragter Grundlagenschulung",
       "kategorie": "Datenschutz",
-      "datum": "2026-08-12",
-      "trainer": "Dr. Julia Berg",
-      "format": "Vor Ort",
-      "ort": "Hamburg",
-      "kapazitaet": 10,
-      "status": "geplant"
+      "beschreibung": "Grundlagenschulung für neu bestellte oder angehende Datenschutzbeauftragte. Vermittelt die rechtlichen Grundlagen der DSGVO sowie die praktische Umsetzung im Unternehmensalltag.",
+      "lernziele": [
+        "Rechtliche Grundlagen der DSGVO und des BDSG verstehen",
+        "Rollen und Pflichten des Datenschutzbeauftragten kennen",
+        "Ein Verfahrensverzeichnis eigenständig aufbauen können",
+        "Meldepflichten bei Datenschutzverstößen sicher anwenden"
+      ],
+      "zielgruppe": "Neue und angehende Datenschutzbeauftragte",
+      "voraussetzungen": "Keine",
+      "agenda": [
+        {
+          "zeit": "09:00–10:30",
+          "titel": "Rechtliche Grundlagen der DSGVO",
+          "beschreibung": "Überblick über Verordnung, BDSG und Zusammenspiel"
+        },
+        {
+          "zeit": "10:45–12:00",
+          "titel": "Rollen & Pflichten des DSB",
+          "beschreibung": "Bestellung, Stellung im Unternehmen, Haftung"
+        },
+        {
+          "zeit": "13:00–14:30",
+          "titel": "Verfahrensverzeichnis in der Praxis",
+          "beschreibung": "Aufbau und Pflege anhand von Beispielen"
+        },
+        {
+          "zeit": "14:45–16:00",
+          "titel": "Meldepflichten & Vorfallmanagement",
+          "beschreibung": "Ablauf bei Datenschutzverstößen, Fristen"
+        }
+      ],
+      "materialien": {
+        "seminarunterlagen": [],
+        "vorlagen": []
+      },
+      "termine": [
+        {
+          "id": "s1",
+          "datum": "2026-08-12",
+          "trainer": "Dr. Julia Berg",
+          "format": "Vor Ort",
+          "ort": "Hamburg",
+          "kapazitaet": 10,
+          "status": "geplant",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": false
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": false
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": false
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": false
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": false
+            }
+          ]
+        },
+        {
+          "id": "s1b",
+          "datum": "2026-11-18",
+          "trainer": "Dr. Julia Berg",
+          "format": "Vor Ort",
+          "ort": "Hamburg",
+          "kapazitaet": 10,
+          "status": "geplant",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": false
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": false
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": false
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": false
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "s2",
-      "titel": "Hinweisgeberschutz kompakt",
-      "kategorie": "Compliance",
-      "datum": "2026-08-19",
-      "trainer": "Markus Feldmann",
-      "format": "Online",
-      "ort": "—",
-      "kapazitaet": 18,
-      "status": "geplant"
-    },
-    {
-      "id": "s3",
-      "titel": "Arbeitssicherheit Basisschulung",
-      "kategorie": "Arbeitssicherheit",
-      "datum": "2026-07-30",
-      "trainer": "Sabine Kroll",
-      "format": "Vor Ort",
-      "ort": "München",
-      "kapazitaet": 7,
-      "status": "laufend"
-    },
-    {
-      "id": "s4",
-      "titel": "Brandschutzhelfer Ausbildung",
-      "kategorie": "Arbeitssicherheit",
-      "datum": "2026-09-02",
-      "trainer": "Thomas Weidner",
-      "format": "Vor Ort",
-      "ort": "Köln",
-      "kapazitaet": 5,
-      "status": "geplant"
-    },
-    {
-      "id": "s5",
+      "id": "k2",
       "titel": "DSGVO Update für Führungskräfte",
       "kategorie": "Datenschutz",
-      "datum": "2026-06-18",
-      "trainer": "Dr. Julia Berg",
-      "format": "Online",
-      "ort": "—",
-      "kapazitaet": 12,
-      "status": "abgeschlossen"
+      "beschreibung": "Kompaktes Update zu aktuellen DSGVO-Entwicklungen speziell für Führungskräfte mit Personalverantwortung.",
+      "lernziele": [
+        "Aktuelle Rechtsprechung zur DSGVO kennen",
+        "Verantwortung als Führungskraft einschätzen können",
+        "Datenschutzrisiken im eigenen Bereich erkennen"
+      ],
+      "zielgruppe": "Führungskräfte",
+      "voraussetzungen": "Grundkenntnisse Datenschutz empfohlen",
+      "agenda": [
+        {
+          "zeit": "09:00–10:30",
+          "titel": "Aktuelle Rechtsprechung",
+          "beschreibung": "Relevante Urteile und deren Praxisfolgen"
+        },
+        {
+          "zeit": "10:45–12:00",
+          "titel": "Verantwortung der Führungsebene",
+          "beschreibung": "Haftung, Organisationspflichten"
+        }
+      ],
+      "materialien": {
+        "seminarunterlagen": [],
+        "vorlagen": []
+      },
+      "termine": [
+        {
+          "id": "s5",
+          "datum": "2026-06-18",
+          "trainer": "Dr. Julia Berg",
+          "format": "Online",
+          "ort": "—",
+          "kapazitaet": 12,
+          "status": "abgeschlossen",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": true
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": true
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": true
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": true
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": true
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "s6",
-      "titel": "Erste-Hilfe-Kurs",
+      "id": "k3",
+      "titel": "Hinweisgeberschutz kompakt",
+      "kategorie": "Compliance",
+      "beschreibung": "Kompaktschulung zu den Anforderungen des Hinweisgeberschutzgesetzes und dem Aufbau interner Meldestellen.",
+      "lernziele": [
+        "Anforderungen des Hinweisgeberschutzgesetzes kennen",
+        "Interne Meldestelle korrekt aufsetzen",
+        "Meldungen rechtssicher bearbeiten"
+      ],
+      "zielgruppe": "Compliance-Verantwortliche, Personalabteilung",
+      "voraussetzungen": "Keine",
+      "agenda": [
+        {
+          "zeit": "09:00–10:15",
+          "titel": "Rechtlicher Rahmen",
+          "beschreibung": "HinSchG im Überblick"
+        },
+        {
+          "zeit": "10:30–12:00",
+          "titel": "Meldestelle einrichten",
+          "beschreibung": "Organisatorische und technische Anforderungen"
+        },
+        {
+          "zeit": "13:00–14:30",
+          "titel": "Fallbearbeitung in der Praxis",
+          "beschreibung": "Vom Eingang der Meldung bis zum Abschluss"
+        }
+      ],
+      "materialien": {
+        "seminarunterlagen": [],
+        "vorlagen": []
+      },
+      "termine": [
+        {
+          "id": "s2",
+          "datum": "2026-08-19",
+          "trainer": "Markus Feldmann",
+          "format": "Online",
+          "ort": "—",
+          "kapazitaet": 18,
+          "status": "geplant",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": false
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": false
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": false
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": false
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "k4",
+      "titel": "Arbeitssicherheit Basisschulung",
       "kategorie": "Arbeitssicherheit",
-      "datum": "2026-09-10",
-      "trainer": "Nina Vogel",
-      "format": "Vor Ort",
-      "ort": "Berlin",
-      "kapazitaet": 8,
-      "status": "geplant"
+      "beschreibung": "Basisschulung zu den gesetzlichen Grundlagen der Arbeitssicherheit und praktischen Gefahrenprävention am Arbeitsplatz.",
+      "lernziele": [
+        "Gesetzliche Grundlagen des Arbeitsschutzes kennen",
+        "Gefahren am Arbeitsplatz erkennen",
+        "Präventionsmaßnahmen richtig anwenden"
+      ],
+      "zielgruppe": "Alle Mitarbeitenden",
+      "voraussetzungen": "Keine",
+      "agenda": [
+        {
+          "zeit": "09:00–10:30",
+          "titel": "Grundlagen des Arbeitsschutzes",
+          "beschreibung": "Gesetze, Verordnungen, Zuständigkeiten"
+        },
+        {
+          "zeit": "10:45–12:00",
+          "titel": "Gefahrenerkennung",
+          "beschreibung": "Typische Gefahrenquellen im Arbeitsalltag"
+        },
+        {
+          "zeit": "13:00–14:30",
+          "titel": "Praxisübung Prävention",
+          "beschreibung": "Maßnahmen anhand von Fallbeispielen"
+        }
+      ],
+      "materialien": {
+        "seminarunterlagen": [],
+        "vorlagen": []
+      },
+      "termine": [
+        {
+          "id": "s3",
+          "datum": "2026-07-30",
+          "trainer": "Sabine Kroll",
+          "format": "Vor Ort",
+          "ort": "München",
+          "kapazitaet": 7,
+          "status": "laufend",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": true
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": true
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": true
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": true
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": true
+            }
+          ]
+        },
+        {
+          "id": "s3b",
+          "datum": "2026-10-15",
+          "trainer": "Sabine Kroll",
+          "format": "Vor Ort",
+          "ort": "München",
+          "kapazitaet": 7,
+          "status": "geplant",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": false
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": false
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": false
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": false
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": false
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "s7",
+      "id": "k5",
       "titel": "Gefährdungsbeurteilung Workshop",
       "kategorie": "Arbeitssicherheit",
-      "datum": "2026-05-14",
-      "trainer": "Sabine Kroll",
-      "format": "Vor Ort",
-      "ort": "Stuttgart",
-      "kapazitaet": 8,
-      "status": "abgeschlossen"
+      "beschreibung": "Praxisworkshop zur Erstellung und Aktualisierung von Gefährdungsbeurteilungen im Unternehmen.",
+      "lernziele": [
+        "Systematik der Gefährdungsbeurteilung anwenden",
+        "Gefährdungen strukturiert erfassen",
+        "Maßnahmen ableiten und dokumentieren"
+      ],
+      "zielgruppe": "Führungskräfte, Sicherheitsbeauftragte",
+      "voraussetzungen": "Keine",
+      "agenda": [
+        {
+          "zeit": "09:00–10:30",
+          "titel": "Systematik & Rechtsgrundlagen",
+          "beschreibung": "Ablauf und gesetzliche Vorgaben"
+        },
+        {
+          "zeit": "10:45–12:30",
+          "titel": "Praxis-Workshop",
+          "beschreibung": "Gefährdungsbeurteilung anhand eigener Arbeitsplätze"
+        }
+      ],
+      "materialien": {
+        "seminarunterlagen": [],
+        "vorlagen": []
+      },
+      "termine": [
+        {
+          "id": "s7",
+          "datum": "2026-05-14",
+          "trainer": "Sabine Kroll",
+          "format": "Vor Ort",
+          "ort": "Stuttgart",
+          "kapazitaet": 8,
+          "status": "abgeschlossen",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": true
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": true
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": true
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": true
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": true
+            }
+          ]
+        }
+      ]
     },
     {
-      "id": "s8",
+      "id": "k6",
+      "titel": "Brandschutzhelfer Ausbildung",
+      "kategorie": "Arbeitssicherheit",
+      "beschreibung": "Ausbildung zum betrieblichen Brandschutzhelfer nach DGUV Information 205-023, Theorie und Löschübung.",
+      "lernziele": [
+        "Aufgaben des Brandschutzhelfers kennen",
+        "Brandklassen und Löschmittel unterscheiden",
+        "Löschgerät im Ernstfall sicher bedienen"
+      ],
+      "zielgruppe": "Benannte Brandschutzhelfer",
+      "voraussetzungen": "Keine",
+      "agenda": [
+        {
+          "zeit": "09:00–10:00",
+          "titel": "Brandschutzgrundlagen",
+          "beschreibung": "Brandklassen, Brandentstehung, Löschmittel"
+        },
+        {
+          "zeit": "10:15–11:30",
+          "titel": "Verhalten im Brandfall",
+          "beschreibung": "Alarmierung, Evakuierung, Aufgaben des Helfers"
+        },
+        {
+          "zeit": "11:45–13:00",
+          "titel": "Praktische Löschübung",
+          "beschreibung": "Handhabung von Feuerlöschern im Freien"
+        }
+      ],
+      "materialien": {
+        "seminarunterlagen": [],
+        "vorlagen": []
+      },
+      "termine": [
+        {
+          "id": "s4",
+          "datum": "2026-09-02",
+          "trainer": "Thomas Weidner",
+          "format": "Vor Ort",
+          "ort": "Köln",
+          "kapazitaet": 5,
+          "status": "geplant",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": false
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": false
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": false
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": false
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "k7",
+      "titel": "Erste-Hilfe-Kurs",
+      "kategorie": "Arbeitssicherheit",
+      "beschreibung": "Betrieblicher Erste-Hilfe-Kurs nach DGUV Grundsatz 304-001 zur Ausbildung betrieblicher Ersthelfer.",
+      "lernziele": [
+        "Grundlagen der Ersten Hilfe anwenden",
+        "Lebensrettende Sofortmaßnahmen sicher durchführen",
+        "Verhalten im Notfall koordinieren"
+      ],
+      "zielgruppe": "Benannte Ersthelfer",
+      "voraussetzungen": "Keine",
+      "agenda": [
+        {
+          "zeit": "09:00–10:30",
+          "titel": "Grundlagen der Ersten Hilfe",
+          "beschreibung": "Absicherung, Notruf, Eigenschutz"
+        },
+        {
+          "zeit": "10:45–12:15",
+          "titel": "Lebensrettende Sofortmaßnahmen",
+          "beschreibung": "Stabile Seitenlage, Reanimation"
+        },
+        {
+          "zeit": "13:00–14:30",
+          "titel": "Praxisübungen",
+          "beschreibung": "Übungen an Fallbeispielen"
+        }
+      ],
+      "materialien": {
+        "seminarunterlagen": [],
+        "vorlagen": []
+      },
+      "termine": [
+        {
+          "id": "s6",
+          "datum": "2026-09-10",
+          "trainer": "Nina Vogel",
+          "format": "Vor Ort",
+          "ort": "Berlin",
+          "kapazitaet": 8,
+          "status": "geplant",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": false
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": false
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": false
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": false
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "k8",
       "titel": "Datenschutz-Auffrischung",
       "kategorie": "Datenschutz",
-      "datum": "2026-08-27",
-      "trainer": "Markus Feldmann",
-      "format": "Online",
-      "ort": "—",
-      "kapazitaet": 25,
-      "status": "geplant"
+      "beschreibung": "Jährliche Pflicht-Auffrischung der Datenschutzgrundlagen für alle Mitarbeitenden.",
+      "lernziele": [
+        "Datenschutzgrundlagen im Arbeitsalltag anwenden",
+        "Typische Fehlerquellen vermeiden",
+        "Aktuelle Änderungen kennen"
+      ],
+      "zielgruppe": "Alle Mitarbeitenden",
+      "voraussetzungen": "Vorherige Datenschutzschulung",
+      "agenda": [
+        {
+          "zeit": "09:00–10:00",
+          "titel": "Auffrischung der Grundlagen",
+          "beschreibung": "Zentrale Prinzipien der DSGVO"
+        },
+        {
+          "zeit": "10:15–11:00",
+          "titel": "Typische Fehlerquellen",
+          "beschreibung": "Beispiele aus der Praxis"
+        }
+      ],
+      "materialien": {
+        "seminarunterlagen": [],
+        "vorlagen": []
+      },
+      "termine": [
+        {
+          "id": "s8",
+          "datum": "2026-08-27",
+          "trainer": "Markus Feldmann",
+          "format": "Online",
+          "ort": "—",
+          "kapazitaet": 25,
+          "status": "geplant",
+          "checkliste": [
+            {
+              "label": "Raum gebucht",
+              "erledigt": false
+            },
+            {
+              "label": "Technik geprüft",
+              "erledigt": false
+            },
+            {
+              "label": "Unterlagen gedruckt",
+              "erledigt": false
+            },
+            {
+              "label": "Einladungen versendet",
+              "erledigt": false
+            },
+            {
+              "label": "Zertifikate vorbereitet",
+              "erledigt": false
+            }
+          ]
+        }
+      ]
     }
   ],
   "teilnehmer": [
@@ -95,458 +596,485 @@
       "name": "Sarah Wagner",
       "firma": "Kanzlei Voss & Partner",
       "email": "sarah.wagner@kanzlei-voss-und-partner.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s1"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t2",
       "name": "Paul Koch",
       "firma": "Kanzlei Voss & Partner",
       "email": "paul.koch@kanzlei-voss-und-partner.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s1"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t3",
       "name": "Leon Krause",
       "firma": "Kanzlei Voss & Partner",
       "email": "leon.krause@kanzlei-voss-und-partner.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s1"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t4",
       "name": "Lukas Schmidt",
       "firma": "Kanzlei Voss & Partner",
       "email": "lukas.schmidt@kanzlei-voss-und-partner.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s5"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t5",
       "name": "Clara Peters",
       "firma": "Kanzlei Voss & Partner",
       "email": "clara.peters@kanzlei-voss-und-partner.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s5"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t6",
       "name": "Mia Krause",
       "firma": "Kanzlei Voss & Partner",
       "email": "mia.krause@kanzlei-voss-und-partner.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s8"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t7",
       "name": "Paul Krüger",
       "firma": "Klinik am Stadtpark",
       "email": "paul.krüger@klinik-am-stadtpark.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s3",
-        "s7"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t8",
       "name": "Anna Hoffmann",
       "firma": "Klinik am Stadtpark",
       "email": "anna.hoffmann@klinik-am-stadtpark.de",
-      "anmeldestatus": "abgesagt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s3"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t9",
       "name": "Lea Becker",
       "firma": "Klinik am Stadtpark",
       "email": "lea.becker@klinik-am-stadtpark.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s3",
-        "s7"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t10",
       "name": "Hannah Wagner",
       "firma": "Klinik am Stadtpark",
       "email": "hannah.wagner@klinik-am-stadtpark.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s6",
-        "s4"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t11",
       "name": "David Neumann",
       "firma": "Klinik am Stadtpark",
       "email": "david.neumann@klinik-am-stadtpark.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s6"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t12",
       "name": "Lukas Krüger",
       "firma": "Klinik am Stadtpark",
       "email": "lukas.krüger@klinik-am-stadtpark.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s4"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t13",
       "name": "Finn Neumann",
       "firma": "Klinik am Stadtpark",
       "email": "finn.neumann@klinik-am-stadtpark.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s7"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t14",
       "name": "Lukas Koch",
       "firma": "IT-Systemhaus Bergmann",
       "email": "lukas.koch@it-systemhaus-bergmann.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s2"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t15",
       "name": "Paul Wagner",
       "firma": "IT-Systemhaus Bergmann",
       "email": "paul.wagner@it-systemhaus-bergmann.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s2"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t16",
       "name": "Sarah Neumann",
       "firma": "IT-Systemhaus Bergmann",
       "email": "sarah.neumann@it-systemhaus-bergmann.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s5"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t17",
       "name": "Marie Richter",
       "firma": "IT-Systemhaus Bergmann",
       "email": "marie.richter@it-systemhaus-bergmann.de",
-      "anmeldestatus": "abgesagt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s5"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t18",
       "name": "Leon Weber",
       "firma": "Autohaus Meyer & Söhne",
       "email": "leon.weber@autohaus-meyer-und-soehne.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s4"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t19",
       "name": "Jan Koch",
       "firma": "Autohaus Meyer & Söhne",
       "email": "jan.koch@autohaus-meyer-und-soehne.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s4"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t20",
       "name": "Lea Krause",
       "firma": "Autohaus Meyer & Söhne",
       "email": "lea.krause@autohaus-meyer-und-soehne.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s6"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t21",
       "name": "Leon Wolf",
       "firma": "Spedition Nordwind GmbH",
       "email": "leon.wolf@spedition-nordwind-gmbh.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s3"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t22",
       "name": "Lukas Wolf",
       "firma": "Spedition Nordwind GmbH",
       "email": "lukas.wolf@spedition-nordwind-gmbh.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s3"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t23",
       "name": "Marie Werner",
       "firma": "Spedition Nordwind GmbH",
       "email": "marie.werner@spedition-nordwind-gmbh.de",
-      "anmeldestatus": "abgesagt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s3"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t24",
       "name": "Sarah Braun",
       "firma": "Spedition Nordwind GmbH",
       "email": "sarah.braun@spedition-nordwind-gmbh.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s7"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t25",
       "name": "Sarah Krüger",
       "firma": "Spedition Nordwind GmbH",
       "email": "sarah.krüger@spedition-nordwind-gmbh.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s7"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t26",
       "name": "Paul Krause",
       "firma": "Hotel Vier Jahreszeiten",
       "email": "paul.krause@hotel-vier-jahreszeiten.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s6"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t27",
       "name": "Emma Zimmermann",
       "firma": "Hotel Vier Jahreszeiten",
       "email": "emma.zimmermann@hotel-vier-jahreszeiten.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s4"
-      ]
+      "bestandskunde": true
     },
     {
       "id": "t28",
       "name": "Julia Neumann",
       "firma": "Bäckerei Feinbrot GmbH",
       "email": "julia.neumann@baeckerei-feinbrot-gmbh.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": false,
-      "schulungIds": [
-        "s1"
-      ]
+      "bestandskunde": false
     },
     {
       "id": "t29",
       "name": "Laura Lehmann",
       "firma": "Bäckerei Feinbrot GmbH",
       "email": "laura.lehmann@baeckerei-feinbrot-gmbh.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": false,
-      "schulungIds": [
-        "s1"
-      ]
+      "bestandskunde": false
     },
     {
       "id": "t30",
       "name": "Sophie Fischer",
       "firma": "Steuerberatung Lang",
       "email": "sophie.fischer@steuerberatung-lang.de",
-      "anmeldestatus": "bestätigt",
-      "bestandskunde": false,
-      "schulungIds": [
-        "s2"
-      ]
+      "bestandskunde": false
     },
     {
       "id": "t31",
       "name": "Leon Zimmermann",
       "firma": "Pflegedienst Sonnenschein",
       "email": "leon.zimmermann@pflegedienst-sonnenschein.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": false,
-      "schulungIds": [
-        "s3"
-      ]
+      "bestandskunde": false
     },
     {
       "id": "t32",
       "name": "Finn Krüger",
       "firma": "Café Lindenhof",
       "email": "finn.krüger@café-lindenhof.de",
-      "anmeldestatus": "angemeldet",
-      "bestandskunde": false,
-      "schulungIds": [
-        "s8"
-      ]
+      "bestandskunde": false
     },
     {
       "id": "t33",
       "name": "Jan Schmidt",
       "firma": "IT-Systemhaus Bergmann",
       "email": "jan.schmidt@it-systemhaus-bergmann.de",
-      "anmeldestatus": "abgesagt",
-      "bestandskunde": true,
-      "schulungIds": [
-        "s8"
-      ]
+      "bestandskunde": true
     }
   ],
-  "kunden": [
+  "buchungen": [
     {
-      "firma": "Klinik am Stadtpark",
-      "bestandskunde": true,
-      "gesamtBuchungen": 10,
-      "buchungenJeSchulung": {
-        "Arbeitssicherheit Basisschulung": 3,
-        "Gefährdungsbeurteilung Workshop": 3,
-        "Erste-Hilfe-Kurs": 2,
-        "Brandschutzhelfer Ausbildung": 2
-      }
+      "id": "b1",
+      "teilnehmerId": "t1",
+      "terminId": "s1",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-23"
     },
     {
-      "firma": "Kanzlei Voss & Partner",
-      "bestandskunde": true,
-      "gesamtBuchungen": 6,
-      "buchungenJeSchulung": {
-        "Datenschutzbeauftragter Grundlagenschulung": 3,
-        "DSGVO Update für Führungskräfte": 2,
-        "Datenschutz-Auffrischung": 1
-      }
+      "id": "b2",
+      "teilnehmerId": "t2",
+      "terminId": "s1",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-07"
     },
     {
-      "firma": "IT-Systemhaus Bergmann",
-      "bestandskunde": true,
-      "gesamtBuchungen": 5,
-      "buchungenJeSchulung": {
-        "Hinweisgeberschutz kompakt": 2,
-        "DSGVO Update für Führungskräfte": 2,
-        "Datenschutz-Auffrischung": 1
-      }
+      "id": "b3",
+      "teilnehmerId": "t3",
+      "terminId": "s1",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-23"
     },
     {
-      "firma": "Spedition Nordwind GmbH",
-      "bestandskunde": true,
-      "gesamtBuchungen": 5,
-      "buchungenJeSchulung": {
-        "Arbeitssicherheit Basisschulung": 3,
-        "Gefährdungsbeurteilung Workshop": 2
-      }
+      "id": "b4",
+      "teilnehmerId": "t4",
+      "terminId": "s5",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-06-04"
     },
     {
-      "firma": "Autohaus Meyer & Söhne",
-      "bestandskunde": true,
-      "gesamtBuchungen": 3,
-      "buchungenJeSchulung": {
-        "Brandschutzhelfer Ausbildung": 2,
-        "Erste-Hilfe-Kurs": 1
-      }
+      "id": "b5",
+      "teilnehmerId": "t5",
+      "terminId": "s5",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-04-27"
     },
     {
-      "firma": "Hotel Vier Jahreszeiten",
-      "bestandskunde": true,
-      "gesamtBuchungen": 2,
-      "buchungenJeSchulung": {
-        "Erste-Hilfe-Kurs": 1,
-        "Brandschutzhelfer Ausbildung": 1
-      }
+      "id": "b6",
+      "teilnehmerId": "t6",
+      "terminId": "s8",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-07-06"
     },
     {
-      "firma": "Bäckerei Feinbrot GmbH",
-      "bestandskunde": false,
-      "gesamtBuchungen": 2,
-      "buchungenJeSchulung": {
-        "Datenschutzbeauftragter Grundlagenschulung": 2
-      }
+      "id": "b7",
+      "teilnehmerId": "t7",
+      "terminId": "s3",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-07-14"
     },
     {
-      "firma": "Steuerberatung Lang",
-      "bestandskunde": false,
-      "gesamtBuchungen": 1,
-      "buchungenJeSchulung": {
-        "Hinweisgeberschutz kompakt": 1
-      }
+      "id": "b8",
+      "teilnehmerId": "t7",
+      "terminId": "s7",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-04-10"
     },
     {
-      "firma": "Pflegedienst Sonnenschein",
-      "bestandskunde": false,
-      "gesamtBuchungen": 1,
-      "buchungenJeSchulung": {
-        "Arbeitssicherheit Basisschulung": 1
-      }
+      "id": "b9",
+      "teilnehmerId": "t8",
+      "terminId": "s3",
+      "anmeldestatus": "abgesagt",
+      "gebuchtAm": "2026-06-05"
     },
     {
-      "firma": "Café Lindenhof",
-      "bestandskunde": false,
-      "gesamtBuchungen": 1,
-      "buchungenJeSchulung": {
-        "Datenschutz-Auffrischung": 1
-      }
+      "id": "b10",
+      "teilnehmerId": "t9",
+      "terminId": "s3",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-05"
+    },
+    {
+      "id": "b11",
+      "teilnehmerId": "t9",
+      "terminId": "s7",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-04-30"
+    },
+    {
+      "id": "b12",
+      "teilnehmerId": "t10",
+      "terminId": "s6",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-16"
+    },
+    {
+      "id": "b13",
+      "teilnehmerId": "t10",
+      "terminId": "s4",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-16"
+    },
+    {
+      "id": "b14",
+      "teilnehmerId": "t11",
+      "terminId": "s6",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-08-01"
+    },
+    {
+      "id": "b15",
+      "teilnehmerId": "t12",
+      "terminId": "s4",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-07-20"
+    },
+    {
+      "id": "b16",
+      "teilnehmerId": "t13",
+      "terminId": "s7",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-04-05"
+    },
+    {
+      "id": "b17",
+      "teilnehmerId": "t14",
+      "terminId": "s2",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-06-28"
+    },
+    {
+      "id": "b18",
+      "teilnehmerId": "t15",
+      "terminId": "s2",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-06-28"
+    },
+    {
+      "id": "b19",
+      "teilnehmerId": "t16",
+      "terminId": "s5",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-05-27"
+    },
+    {
+      "id": "b20",
+      "teilnehmerId": "t17",
+      "terminId": "s5",
+      "anmeldestatus": "abgesagt",
+      "gebuchtAm": "2026-06-03"
+    },
+    {
+      "id": "b21",
+      "teilnehmerId": "t18",
+      "terminId": "s4",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-07-10"
+    },
+    {
+      "id": "b22",
+      "teilnehmerId": "t19",
+      "terminId": "s4",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-24"
+    },
+    {
+      "id": "b23",
+      "teilnehmerId": "t20",
+      "terminId": "s6",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-24"
+    },
+    {
+      "id": "b24",
+      "teilnehmerId": "t21",
+      "terminId": "s3",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-06-19"
+    },
+    {
+      "id": "b25",
+      "teilnehmerId": "t22",
+      "terminId": "s3",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-07-07"
+    },
+    {
+      "id": "b26",
+      "teilnehmerId": "t23",
+      "terminId": "s3",
+      "anmeldestatus": "abgesagt",
+      "gebuchtAm": "2026-06-19"
+    },
+    {
+      "id": "b27",
+      "teilnehmerId": "t24",
+      "terminId": "s7",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-03-28"
+    },
+    {
+      "id": "b28",
+      "teilnehmerId": "t25",
+      "terminId": "s7",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-04-13"
+    },
+    {
+      "id": "b29",
+      "teilnehmerId": "t26",
+      "terminId": "s6",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-07-26"
+    },
+    {
+      "id": "b30",
+      "teilnehmerId": "t27",
+      "terminId": "s4",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-08-04"
+    },
+    {
+      "id": "b31",
+      "teilnehmerId": "t28",
+      "terminId": "s1",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-25"
+    },
+    {
+      "id": "b32",
+      "teilnehmerId": "t29",
+      "terminId": "s1",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-07-13"
+    },
+    {
+      "id": "b33",
+      "teilnehmerId": "t30",
+      "terminId": "s2",
+      "anmeldestatus": "bestätigt",
+      "gebuchtAm": "2026-07-02"
+    },
+    {
+      "id": "b34",
+      "teilnehmerId": "t31",
+      "terminId": "s3",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-06-23"
+    },
+    {
+      "id": "b35",
+      "teilnehmerId": "t32",
+      "terminId": "s8",
+      "anmeldestatus": "angemeldet",
+      "gebuchtAm": "2026-07-06"
+    },
+    {
+      "id": "b36",
+      "teilnehmerId": "t33",
+      "terminId": "s8",
+      "anmeldestatus": "abgesagt",
+      "gebuchtAm": "2026-07-16"
     }
   ]
 }
