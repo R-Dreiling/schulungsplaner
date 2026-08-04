@@ -2065,7 +2065,9 @@ function detailChecklisteHinzufuegen(terminId) {
 }
 
 function detailChecklisteEntfernen(terminId, index) {
-  checklistePunktEntfernen(terminId, index);
+  if (confirm('Diesen Checklistenpunkt entfernen?')) {
+    checklistePunktEntfernen(terminId, index);
+  }
 }
 
 function detailAbschnittTeilnehmer(termin) {
