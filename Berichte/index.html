@@ -1,0 +1,2133 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Schulungsplaner – Dashboard</title>
+<style>
+/* ========================================================================
+   Schulungsplaner Dashboard – gemeinsames Design-System (tribeta-Layout)
+   Diese Datei wird von allen Seiten geteilt. Seiten-Agents duerfen hier
+   vorhandene Klassen NUTZEN, aber keine bestehenden Regeln UEBERSCHREIBEN.
+   Seitenspezifisches CSS gehoert in Design/fragments/page-*.css
+   ======================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Mulish:wght@400;500;600;700&display=swap');
+
+:root {
+  /* tribeta Farbpalette */
+  --teal: #2BD5D8;
+  --teal-deep: #0B8A8D;
+  --indigo: #6C7BFF;
+  --indigo-deep: #4D5EE6;
+  --lime: #BFF247;
+  --lime-deep: #7FAE13;
+  --ink: #0A1028;
+  --text: #4A5468;
+  --muted: #697187;
+  --muted2: #9AA2B5;
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --card-2: #F4F7FB;
+  --line: #E7EBF2;
+  --line-strong: #D9DFE9;
+
+  /* Status-Farben (konsistent in der gesamten App) */
+  --status-green-bg: #E7F9F1;
+  --status-green-fg: #157A5D;
+  --status-amber-bg: #FFF4DE;
+  --status-amber-fg: #9A6300;
+  --status-gray-bg: #F0F1F5;
+  --status-gray-fg: #5B6272;
+  --status-red-bg: #FDECEC;
+  --status-red-fg: #B0362C;
+
+  --font-display: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Mulish', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-card: 0 1px 2px rgba(10,16,40,0.04), 0 4px 16px rgba(10,16,40,0.06);
+  --shadow-pop: 0 8px 28px rgba(10,16,40,0.14);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--card-2);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, .font-display { font-family: var(--font-display); color: var(--ink); }
+a { color: inherit; }
+button { font-family: var(--font-body); cursor: pointer; }
+
+/* ---------- App Shell (Desktop-App-Look) ---------- */
+.app-window {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-pop);
+  background: var(--bg);
+}
+.titlebar {
+  height: 48px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  background: var(--ink);
+  color: #fff;
+}
+.titlebar .traffic-dots { display: flex; gap: 6px; }
+.titlebar .dot { width: 10px; height: 10px; border-radius: 50%; }
+.titlebar .dot.red { background: #FF6159; }
+.titlebar .dot.yellow { background: #FFBD2E; }
+.titlebar .dot.green { background: #28C93F; }
+.titlebar .logo { height: 18px; margin-left: 10px; }
+.titlebar .app-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  color: #cfd4e8;
+  margin-left: 4px;
+}
+
+.app-body { flex: 1; display: flex; min-height: 0; }
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: 232px;
+  flex: none;
+  background: var(--ink);
+  color: #cfd4e8;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px;
+}
+.sidebar-nav { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #b8bfd6;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+.sidebar-nav-item svg { width: 18px; height: 18px; flex: none; stroke: currentColor; }
+.sidebar-nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.sidebar-nav-item.active {
+  background: linear-gradient(90deg, rgba(43,213,216,0.16), rgba(108,123,255,0.10));
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+.sidebar-footer {
+  margin-top: auto;
+  font-size: 11px;
+  color: #6b7290;
+  padding: 10px 12px;
+}
+
+/* ---------- Main content ---------- */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--card-2);
+}
+.page { display: none; padding: 28px 32px 40px 32px; }
+.page.active { display: block; }
+.page-header { margin-bottom: 22px; }
+.page-header h1 { font-size: 21px; font-weight: 700; margin: 0 0 4px 0; }
+.page-header .subtitle { font-size: 13px; color: var(--muted); margin: 0; }
+
+/* ---------- Reusable components ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.kpi-tile {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  border-top: 3px solid var(--teal-deep);
+}
+.kpi-label {
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+.kpi-value { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--ink); }
+.kpi-sub { font-size: 12px; color: var(--muted2); margin-top: 4px; }
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 12px 0;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  white-space: nowrap;
+}
+.badge-green { background: var(--status-green-bg); color: var(--status-green-fg); }
+.badge-amber { background: var(--status-amber-bg); color: var(--status-amber-fg); }
+.badge-gray  { background: var(--status-gray-bg); color: var(--status-gray-fg); }
+.badge-red   { background: var(--status-red-bg); color: var(--status-red-fg); }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* Progress / Auslastung */
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill { height: 100%; border-radius: 999px; background: var(--teal-deep); }
+.progress-fill.full { background: var(--indigo-deep); }
+
+/* Tables */
+table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.data-table thead th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line-strong);
+}
+table.data-table tbody td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
+table.data-table tbody tr:hover { background: var(--card-2); }
+table.data-table tbody tr:last-child td { border-bottom: none; }
+table.data-table .cell-strong { color: var(--ink); font-weight: 600; }
+table.data-table.clickable tbody tr { cursor: pointer; }
+
+/* Filter bar */
+.filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-input, .filter-select {
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+}
+.filter-input { flex: 1; min-width: 180px; }
+.filter-input:focus, .filter-select:focus { outline: 2px solid var(--teal); outline-offset: -1px; }
+
+/* Buttons */
+.btn {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: var(--bg);
+  color: var(--ink);
+}
+.btn-primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+.btn-link { background: none; border: none; color: var(--indigo-deep); font-weight: 600; padding: 0; }
+
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.list-row:last-child { border-bottom: none; }
+
+.empty-hint { color: var(--muted2); font-size: 13px; padding: 16px 0; }
+
+
+/* ---- Seitenspezifisches CSS (von den Seiten-Fragmenten) ---- */
+/* ---- page-uebersicht.css ---- */
+/* Seitenspezifisches CSS fuer #page-uebersicht (Dashboard-Startseite).
+   Alle Selektoren scoped mit #page-uebersicht, ergaenzt nur styles.css. */
+
+#page-uebersicht .uebersicht-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  #page-uebersicht .uebersicht-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+#page-uebersicht .uebersicht-col .section-title {
+  margin-top: 0;
+}
+
+#page-uebersicht .util-card,
+#page-uebersicht .next-card {
+  padding: 4px 22px;
+}
+
+/* Auslastung je Schulung */
+#page-uebersicht .util-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+#page-uebersicht .util-row:last-child {
+  border-bottom: none;
+}
+#page-uebersicht .util-info {
+  flex: 1;
+  min-width: 0;
+}
+#page-uebersicht .util-title {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#page-uebersicht .util-kat {
+  font-size: 11.5px;
+  color: var(--muted2);
+  margin-bottom: 9px;
+}
+#page-uebersicht .util-track-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#page-uebersicht .util-track-wrap .progress-track {
+  flex: 1;
+}
+#page-uebersicht .util-count {
+  flex: none;
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+#page-uebersicht .util-row > .badge {
+  flex: none;
+}
+
+/* Naechste anstehende Schulungen */
+#page-uebersicht .next-card .list-row {
+  gap: 12px;
+}
+#page-uebersicht .lr-main {
+  min-width: 0;
+}
+#page-uebersicht .lr-title {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#page-uebersicht .lr-meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+#page-uebersicht .next-card .badge {
+  flex: none;
+}
+
+
+/* ---- page-schulungdetail.css ---- */
+/* ========================================================================
+   Seite: Schulungsdetail
+   Alle Selektoren unter #page-schulungdetail gescopt.
+   ======================================================================== */
+
+#page-schulungdetail .back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  font-size: 13.5px;
+}
+
+/* ---------- Kopfbereich je Panel ---------- */
+#page-schulungdetail .detail-header {
+  padding: 24px 28px 26px 28px;
+  border-top: 3px solid var(--teal-deep);
+  margin-bottom: 26px;
+}
+
+#page-schulungdetail .detail-header h1 {
+  font-size: 20px;
+  line-height: 1.25;
+  margin: 0 0 12px 0;
+}
+
+#page-schulungdetail .detail-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+#page-schulungdetail .detail-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+
+#page-schulungdetail .detail-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#page-schulungdetail .detail-meta-label {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+#page-schulungdetail .detail-meta-value {
+  font-size: 13.5px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------- Auslastung ---------- */
+#page-schulungdetail .detail-capacity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+#page-schulungdetail .detail-capacity-text {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ---------- Teilnehmer-Abschnitt ---------- */
+#page-schulungdetail .detail-section-title {
+  margin-top: 4px;
+}
+
+/* ---------- Leerzustand (keine Auswahl) ---------- */
+/* Hinweis: #detail-empty traegt bewusst inline style="display:block" (siehe HTML),
+   damit es beim ersten Laden sichtbar ist; hier daher kein display: flex, das
+   von der Inline-Deklaration ueberschrieben wuerde. Zentrierung erfolgt ueber
+   Text-Alignment auf dem Absatz selbst. */
+#page-schulungdetail #detail-empty {
+  padding: 72px 0;
+}
+
+#page-schulungdetail #detail-empty .empty-hint {
+  font-size: 14px;
+  text-align: center;
+}
+
+
+/* ---- page-teilnehmer.css ---- */
+/* Seitenspezifisches CSS fuer die Teilnehmer-Seite. Alle Selektoren mit
+   #page-teilnehmer gescoped, ergaenzt das gemeinsame Design-System aus
+   Design/styles.css (nutzt dessen Tokens/Variablen). */
+
+#page-teilnehmer .training-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+#page-teilnehmer .training-flag {
+  gap: 5px;
+}
+
+#page-teilnehmer .training-flag::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: currentColor;
+  box-shadow: 3px 3px 0 -1px currentColor;
+  flex: none;
+}
+
+#page-teilnehmer .training-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#page-teilnehmer .training-chip {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--text);
+  padding: 2px 0;
+}
+
+#page-teilnehmer .training-chip::before {
+  content: "•";
+  color: var(--muted2);
+  margin-right: 6px;
+}
+
+#page-teilnehmer table.data-table td {
+  vertical-align: top;
+}
+
+#page-teilnehmer .filter-select {
+  min-width: 190px;
+}
+
+
+/* ---- page-kunden.css ---- */
+/* ========================================================================
+   Seite "Kunden" – scoped CSS, nutzt Design-Tokens aus styles.css
+   Alle Selektoren unter #page-kunden gekapselt.
+   ======================================================================== */
+
+#page-kunden .kunden-sort-hint {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: -6px 0 16px 2px;
+}
+#page-kunden .kunden-sort-hint svg { width: 14px; height: 14px; stroke: var(--muted2); flex: none; }
+
+#page-kunden .kunden-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+#page-kunden .kunden-card {
+  padding: 20px 22px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+#page-kunden .kunden-card:hover {
+  box-shadow: var(--shadow-pop);
+  transform: translateY(-2px);
+}
+
+#page-kunden .kunden-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+#page-kunden .kunden-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+#page-kunden .kunden-avatar-bestand {
+  background: linear-gradient(135deg, var(--teal), var(--indigo));
+  color: #fff;
+}
+#page-kunden .kunden-avatar-neu {
+  background: var(--card-2);
+  color: var(--muted);
+  border: 1px solid var(--line-strong);
+}
+
+#page-kunden .kunden-name-block { flex: 1; min-width: 0; padding-top: 1px; }
+#page-kunden .kunden-name {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.28;
+  margin: 0 0 8px 0;
+}
+
+#page-kunden .kunden-kpi {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+#page-kunden .kunden-kpi-value {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1;
+}
+#page-kunden .kunden-kpi-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+}
+
+#page-kunden .kunden-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#page-kunden .kunden-breakdown-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#page-kunden .kunden-breakdown-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+}
+#page-kunden .kunden-breakdown-title {
+  color: var(--text);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#page-kunden .kunden-breakdown-count {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+#page-kunden .kunden-bar-track {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+#page-kunden .kunden-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--teal-deep);
+}
+
+@media (max-width: 900px) {
+  #page-kunden .kunden-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+
+/* ---- Aussenrahmen fuer die Vorschau (die App selbst ist app-window) ---- */
+body { display: flex; align-items: center; justify-content: center; padding: 18px; background: #e4e8f0; min-height: 100vh; }
+.app-window { width: 1360px; max-width: 100%; height: 860px; }
+</style>
+</head>
+<body>
+
+<div class="app-window">
+  <div class="titlebar">
+    <div class="traffic-dots">
+      <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+    </div>
+    <img class="logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI1NzMuMDgiIGhlaWdodD0iMTI2LjgwIiB2aWV3Qm94PSIwIDAgNTczLjA4IDEyNi44MCI+Cjx0aXRsZT50cmliZXRhPC90aXRsZT4KPGRlZnM+CjxjbGlwUGF0aCBpZD0idGJfd29ydG1hcmtlIj4KPHBhdGggZD0iTTE5OS42OCAwSDU3My4wOFYxMjYuODBIMTk5LjY4WiIvPgo8L2NsaXBQYXRoPgo8L2RlZnM+CjxnIGNsaXAtcGF0aD0idXJsKCN0Yl93b3J0bWFya2UpIj4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcF8xIj4KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsLTY3My40Niw2MDMuMDcpIiBkPSJNNjczLjQ2IDUwMy41M0gxMjQ2LjU0VjYwMy4wN0g2NzMuNDZaIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiLz4KPC9jbGlwUGF0aD4KPGNsaXBQYXRoIGlkPSJjbGlwXzIiPgo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtNjczLjQ2LDYwMy4wNykiIGQ9Ik0wIDEwODBIMTkyMFYwSDBaIi8+CjwvY2xpcFBhdGg+CjxjbGlwUGF0aCBpZD0iY2xpcF8zIj4KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsLTY3My40Niw2MDMuMDcpIiBkPSJNNzMyLjQ2NyA1NjIuMjEzVjU2Mi4yMTIgNTA5Ljg5Nkw3NjUuNDM1IDQ3Ni45MjYgNzk4LjQwMiA1MDkuODk2VjU2Mi4yMTJMNzk4LjQwMSA1NjIuMjEzWiIvPgo8L2NsaXBQYXRoPgo8Y2xpcFBhdGggaWQ9ImNsaXBfNCI+CjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC02NzMuNDYsNjAzLjA3KSIgZD0iTTAgMTA4MEgxOTIwVjBIMFoiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcF8xKSI+CjxnPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcF8yKSI+CjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDI0Mi4xODIwNywyOC44OTgxOTQpIiBkPSJNMCAwVi0xNC44NjdILTE1Ljg3N0wtMzIuNTIzIDBWMTcuNjU2SC0xNS44NzdWMFoiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsMjQyLjQzODE3LDgzLjI2OTIyOSkiIGQ9Ik0wIDBWLTE0LjczMkgtMTIuNDk0Qy0yMy42OTUtMTQuNzMyLTMyLjc3OS01LjY2MS0zMi43NzkgNS41MzlWMzkuNTA1SC0xNi4xMzNWNi4wOTJDLTE2LjEzMyAyLjcyMy0xMy40MTEgMC0xMC4wNDEgMFoiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNTA2LjQ2NDc5LDI4Ljg5ODE5NCkiIGQ9Ik0wIDBWLTE0Ljg2N0gtMTUuODc3TC0zMi41MjMgMFYxNy42NTZILTE1Ljg3N1YwWiIgZmlsbD0iI2ZmZmZmZiIvPgo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw1MDYuNzIxLDgzLjI2OTIyOSkiIGQ9Ik0wIDBWLTE0LjczMkgtMTIuNDk0Qy0yMy42OTUtMTQuNzMyLTMyLjc3OS01LjY2MS0zMi43NzkgNS41MzlWMzkuNTA1SC0xNi4xMzNWNi4wOTJDLTE2LjEzMyAyLjcyMy0xMy40MTEgMC0xMC4wNDEgMFoiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsMjczLjI0MjI2LDMxLjE4MTg4NSkiIGQ9Ik0wIDBDLTIuNjM0LTEuNTYxLTQuNzI3LTQuMDU2LTYuMjg2LTcuNDY0VjIuMjg3SC0yMS45MTdWLTY2LjgyNUgtNS4yNzRWLTI4LjMzMUMtNS4yNzQtMjMuMDgtMy44MzItMTguOTkyLS45NTMtMTYuMDcxIDEuOTI1LTEzLjE0OCA1LjczOS0xMS42ODggMTAuNDgyLTExLjY4OEgxNi40NTNWMy4wNDlIMTIuMzg4QzcuNTYxIDMuMDQ5IDMuNDI5IDIuMDM0IDAgMCIgZmlsbD0iI2ZmZmZmZiIvPgo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtNjczLjQ2LDYwMy4wNykiIGQ9Ik05NzAuNzEgNTA1LjA2M0g5ODcuMzUzVjU3NC4xNzVIOTcwLjcxWiIgZmlsbD0iI2ZmZmZmZiIvPgo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtNjczLjQ2LDYwMy4wNykiIGQ9Ik05NzAuNzEgNTgzLjQ0OUg5ODcuMzUzVjYwMS4yMzVIOTcwLjcxWiIgZmlsbD0iI2ZmZmZmZiIvPgo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwzNzYuMTQxNjcsNzQuMjUyMikiIGQ9Ik0wIDBDLTEuNjQ0LTMuMTI3LTMuOTQ5LTUuNTk0LTYuOTE0LTcuMzczLTkuODgtOS4xNTItMTMuMjc2LTEwLjAyOC0xNy4wNzctMTAuMDI4LTIwLjcyOS0xMC4wMjgtMjQuMDA1LTkuMTUyLTI2LjkyOS03LjM3My0yOS44NTQtNS41OTQtMzIuMTMyLTMuMTI3LTMzLjc5IDAtMzUuNDM0IDMuMTQtMzYuMjcgNi43MzktMzYuMjcgMTAuNzk2LTM2LjI3IDE0Ljc4Ni0zNS40MzQgMTguMzU3LTMzLjc5IDIxLjUzOC0zMi4xMzIgMjQuNzE5LTI5Ljg1NCAyNy4xODUtMjYuOTI5IDI4Ljk2NS0yNC4wMDUgMzAuNzQ0LTIwLjcyOSAzMS42MzMtMTcuMDc3IDMxLjYzMy0xMy4yNzYgMzEuNjMzLTkuODggMzAuNzMtNi45MTQgMjguOTExLTMuOTQ5IDI3LjA3OC0xLjY0NCAyNC42MjUgMCAyMS41MzggMS42NTggMTguNDM4IDIuNDggMTQuODY2IDIuNDggMTAuNzk2IDIuNDggNi43MzkgMS42NTggMy4xNCAwIDBNMTUuMTIyIDI5LjA5OUMxMi4wMzYgMzQuNTE4IDcuODU4IDM4LjgzMSAyLjYxNSA0Mi4wNTItMi42NDIgNDUuMjczLTguNTMyIDQ2Ljg3Ny0xNS4wNTUgNDYuODc3LTIwLjM3OSA0Ni44NzctMjUuMDgzIDQ1LjgzOS0yOS4xNTMgNDMuNzY0LTMxLjkzIDQyLjM0OC0zNC4yNzUgNDAuNTE1LTM2LjI3IDM4LjMzMlY3Mi40MThILTUyLjkwMlYtMjMuNzQ5SC0zNy4yODFWLTE1Ljg5MUMtMzUuMDQzLTE4LjU2LTMyLjI5NC0yMC43MTYtMjguOTY1LTIyLjI5My0yNC43NzMtMjQuMjg4LTIwLjE3Ny0yNS4yODUtMTUuMTc3LTI1LjI4NS04LjQ5MS0yNS4yODUtMi41Mi0yMy42OTUgMi43MzYtMjAuNTE0IDcuOTkzLTE3LjMzMyAxMi4xNDQtMTIuOTkzIDE1LjE5LTcuNDk0IDE4LjIzNi0xLjk5NSAxOS43NTkgNC4xMTEgMTkuNzU5IDEwLjc5NiAxOS43NTkgMTcuNTc2IDE4LjIyMyAyMy42ODEgMTUuMTIyIDI5LjA5OSIgZmlsbD0iI2ZmZmZmZiIvPgo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw0MTkuNjg5NzcsNTUuNDUwMTM2KSIgZD0iTTAgMEMuMjgzIDEuNDY5IC42NDcgMi44NzEgMS4xNzMgNC4xMzggMi41NzQgNy40OCA0LjYyMyAxMC4wMTQgNy4zNDYgMTEuNzUzIDEwLjA1NSAxMy40OTIgMTMuMTQxIDE0LjM1NCAxNi42MTkgMTQuMzU0IDIwLjI1OCAxNC4zNTQgMjMuMzcxIDEzLjQ2NSAyNS45NDYgMTEuNjg2IDI4LjUzMyA5LjkwNiAzMC4zOTMgNy40OTQgMzEuNTM5IDQuNDQ4IDMyLjA2NSAzLjA2IDMyLjM2MSAxLjU2MyAzMi40ODIgMFpNNDcuOTk2IDcuMzA1QzQ2LjQ3MyAxMS4zMzUgNDQuMjYyIDE0LjkwNyA0MS4zOTEgMTguMDQ3IDM4LjUwNyAyMS4xNzQgMzUuMDE2IDIzLjYyNyAzMC45MDYgMjUuNDA2IDI2Ljc5NSAyNy4xODUgMjIuMDM3IDI4LjA3NSAxNi42MTkgMjguMDc1IDEwLjE3NiAyOC4wNzUgNC4zNTMgMjYuNTEyLS44NDkgMjMuMzg1LTYuMDY1IDIwLjI0NC0xMC4xNzYgMTUuOTg1LTEzLjE4MiAxMC42MDctMTYuMTg3IDUuMjMtMTcuNjgzLS45My0xNy42ODMtNy44NzEtMTcuNjgzLTE0LjU3LTE2LjIwMS0yMC42NjItMTMuMjM1LTI2LjE3NS0xMC4yNy0zMS42NzQtNi4xMzMtMzYuMDQxLS43OTUtMzkuMjQ4IDQuNTQyLTQyLjQ3IDEwLjc2OS00NC4wODcgMTcuODg2LTQ0LjA4NyAyMi42My00NC4wODcgMjYuOTctNDMuMzU5IDMwLjkwNi00MS45MTcgMzQuODQxLTQwLjQ4OCAzOC4yNTEtMzguNDk0IDQxLjEzNS0zNS45NDYgNDQuMDItMzMuNDEyIDQ2LjEzNi0zMC40ODggNDcuNDg0LTI3LjE4NUwzNC4wMTktMjAuNTgxQzMyLjQ5Ni0yMy4yOSAzMC4zOTMtMjUuNDQ3IDI3LjcyNS0yNy4wNjQgMjUuMDU2LTI4LjY2OCAyMS44MjEtMjkuNDc3IDE4LjAwNy0yOS40NzcgMTQuMjA2LTI5LjQ3NyAxMC44MzctMjguNTg3IDcuOTEyLTI2LjgwOCA0Ljk4Ny0yNS4wMjkgMi43OS0yMi41MDkgMS4zMDctMTkuMjQ3IC40MDQtMTcuMjUyLS4xMjEtMTUuMDU1LS4zNS0xMi42OTZINDkuMzk4QzQ5LjczNC0xMS43NjYgNDkuOTY0LTEwLjY3NSA1MC4wODUtOS4zOTQgNTAuMjItOC4xMjcgNTAuMjg3LTYuOTAxIDUwLjI4Ny01LjcxNSA1MC4yODctMS4wNTEgNDkuNTE5IDMuMjg5IDQ3Ljk5NiA3LjMwNSIgZmlsbD0iI2ZmZmZmZiIvPgo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw1NTYuNDI5NSw2OS44MDQ1MDgpIiBkPSJNMCAwQzAtMy4xNC0uNzQxLTYuMDExLTIuMjI0LTguNjM5LTMuNzA2LTExLjI2OC01Ljc4Mi0xMy4zMTYtOC40NTEtMTQuNzk5LTExLjEyLTE2LjI4Mi0xNC4xOTMtMTcuMDIzLTE3LjY1Ni0xNy4wMjMtMjAuMzc5LTE3LjAyMy0yMi42My0xNi4zMjItMjQuNDYzLTE0LjkyLTI2LjI4Mi0xMy41MzItMjcuMTg2LTExLjY0NS0yNy4xODYtOS4yNzMtMjcuMTg2LTYuODItMjYuMzktNC44MjUtMjQuNzczLTMuMzAyLTIzLjE2OS0xLjc3OS0yMC43MDItLjcxNC0xNy40LS4xMjFMMCAyLjgzWk0xMy4wMiAzMC42NzZDMTAuNjA3IDM0LjM2OSA3LjIzOCAzNy4yNCAyLjkyNSAzOS4zMTYtMS40MDIgNDEuMzkyLTYuNDAyIDQyLjQyOS0xMi4wNzYgNDIuNDI5LTE2LjcyNiA0Mi40MjktMjEuMDUzIDQxLjY3NS0yNS4wMjkgNDAuMTUxLTI5LjAwNSAzOC42MjgtMzIuNDU1IDM2LjUyNi0zNS4zOCAzMy44NTctMzguMzA1IDMxLjE4OS00MC40NDggMjguMDM1LTQxLjc5NiAyNC4zOTZMLTI4LjIxIDE3Ljc5MUMtMjYuOTI5IDIwLjkxOC0yNC45MjEgMjMuNDM5LTIyLjE3MiAyNS4zNTItMTkuNDIyIDI3LjI1My0xNi4yNjggMjguMjEtMTIuNzEgMjguMjEtOC44OTYgMjguMjEtNS44MjMgMjcuMjEyLTMuNDkxIDI1LjIxOC0xLjE3MyAyMy4yMjMgMCAyMC43NTYgMCAxNy43OTFWMTUuNTU0TC0yMC41ODEgMTIuMTk4Qy0yNS45OTkgMTEuMzQ5LTMwLjQ4OCA5LjkwNi0zNC4wNDYgNy44NzEtMzcuNjA0IDUuODUtNDAuMjMyIDMuMzI5LTQxLjkzMSAuMzIzLTQzLjYxNS0yLjY4Mi00NC40NjQtNi4wOTItNDQuNDY0LTkuOTA2LTQ0LjQ2NC0xMy44OTYtNDMuNDk0LTE3LjM4Ny00MS41NC0yMC4zOTMtMzkuNTk5LTIzLjM5OC0zNi44NDktMjUuNzAzLTMzLjI5MS0yNy4zMDctMjkuNzMzLTI4LjkyNC0yNS41NDEtMjkuNzMzLTIwLjcwMi0yOS43MzMtMTYuOTAyLTI5LjczMy0xMy40MjQtMjkuMTk0LTEwLjI5Ny0yOC4xNDItNy4xNTctMjcuMDc4LTQuMzY3LTI1LjU1NS0xLjkxNC0yMy41Ni0uOTE3LTIyLjc2NSAwLTIxLjg2MiAuODktMjAuODkxVi0yOC4xOTZIMTYuNjQ2VjE3Ljc5MUMxNi42NDYgMjIuNjk3IDE1LjQzMiAyNi45OTcgMTMuMDIgMzAuNjc2IiBmaWxsPSIjZmZmZmZmIi8+CjwvZz4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfMykiPgo8aW1hZ2UgeD0iNTkiIHk9IjQwIiB3aWR0aD0iNjYiIGhlaWdodD0iNjAiIHhsaW5rOmhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCwKaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVJQUFBQThDQVlBQUFEU2ZHeFpBQUFBQ1hCSVdYTUFBQTdFQUFBTwp4QUdWS3c0YkFBQUR1a2xFUVZSNG5PWFo2VnFiUUJpRzRmblhxcTJ0YmExYjNYZlAyelZxNHE1Wk5YRTNSbzEyCk9adXZ6RUFDWkJZUVptQUlQOTRUdUs5SEF4OW9vbllGNDYxVkwrRVgza1hOV2hYR3p2RXVZTFNDZHc2alpid0sKakpSYUs4TndFYThFdzRVU0RCV0tNSlRISzhEUE03dzhESjdpblpIOU9EazFkM3dDMy9HT2pzbStIUjZaT3ppRQpBYno5QS9pS3Q3ZFA5aVczWnk2YmcvNXNGdnAzOFhiaDh3N2VEbnpheHR1R1Q1bHQ2TXRrb0c4ckE3MWJXOUM3CmliY0pQUnQ0RzlDenZnNGY4ZGJXNEFQZTZpb1ptcmk4Qmh2amtzSXdJV2lNa1hJblJObUdLRmdRTGd3VFl2REUKd2poMlk3UWhqQTB3TVN5SVhDNEV4Z1lYdzRSd1lZakxHT3ZTTXREazFRM1FHT2tyZzBDd01meVVjUkdvRENlSQpuREp5b2N0b1F5Z3BveWdxSXk4c3c0bkJMbU5mYWhsbzZ2b1dKdkU4eWhqdjhqSW9pTFNXZ2FadTdnQmp2S3VNCnFxQ01TblJsREVnc3c0U3dNS0lvdzhiZ2xIRWFUeGxvK3ZZZW5CaHl5emhQVEJrRVl2ckdqU0d6ak5HRWxHRkEKUEFEQklDQmRYRVpXak5FQkViNE03eGMxWGhsRlJXWDRleHhITTNjWWdsRUZBNk1ONGNTZ3FxanhxNkF3U3ZUagpPS01LNnFlMXN3b0pqK01HUkIwd2hnbkNMbU5LcHpJVXZhaWhtWHNuUklneWFyd3lxc0hLeVBzb1ErS0xHcHJGCkVBUWpyaklxM0RLaWZJVTNJQjdCeHRDMURQV3Y4R2oyQVVNNE1SZ2dyREo4L0xRbTZleG5RRFNBeG1DVndmOXAKZlhjWm5vL2owWmVCNXVvTm1HTmlwS3NNQjBUNE1zVC9RSU9VNFhYMmsvY0tiMEE4QWNHSXNRd2REc0pvL2hGRApQRUhheXlBUUxneG5HUTl4bEJIczdCZTJEQVBpR1NpTVNNclE2K3lINWhzWW9yVm95MUJ4RUE1YUJscG92SUNOCjRiZU11aFpseUR6dUVBZzNobGNaai93eWxKNzkxQjZFMGNLVENTRXNvOTc5WlJnUVRXQmpwS3NNdEVnZ2VCaDYKbHFIaUlJd1duNXNneGdoWFJsSU93Z2JFSzRIb3pqTDhINFJOQ0xMd1pjd3FMVU53RkpaUWhnTWlXQm1pRjdVawpmU3BBU3k5djRNS1FWWWJYNlU5VWhyRkFaWWdPUEI1bEVBZ0tRM0laU1RnSXR5RmlLeVBxRDBtY010QlMwNFpJCmN4a0d4Ry9nWXpRNUdNOEJYdFJVVmhIK3VJT1dEWWhsSVlhZlA1TWdaZWgxRUhaQUpLaU1zR2MveG5FSExiLysKZ1JaR21zc3dJUndZOFpZUjVVY2tkeGsyUkZSbHhISVE5aTREclRnaFVsd0dXbm43Q3p5TThHWG9kaERtbDJGQwpDREIwTFVQMjJjK0dpTFVNUldlL2Qzd3FjRU9rdUF3YVF1TXlsSno5ckRMWUVJRXhlR1hvL3hISmdQakhob2k1CkRMVm5QN29NQzBJMlJvQXlZajRJT3lBMExpUE0yYzluR1IwUUNqQTBMNk9Gd1lCSWNCa2VqK1NpTWpnUWVwUVIKNWFlQy8xeGFtVGVvV04vM0FBQUFBRWxGVGtTdVFtQ0MiLz4KPC9nPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcF80KSI+CjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDE4My45NDgzNywzNC4xNzYwODgpIiBkPSJNMCAwLTMyLjk4MS0zMi45ODItNTkuMjc3LTYuNjg3LTg5LjY3NSAyMy43MjhDLTkwLjkzOSAyNC45OTItOTIuOTg4IDI0Ljk5Mi05NC4yNTIgMjMuNzI4TC0xNTAuOTYyLTMyLjk4Mi0xODMuOTQ0IDAtMTUxLjMxOSAzMi42MjZDLTE1MC4zMjMgMzMuNjIyLTE0OC45NzQgMzQuMTgtMTQ3LjU2NSAzNC4xOEgtMzYuMzc4Qy0zNC45NzEgMzQuMTgtMzMuNjIgMzMuNjIyLTMyLjYyNiAzMi42MjZaIiBmaWxsPSIjMmJkNWQ4Ii8+CjwvZz4KPC9nPgo8L2c+CjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwwKSBzY2FsZSgwLjQzMzMzMikiPgo8ZGVmcz4KPGNsaXBQYXRoIGlkPSJpY19jbGlwXzEiPgo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtNzQ3LDY4Ni4xNikiIGQ9Ik03NDcgMzkzLjg0SDExNzMuMjRWNjg2LjE2SDc0N1oiIGNsaXAtcnVsZT0iZXZlbm9kZCIvPgo8L2NsaXBQYXRoPgo8Y2xpcFBhdGggaWQ9ImljX2NsaXBfMiI+CjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC03NDcsNjg2LjE2KSIgZD0iTTg4My42NDIgNTkxLjQ0N1Y0NzAuMjc1TDk1OS45OTUgMzkzLjkxNSAxMDM2LjM0OCA0NzAuMjc1VjU5MS40NDdaIi8+CjwvY2xpcFBhdGg+CjxjbGlwUGF0aCBpZD0iaWNfY2xpcF8zIj4KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsLTc0Nyw2ODYuMTYpIiBkPSJNMCAxMDgwSDE5MjBWMEgwWiIvPgo8L2NsaXBQYXRoPgo8L2RlZnM+CjxnIGNsaXAtcGF0aD0idXJsKCNpY19jbGlwXzEpIj4KPGc+CjxnIGNsaXAtcGF0aD0idXJsKCNpY19jbGlwXzIpIj4KPGltYWdlIHg9IjEzNiIgeT0iOTQiIHdpZHRoPSIxNTQiIGhlaWdodD0iMTk5IiB4bGluazpocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsCmlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFKb0FBQURIQ0FZQUFBRGg3MG8rQUFBQUNYQklXWE1BQUE3RUFBQU8KeEFHVkt3NGJBQUFKd1VsRVFWUjRuTzNjMTNZVVJ4U0Y0YnB6TmppQURjWW14L2NtNTR3UUlDUnlGc0hoYmNxZAowM1JYZDFkWE9LZHFYNXczK05jM1MxTmJJLzU2K2x4bTkrUlpkbisyN21sK1cvWHR5KzZKM0xmWnZTMzV4K1B1CmJlYTNzU24zVnZjNHYwZmxiY2c5NlQzczNxUHNmbi9RdklmNXJlZjMyL3FEK3U2WHQ1N2Q3dlRXeXJ0ZjNhNTcKNmEyMTcyNSt2OTY5VjkrZDlPNW05MHQ1dCsrMDd1ZGJ0L3Z2NWkzNVUvTnUzS3h1WjNZMzVNN3IzYnN1ZDF4cgozalc1NDJwK1AyWjNOYjhyemJzaWYwanZjbm1Ycy92K1VubVg4cnRZMzNjWEw5WjNJYjBMOHR2eXpxZDN2cnB2CnpxVjNybjFuMHpzcnZ5N3ZUSHBuc3ZzcXZkUHBuVjQ1VVlYV2lLMDN1RW14OVFVM0piYWg0QlN4S1lOVHg2WUsKYmpTMnFjRXBZaHNPYml5MnZ1QjR4TllPellwc214NWtXNGRzaXRoYW9UbUtiVFUwYnJLdGU1S3RFeHRrVThjbQo5ajk3c1JxYVNyWXRIN0k5Y2k1Ykt6VEl0amkyTExTeDJFS1hMWStObzJ4WDJjaFdoUWJaSUp2TjJGcWh6WXR0CmpteGJtckp0ZUpCdERiSlppRzBsTk9leWJiaVhiVGRrY3k2YjJQLzg1VXBvRkdYYm95bGJLelltc3UwTVVMYkIKMERqSjFnNXRwbXhyb2N0MmhZUnNlV2hHWXBzbjI2TG5Lc2pHVGpaeG9BeHR6a2VvWmRuMlFyYmdaTXRDRzR1TgpyR3hMbjZzZ216UFpxdENtQkxkRU4yTmY2anJWamZkRHZFcTNTYkVONmFZUm16anc0dFhrMENBYkJkbHU2TXZtCmNXS1VoOWFKTFZ6Wk1ESHlKVnNkbWpYWklobFBhc3EyNkE4RVJySzFRek1oRzZlSGVNam1MRFp4c0JzYVNkbDgKakNjeEN6ZjUxVWNTMm1zNU9UYklodkdrcG14RmFETmlvL0JjeFdSaUJObnEyTVRCbDBsa0wyZkdGcXBzR0U5YQprNjBUR21URGVOS09iSFZva0EzalNZdXlEWWJHU2pZUDQwbklOaysySkxRM2NpVTJCN0p4bW9YemZhNmlJMXNSCldrOXNrY20yNkJFZXNvM0tKZzY5S2tQakp4dkdrM3hreTBKVHhqWVVHbkhaTUo2a05aNnNRak1xRzZlSkVXUnoKSWxzcnRIWnNNM1NMWW1LRThlU1NpVkVTMmxzNUhGdEVzbUU4YVZVMmNlaDFHcG9xTnNoRzZpR2U2Y1FvRDIwMApOc2hHV1RZTzQwbHh1QXdOc2tFMmk3SmxvVTJQemJkc2tjekNBNXdZSmFHOWsvTmljeWdicDRmNEJiTEZNREZxCmhhWXRtNCtKRWF0Wk9NYVRSV2psT2Z3WURWVTJqQ2Q3WXhPSDN5aEM0eUFieHBNc1pNdERhOFVHMldqSUZ0WjQKc2c3TnVHek1Ka2FRemFwc1NXanZaWDlzOUdYak5KNk1YVFp4SkF0dEtMWUlaY052NmxxUkxRdE5IUnRrd3l4OAp1V3ppeU5zOE5CZXlZVHdacjJ4NWFKTmljeXdicDRkNHlEWWFXeDBhRTltV1A4SXprUzJ3V1hnUzJnZXBFeHRrCkMyTmk1R284V1lRMk1UYVZibFFlNGpFeElqa3hhb1FHMlNDYlBkbkUwWGZOMENBYlpMTWpXMDlvb2NzV3lYaVMKMkN3OEM2MDh5TVpYTnVvVEkwVm9rSTNXZUpMM0xEd0piVnMyWXd0V3RxZ21SdlJrSzBMYlZvVG1XRGFNSjRPYwpoVGRDTXlBYm80ZjRPR1NqTXpFU1I5ODNRek12RzJiaDlHVHo4VnlWaDZhSURiSkJOaE95aVdObGFKTmxlKzlCCk5vd251Y3VXaFBaUnpvOHRQTmt3bnJRcld4R2FUbXlRamV6RWlLQnNqZEFnbXkvWlloaFBka0xqSXh2R2s3eGsKNndrdFFOa3dNZkl1bXpqMklRbnJnMTVzTHA2cnRIUnovUkR2UlRkZUV5TkZhQzVrNC9ZUUQ5bDBaVXRDK3lTcgoyQWpMaG9rUmI5bUswRDRwUW9Oc3JHVWpNcDRVeDZ2UUlGdnNzdG1jR0dXaDljWUcyVEFMTnpneHFrS0RiQVJsCkMyZzhLWTV2MTZFRkkxczBFeU5kMmR5UEovUFF4bUtEYkpnWUxaUXRDZTJ6bkJTYlI5a3dudVEvTVNwQ214aWIKUzlrWVBjUkR0dkhZR3FHNWxBMFRvOWhrNjRRRzJYakp4bWM4MlJNYVpDTWxXeUN6OElIUUtQK0JRRjgyakNkWApZeE1uUGc2RkZyNXN2c2FUTWM3Q2s5QytTQnF4UVRaanoxVUVaU3RDb3hMYlF0bGU4Wkl0cGxsNEl6UXFzWVgrCkVNOW9ZbVJRdGs1b2VXekR3Ukg3NmdPemNESVRvekhkZWtLRGJKRE52R3dEb1lVdFd4UVRJMkxqU1hIaTAxQm8Ka0EyeW1SdFA1cUhaakEyeVlUeVpoL2EzdEI0YlpMTThDNmYvbTdyaVpCYWFnOWdnVzhTeUZhRTVpNDJqYkJoUApHbm1JcjBLRGJKaUYyNVN0RlZvTXNrVTFNU0lrMjBwb1Fjckc2Q0UrMVBGa2IyaThaTU40a3NONFVwejgzQjhhClpPTXFHODN4WkJMYVA5SjdiSXhsNHphZTlDVmJFVm9vc1lVbld5amp5VVpvb2NTRzhTVEY4V1FudEZCaWcyeGsKSHVLTDRIcENNeE9iM3NSSUZSeU5MM1hwNjBaelBDbE85WVlXcTJ6Y0h1TDV5SmFGWmpPMlVNZVRMR2JoUHNlVApuZWVxS2pUSUJ0bHN5aVpPZmFsRGcyeE1IdUlaVG96eTBCekZCdGtvanlmdHlwYUU5cS9NajBGc2tJMnRiTzNRCk9NVEdVYlpveHBQRHNUVkNnMnlRelo1cy9hRnhpSTN0ZURJRzJWWWY0bnRDZzJ4c1pTTThubFNIeGlFMkNnL3gKTVl3bkY4cW1DQTJ5Y1grSXB6U2VuQllhaDlnWXk3YmtFWjdMTEh4Q2FKQ051MndVZmxOM1htZ2NZb3RVTnVxego4Qm1oeFJZYlpEUDVYRFV6dE5oaXd5emMxQ3c4Q2UyL21hSEZGaHR4MlpoTWpJclFkR0p6OXdjQ1p1RWVaK0dHCnhwT04wQ0FicVlmNHdHVHJoQmFpYlBTZnEyS1loZmVFQnRuaWxzM09lSElnTk1nV3pVTzhJOWtVb1VFMnlHYnUKSVg0a05NZ0cyY3pJTmlFMHlJYng1SExaSm9aR1d6WTJEL0VjWkxNMG5wd1JHbVNqSnh1ZjhlVE0wQ0FiWk5PYgpHR21FQnRrb1RveW95NllaR21TTGJUeTVWTFlGb1VFMmlySlJIVTh1REEyeXhTYWI3a084Z2RBZ0c4YVQ0N0VaCkNnMnhzUjVQT3BETllHaVVQMFpWd1prZVQwN1VyUlhiSE4xNGppY05od2JaV010bWNUeHBJVFRLc3JtY2hldkkKRnU0czNGSm9rQzN1aWRGcWJCWkRnMnhzWnVFT1pMTWNHbVNMVzdaNlBPa2d0QkJsby84UVQrMGZYaHlGQnRsSQp5ZVpoUE9rd05NZ1c4OFRJY1dpUWpkNTQwbzFzSGtLakxSdWJoM2htc25rS0RiSlJuQmpabE0xamFKQXRKdGs4Cmh3YlpLTXEyNUF2ZG9kZ0loQWJaWWhoUEVna05zb1UrbmlRVUdtUUxXVFppb1ZHT1RSVWNoWWtSN2ZFa3dkRHcKTVJyaWVKSm9hSkF0Tk5rSWh3YlpTRDNFTDVTTmVHaVVaY01zZkU1d0RFS0RiQ0hJeGlRMHlNWjlQTWtvTk1qRwpXVFptb1lVb0cvMkhlQk95TVF3TnNuRWNUeklORGJKeG14Z3hEZzJ5VVp3WURjWEdQRFRhc3JGNWlIY2dXd0NoClFUWU9zZ1VTR21TakxsdEFvVUUyeXVQSndFS0RiRlRIa3dHR3BpbmJaLzNZVG5pVGJkdVRiUE8vMEEwME5NM1kKT01qR2REd1pjR2c2c2JuNkdGVUY1M2RpWkV1M3dFT0RiRlJraXlBMHlFWmhGaDVKYUpETjk4UW9vdEFnbTAvWgpJZ3NOc3ZtU0xjTFFLTXNXN2l3ODB0QWdtMnZaSWc0dFJObm9Qc1JISGhwa2N6VUxSMmhhc1VHMnViSWhOTzNZCllwSnQrWGdTb1MyS3paMXNiQ1pHQThFaHRNV3hRYllwc2lFMEk3RkJ0akhaRUpxeDJDQ2JTamFFWmpRMnlEWVUKRzBKakc5dThoL2lwMDNCYjQwbUVaaVcybUQ1R3A4bUcwS3pGUmxNMlg3TndoR1kxTnNpRzBKekZCdG5TUTJoTwpZb05zQ00xWmJISEw5ajlYRjFHSWgxSUpVd0FBQUFCSlJVNUVya0pnZ2c9PSIvPgo8L2c+CjxnIGNsaXAtcGF0aD0idXJsKCNpY19jbGlwXzMpIj4KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNDI2LjAxMzE5LDc5LjIzOTA3OCkiIGQ9Ik0wIDAtNzYuMzg3LTc2LjM4Ny0xMzcuMjg5LTE1LjQ4Ni0yMDcuNjk0IDU0Ljk1NUMtMjEwLjYyIDU3Ljg4My0yMTUuMzY3IDU3Ljg4NS0yMTguMjkzIDU0Ljk1N0wtMzQ5LjYzOS03Ni4zODctNDI2LjAyNiAwLTM1MC40NjMgNzUuNTYzQy0zNDguMTU3IDc3Ljg2OS0zNDUuMDMxIDc5LjE2NC0zNDEuNzcyIDc5LjE2NEgtODQuMjU1Qy04MC45OTUgNzkuMTY0LTc3Ljg2OSA3Ny44NjktNzUuNTYzIDc1LjU2M1oiIGZpbGw9IiMyYmQ1ZDgiLz4KPC9nPgo8L2c+CjwvZz4KPC9nPgo8L3N2Zz4K" alt="tribeta" />
+    <span class="app-name">Schulungsplaner</span>
+  </div>
+  <div class="app-body">
+    <nav class="sidebar">
+      <div class="sidebar-nav">
+        <button class="sidebar-nav-item active" data-nav="uebersicht" onclick="showPage('uebersicht')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          Übersicht
+        </button>
+        <button class="sidebar-nav-item" data-nav="schulungen" onclick="showPage('schulungen')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H20v15H5.5A2.5 2.5 0 0 0 3 20.5z"/><path d="M3 5.5A2.5 2.5 0 0 0 5.5 8H20"/></svg>
+          Schulungen
+        </button>
+        <button class="sidebar-nav-item" data-nav="teilnehmer" onclick="showPage('teilnehmer')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="8.5" r="2.6"/><path d="M15.8 14.2c2.9.3 4.9 2.3 4.9 5.3"/></svg>
+          Teilnehmer
+        </button>
+        <button class="sidebar-nav-item" data-nav="kunden" onclick="showPage('kunden')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1.5"/><path d="M8 9V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3"/><path d="M3 13h18"/></svg>
+          Kunden
+        </button>
+      </div>
+      <div class="sidebar-footer">Schulungsplaner · Prototyp<br/>Beispieldaten, Q3 2026</div>
+    </nav>
+
+    <main class="main">
+      <section id="page-uebersicht" class="page active">
+<div class="page-header">
+  <h1>Übersicht</h1>
+  <p class="subtitle">Kennzahlen, Auslastung und nächste Termine auf einen Blick.</p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi-tile">
+    <div class="kpi-label">Gebuchte Schulungen</div>
+    <div class="kpi-value">8</div>
+    <div class="kpi-sub">5 geplant · 1 laufend · 2 abgeschlossen</div>
+  </div>
+  <div class="kpi-tile" style="border-top-color: var(--indigo-deep);">
+    <div class="kpi-label">Teilnehmer gesamt</div>
+    <div class="kpi-value">33</div>
+    <div class="kpi-sub">eindeutige Personen über alle Schulungen</div>
+  </div>
+  <div class="kpi-tile" style="border-top-color: var(--lime-deep);">
+    <div class="kpi-label">Ø Auslastung</div>
+    <div class="kpi-value">53%</div>
+    <div class="kpi-sub">Mittelwert über 8 Schulungen</div>
+  </div>
+</div>
+
+<div class="uebersicht-grid">
+
+  <div class="uebersicht-col">
+    <h2 class="section-title">Auslastung je Schulung</h2>
+    <div class="card util-card">
+      <div class="util-list">
+
+        <div class="util-row">
+          <div class="util-info">
+            <div class="util-title">Datenschutzbeauftragter Grundlagenschulung</div>
+            <div class="util-kat">Datenschutz</div>
+            <div class="util-track-wrap">
+              <div class="progress-track"><div class="progress-fill" style="width: 50%;"></div></div>
+              <span class="util-count">5 von 10 Plätzen belegt</span>
+            </div>
+          </div>
+          <span class="badge badge-green">5 Plätze frei</span>
+        </div>
+
+        <div class="util-row">
+          <div class="util-info">
+            <div class="util-title">Hinweisgeberschutz kompakt</div>
+            <div class="util-kat">Compliance</div>
+            <div class="util-track-wrap">
+              <div class="progress-track"><div class="progress-fill" style="width: 17%;"></div></div>
+              <span class="util-count">3 von 18 Plätzen belegt</span>
+            </div>
+          </div>
+          <span class="badge badge-green">15 Plätze frei</span>
+        </div>
+
+        <div class="util-row">
+          <div class="util-info">
+            <div class="util-title">Arbeitssicherheit Basisschulung</div>
+            <div class="util-kat">Arbeitssicherheit</div>
+            <div class="util-track-wrap">
+              <div class="progress-track"><div class="progress-fill full" style="width: 100%;"></div></div>
+              <span class="util-count">7 von 7 Plätzen belegt</span>
+            </div>
+          </div>
+          <span class="badge badge-red">Ausgebucht</span>
+        </div>
+
+        <div class="util-row">
+          <div class="util-info">
+            <div class="util-title">Brandschutzhelfer Ausbildung</div>
+            <div class="util-kat">Arbeitssicherheit</div>
+            <div class="util-track-wrap">
+              <div class="progress-track"><div class="progress-fill full" style="width: 100%;"></div></div>
+              <span class="util-count">5 von 5 Plätzen belegt</span>
+            </div>
+          </div>
+          <span class="badge badge-red">Ausgebucht</span>
+        </div>
+
+        <div class="util-row">
+          <div class="util-info">
+            <div class="util-title">DSGVO Update für Führungskräfte</div>
+            <div class="util-kat">Datenschutz</div>
+            <div class="util-track-wrap">
+              <div class="progress-track"><div class="progress-fill" style="width: 33%;"></div></div>
+              <span class="util-count">4 von 12 Plätzen belegt</span>
+            </div>
+          </div>
+          <span class="badge badge-green">8 Plätze frei</span>
+        </div>
+
+        <div class="util-row">
+          <div class="util-info">
+            <div class="util-title">Erste-Hilfe-Kurs</div>
+            <div class="util-kat">Arbeitssicherheit</div>
+            <div class="util-track-wrap">
+              <div class="progress-track"><div class="progress-fill" style="width: 50%;"></div></div>
+              <span class="util-count">4 von 8 Plätzen belegt</span>
+            </div>
+          </div>
+          <span class="badge badge-green">4 Plätze frei</span>
+        </div>
+
+        <div class="util-row">
+          <div class="util-info">
+            <div class="util-title">Gefährdungsbeurteilung Workshop</div>
+            <div class="util-kat">Arbeitssicherheit</div>
+            <div class="util-track-wrap">
+              <div class="progress-track"><div class="progress-fill" style="width: 63%;"></div></div>
+              <span class="util-count">5 von 8 Plätzen belegt</span>
+            </div>
+          </div>
+          <span class="badge badge-green">3 Plätze frei</span>
+        </div>
+
+        <div class="util-row">
+          <div class="util-info">
+            <div class="util-title">Datenschutz-Auffrischung</div>
+            <div class="util-kat">Datenschutz</div>
+            <div class="util-track-wrap">
+              <div class="progress-track"><div class="progress-fill" style="width: 12%;"></div></div>
+              <span class="util-count">3 von 25 Plätzen belegt</span>
+            </div>
+          </div>
+          <span class="badge badge-green">22 Plätze frei</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="uebersicht-col">
+    <h2 class="section-title">Nächste anstehende Schulungen</h2>
+    <div class="card next-card">
+
+      <div class="list-row">
+        <div class="lr-main">
+          <div class="lr-title">Arbeitssicherheit Basisschulung</div>
+          <div class="lr-meta">Sabine Kroll · 30.07.2026</div>
+        </div>
+        <span class="badge badge-green"><span class="badge-dot"></span>Läuft</span>
+      </div>
+
+      <div class="list-row">
+        <div class="lr-main">
+          <div class="lr-title">Datenschutzbeauftragter Grundlagenschulung</div>
+          <div class="lr-meta">Dr. Julia Berg · 12.08.2026</div>
+        </div>
+        <span class="badge badge-amber">in 8 Tagen</span>
+      </div>
+
+      <div class="list-row">
+        <div class="lr-main">
+          <div class="lr-title">Hinweisgeberschutz kompakt</div>
+          <div class="lr-meta">Markus Feldmann · 19.08.2026</div>
+        </div>
+        <span class="badge badge-amber">in 15 Tagen</span>
+      </div>
+
+      <div class="list-row">
+        <div class="lr-main">
+          <div class="lr-title">Datenschutz-Auffrischung</div>
+          <div class="lr-meta">Markus Feldmann · 27.08.2026</div>
+        </div>
+        <span class="badge badge-amber">in 23 Tagen</span>
+      </div>
+
+      <div class="list-row">
+        <div class="lr-main">
+          <div class="lr-title">Brandschutzhelfer Ausbildung</div>
+          <div class="lr-meta">Thomas Weidner · 02.09.2026</div>
+        </div>
+        <span class="badge badge-amber">in 29 Tagen</span>
+      </div>
+
+      <div class="list-row">
+        <div class="lr-main">
+          <div class="lr-title">Erste-Hilfe-Kurs</div>
+          <div class="lr-meta">Nina Vogel · 10.09.2026</div>
+        </div>
+        <span class="badge badge-amber">in 37 Tagen</span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+      </section>
+
+      <section id="page-schulungen" class="page">
+<div class="page-header">
+  <h1>Schulungen</h1>
+  <p class="subtitle">8 gebuchte Schulungen · Titel anklicken für Details und Teilnehmerliste</p>
+</div>
+
+<div class="filter-bar">
+  <input type="text" id="schulungen-search" class="filter-input" placeholder="Schulung suchen …" />
+  <select id="schulungen-status-filter" class="filter-select">
+    <option value="">Status: Alle</option>
+    <option value="geplant">Geplant</option>
+    <option value="laufend">Laufend</option>
+    <option value="abgeschlossen">Abgeschlossen</option>
+  </select>
+  <select id="schulungen-kategorie-filter" class="filter-select">
+    <option value="">Kategorie: Alle</option>
+    <option value="Datenschutz">Datenschutz</option>
+    <option value="Compliance">Compliance</option>
+    <option value="Arbeitssicherheit">Arbeitssicherheit</option>
+  </select>
+</div>
+
+<div class="card">
+  <table class="data-table clickable" id="schulungen-table">
+    <thead>
+      <tr>
+        <th>Titel</th>
+        <th>Kategorie</th>
+        <th>Datum</th>
+        <th>Trainer</th>
+        <th>Format / Ort</th>
+        <th>Status</th>
+        <th>Teilnehmer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr onclick="showSchulungDetail('s1')" data-titel="Datenschutzbeauftragter Grundlagenschulung" data-status="geplant" data-kategorie="Datenschutz">
+        <td class="cell-strong">Datenschutzbeauftragter Grundlagenschulung</td>
+        <td>Datenschutz</td>
+        <td>12.08.2026</td>
+        <td>Dr. Julia Berg</td>
+        <td>Vor Ort · Hamburg</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
+        <td>5 / 10</td>
+      </tr>
+      <tr onclick="showSchulungDetail('s2')" data-titel="Hinweisgeberschutz kompakt" data-status="geplant" data-kategorie="Compliance">
+        <td class="cell-strong">Hinweisgeberschutz kompakt</td>
+        <td>Compliance</td>
+        <td>19.08.2026</td>
+        <td>Markus Feldmann</td>
+        <td>Online</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
+        <td>3 / 18</td>
+      </tr>
+      <tr onclick="showSchulungDetail('s3')" data-titel="Arbeitssicherheit Basisschulung" data-status="laufend" data-kategorie="Arbeitssicherheit">
+        <td class="cell-strong">Arbeitssicherheit Basisschulung</td>
+        <td>Arbeitssicherheit</td>
+        <td>30.07.2026</td>
+        <td>Sabine Kroll</td>
+        <td>Vor Ort · München</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Laufend</span></td>
+        <td>7 / 7 <span class="badge badge-red">Ausgebucht</span></td>
+      </tr>
+      <tr onclick="showSchulungDetail('s4')" data-titel="Brandschutzhelfer Ausbildung" data-status="geplant" data-kategorie="Arbeitssicherheit">
+        <td class="cell-strong">Brandschutzhelfer Ausbildung</td>
+        <td>Arbeitssicherheit</td>
+        <td>02.09.2026</td>
+        <td>Thomas Weidner</td>
+        <td>Vor Ort · Köln</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
+        <td>5 / 5 <span class="badge badge-red">Ausgebucht</span></td>
+      </tr>
+      <tr onclick="showSchulungDetail('s5')" data-titel="DSGVO Update für Führungskräfte" data-status="abgeschlossen" data-kategorie="Datenschutz">
+        <td class="cell-strong">DSGVO Update für Führungskräfte</td>
+        <td>Datenschutz</td>
+        <td>18.06.2026</td>
+        <td>Dr. Julia Berg</td>
+        <td>Online</td>
+        <td><span class="badge badge-gray"><span class="badge-dot"></span>Abgeschlossen</span></td>
+        <td>4 / 12</td>
+      </tr>
+      <tr onclick="showSchulungDetail('s6')" data-titel="Erste-Hilfe-Kurs" data-status="geplant" data-kategorie="Arbeitssicherheit">
+        <td class="cell-strong">Erste-Hilfe-Kurs</td>
+        <td>Arbeitssicherheit</td>
+        <td>10.09.2026</td>
+        <td>Nina Vogel</td>
+        <td>Vor Ort · Berlin</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
+        <td>4 / 8</td>
+      </tr>
+      <tr onclick="showSchulungDetail('s7')" data-titel="Gefährdungsbeurteilung Workshop" data-status="abgeschlossen" data-kategorie="Arbeitssicherheit">
+        <td class="cell-strong">Gefährdungsbeurteilung Workshop</td>
+        <td>Arbeitssicherheit</td>
+        <td>14.05.2026</td>
+        <td>Sabine Kroll</td>
+        <td>Vor Ort · Stuttgart</td>
+        <td><span class="badge badge-gray"><span class="badge-dot"></span>Abgeschlossen</span></td>
+        <td>5 / 8</td>
+      </tr>
+      <tr onclick="showSchulungDetail('s8')" data-titel="Datenschutz-Auffrischung" data-status="geplant" data-kategorie="Datenschutz">
+        <td class="cell-strong">Datenschutz-Auffrischung</td>
+        <td>Datenschutz</td>
+        <td>27.08.2026</td>
+        <td>Markus Feldmann</td>
+        <td>Online</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Geplant</span></td>
+        <td>3 / 25</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="empty-hint" id="schulungen-empty-hint" style="display:none;">Keine Schulungen gefunden — Suchbegriff oder Filter anpassen.</p>
+</div>
+
+<script>
+(function () {
+  var searchInput = document.getElementById('schulungen-search');
+  var statusFilter = document.getElementById('schulungen-status-filter');
+  var kategorieFilter = document.getElementById('schulungen-kategorie-filter');
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#schulungen-table tbody tr'));
+  var emptyHint = document.getElementById('schulungen-empty-hint');
+
+  function applyFilters() {
+    var query = searchInput.value.trim().toLowerCase();
+    var status = statusFilter.value;
+    var kategorie = kategorieFilter.value;
+    var visibleCount = 0;
+
+    rows.forEach(function (row) {
+      var matchesQuery = !query || row.getAttribute('data-titel').toLowerCase().indexOf(query) !== -1;
+      var matchesStatus = !status || row.getAttribute('data-status') === status;
+      var matchesKategorie = !kategorie || row.getAttribute('data-kategorie') === kategorie;
+      var visible = matchesQuery && matchesStatus && matchesKategorie;
+      row.style.display = visible ? '' : 'none';
+      if (visible) visibleCount++;
+    });
+
+    emptyHint.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+  statusFilter.addEventListener('change', applyFilters);
+  kategorieFilter.addEventListener('change', applyFilters);
+})();
+</script>
+
+      </section>
+
+      <section id="page-schulungdetail" class="page">
+<a class="btn-link back-link" onclick="showPage('schulungen')" style="cursor:pointer;">← Zurück zu Schulungen</a>
+
+<!-- ===================== s1: Datenschutzbeauftragter Grundlagenschulung ===================== -->
+<div class="detail-panel" id="detail-s1" style="display:none;">
+  <div class="card detail-header">
+    <h1>Datenschutzbeauftragter Grundlagenschulung</h1>
+    <div class="detail-badges">
+      <span class="badge badge-gray">Datenschutz</span>
+      <span class="badge badge-amber">Geplant</span>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Datum</span>
+        <span class="detail-meta-value">12.08.2026</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Trainer</span>
+        <span class="detail-meta-value">Dr. Julia Berg</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Format</span>
+        <span class="detail-meta-value">Vor Ort · Hamburg</span>
+      </div>
+    </div>
+    <div class="detail-capacity">
+      <div class="progress-track"><div class="progress-fill" style="width:50%;"></div></div>
+      <div class="detail-capacity-row">
+        <span class="detail-capacity-text">5 von 10 Plätzen belegt</span>
+        <span class="badge badge-green">5 Plätze frei</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title detail-section-title">Teilnehmer</h2>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th>Bestandskunde</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cell-strong">Sarah Wagner</td><td>Kanzlei Voss &amp; Partner</td><td>sarah.wagner@kanzlei-voss-und-partner.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Paul Koch</td><td>Kanzlei Voss &amp; Partner</td><td>paul.koch@kanzlei-voss-und-partner.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Leon Krause</td><td>Kanzlei Voss &amp; Partner</td><td>leon.krause@kanzlei-voss-und-partner.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Julia Neumann</td><td>Bäckerei Feinbrot GmbH</td><td>julia.neumann@baeckerei-feinbrot-gmbh.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-gray">Neukunde</span></td></tr>
+        <tr><td class="cell-strong">Laura Lehmann</td><td>Bäckerei Feinbrot GmbH</td><td>laura.lehmann@baeckerei-feinbrot-gmbh.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-gray">Neukunde</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== s2: Hinweisgeberschutz kompakt ===================== -->
+<div class="detail-panel" id="detail-s2" style="display:none;">
+  <div class="card detail-header">
+    <h1>Hinweisgeberschutz kompakt</h1>
+    <div class="detail-badges">
+      <span class="badge badge-gray">Compliance</span>
+      <span class="badge badge-amber">Geplant</span>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Datum</span>
+        <span class="detail-meta-value">19.08.2026</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Trainer</span>
+        <span class="detail-meta-value">Markus Feldmann</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Format</span>
+        <span class="detail-meta-value">Online</span>
+      </div>
+    </div>
+    <div class="detail-capacity">
+      <div class="progress-track"><div class="progress-fill" style="width:16.7%;"></div></div>
+      <div class="detail-capacity-row">
+        <span class="detail-capacity-text">3 von 18 Plätzen belegt</span>
+        <span class="badge badge-green">15 Plätze frei</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title detail-section-title">Teilnehmer</h2>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th>Bestandskunde</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cell-strong">Lukas Koch</td><td>IT-Systemhaus Bergmann</td><td>lukas.koch@it-systemhaus-bergmann.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Paul Wagner</td><td>IT-Systemhaus Bergmann</td><td>paul.wagner@it-systemhaus-bergmann.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Sophie Fischer</td><td>Steuerberatung Lang</td><td>sophie.fischer@steuerberatung-lang.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-gray">Neukunde</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== s3: Arbeitssicherheit Basisschulung ===================== -->
+<div class="detail-panel" id="detail-s3" style="display:none;">
+  <div class="card detail-header">
+    <h1>Arbeitssicherheit Basisschulung</h1>
+    <div class="detail-badges">
+      <span class="badge badge-gray">Arbeitssicherheit</span>
+      <span class="badge badge-green">Laufend</span>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Datum</span>
+        <span class="detail-meta-value">30.07.2026</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Trainer</span>
+        <span class="detail-meta-value">Sabine Kroll</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Format</span>
+        <span class="detail-meta-value">Vor Ort · München</span>
+      </div>
+    </div>
+    <div class="detail-capacity">
+      <div class="progress-track"><div class="progress-fill full" style="width:100%;"></div></div>
+      <div class="detail-capacity-row">
+        <span class="detail-capacity-text">7 von 7 Plätzen belegt</span>
+        <span class="badge badge-red">Ausgebucht</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title detail-section-title">Teilnehmer</h2>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th>Bestandskunde</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cell-strong">Paul Krüger</td><td>Klinik am Stadtpark</td><td>paul.krüger@klinik-am-stadtpark.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Anna Hoffmann</td><td>Klinik am Stadtpark</td><td>anna.hoffmann@klinik-am-stadtpark.de</td><td><span class="badge badge-red">Abgesagt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Lea Becker</td><td>Klinik am Stadtpark</td><td>lea.becker@klinik-am-stadtpark.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Leon Wolf</td><td>Spedition Nordwind GmbH</td><td>leon.wolf@spedition-nordwind-gmbh.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Lukas Wolf</td><td>Spedition Nordwind GmbH</td><td>lukas.wolf@spedition-nordwind-gmbh.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Marie Werner</td><td>Spedition Nordwind GmbH</td><td>marie.werner@spedition-nordwind-gmbh.de</td><td><span class="badge badge-red">Abgesagt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Leon Zimmermann</td><td>Pflegedienst Sonnenschein</td><td>leon.zimmermann@pflegedienst-sonnenschein.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-gray">Neukunde</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== s4: Brandschutzhelfer Ausbildung ===================== -->
+<div class="detail-panel" id="detail-s4" style="display:none;">
+  <div class="card detail-header">
+    <h1>Brandschutzhelfer Ausbildung</h1>
+    <div class="detail-badges">
+      <span class="badge badge-gray">Arbeitssicherheit</span>
+      <span class="badge badge-amber">Geplant</span>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Datum</span>
+        <span class="detail-meta-value">02.09.2026</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Trainer</span>
+        <span class="detail-meta-value">Thomas Weidner</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Format</span>
+        <span class="detail-meta-value">Vor Ort · Köln</span>
+      </div>
+    </div>
+    <div class="detail-capacity">
+      <div class="progress-track"><div class="progress-fill full" style="width:100%;"></div></div>
+      <div class="detail-capacity-row">
+        <span class="detail-capacity-text">5 von 5 Plätzen belegt</span>
+        <span class="badge badge-red">Ausgebucht</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title detail-section-title">Teilnehmer</h2>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th>Bestandskunde</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cell-strong">Hannah Wagner</td><td>Klinik am Stadtpark</td><td>hannah.wagner@klinik-am-stadtpark.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Lukas Krüger</td><td>Klinik am Stadtpark</td><td>lukas.krüger@klinik-am-stadtpark.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Leon Weber</td><td>Autohaus Meyer &amp; Söhne</td><td>leon.weber@autohaus-meyer-und-soehne.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Jan Koch</td><td>Autohaus Meyer &amp; Söhne</td><td>jan.koch@autohaus-meyer-und-soehne.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Emma Zimmermann</td><td>Hotel Vier Jahreszeiten</td><td>emma.zimmermann@hotel-vier-jahreszeiten.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== s5: DSGVO Update für Führungskräfte ===================== -->
+<div class="detail-panel" id="detail-s5" style="display:none;">
+  <div class="card detail-header">
+    <h1>DSGVO Update für Führungskräfte</h1>
+    <div class="detail-badges">
+      <span class="badge badge-gray">Datenschutz</span>
+      <span class="badge badge-gray">Abgeschlossen</span>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Datum</span>
+        <span class="detail-meta-value">18.06.2026</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Trainer</span>
+        <span class="detail-meta-value">Dr. Julia Berg</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Format</span>
+        <span class="detail-meta-value">Online</span>
+      </div>
+    </div>
+    <div class="detail-capacity">
+      <div class="progress-track"><div class="progress-fill" style="width:33.3%;"></div></div>
+      <div class="detail-capacity-row">
+        <span class="detail-capacity-text">4 von 12 Plätzen belegt</span>
+        <span class="badge badge-green">8 Plätze frei</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title detail-section-title">Teilnehmer</h2>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th>Bestandskunde</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cell-strong">Lukas Schmidt</td><td>Kanzlei Voss &amp; Partner</td><td>lukas.schmidt@kanzlei-voss-und-partner.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Clara Peters</td><td>Kanzlei Voss &amp; Partner</td><td>clara.peters@kanzlei-voss-und-partner.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Sarah Neumann</td><td>IT-Systemhaus Bergmann</td><td>sarah.neumann@it-systemhaus-bergmann.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Marie Richter</td><td>IT-Systemhaus Bergmann</td><td>marie.richter@it-systemhaus-bergmann.de</td><td><span class="badge badge-red">Abgesagt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== s6: Erste-Hilfe-Kurs ===================== -->
+<div class="detail-panel" id="detail-s6" style="display:none;">
+  <div class="card detail-header">
+    <h1>Erste-Hilfe-Kurs</h1>
+    <div class="detail-badges">
+      <span class="badge badge-gray">Arbeitssicherheit</span>
+      <span class="badge badge-amber">Geplant</span>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Datum</span>
+        <span class="detail-meta-value">10.09.2026</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Trainer</span>
+        <span class="detail-meta-value">Nina Vogel</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Format</span>
+        <span class="detail-meta-value">Vor Ort · Berlin</span>
+      </div>
+    </div>
+    <div class="detail-capacity">
+      <div class="progress-track"><div class="progress-fill" style="width:50%;"></div></div>
+      <div class="detail-capacity-row">
+        <span class="detail-capacity-text">4 von 8 Plätzen belegt</span>
+        <span class="badge badge-green">4 Plätze frei</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title detail-section-title">Teilnehmer</h2>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th>Bestandskunde</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cell-strong">Hannah Wagner</td><td>Klinik am Stadtpark</td><td>hannah.wagner@klinik-am-stadtpark.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">David Neumann</td><td>Klinik am Stadtpark</td><td>david.neumann@klinik-am-stadtpark.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Lea Krause</td><td>Autohaus Meyer &amp; Söhne</td><td>lea.krause@autohaus-meyer-und-soehne.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Paul Krause</td><td>Hotel Vier Jahreszeiten</td><td>paul.krause@hotel-vier-jahreszeiten.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== s7: Gefährdungsbeurteilung Workshop ===================== -->
+<div class="detail-panel" id="detail-s7" style="display:none;">
+  <div class="card detail-header">
+    <h1>Gefährdungsbeurteilung Workshop</h1>
+    <div class="detail-badges">
+      <span class="badge badge-gray">Arbeitssicherheit</span>
+      <span class="badge badge-gray">Abgeschlossen</span>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Datum</span>
+        <span class="detail-meta-value">14.05.2026</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Trainer</span>
+        <span class="detail-meta-value">Sabine Kroll</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Format</span>
+        <span class="detail-meta-value">Vor Ort · Stuttgart</span>
+      </div>
+    </div>
+    <div class="detail-capacity">
+      <div class="progress-track"><div class="progress-fill" style="width:62.5%;"></div></div>
+      <div class="detail-capacity-row">
+        <span class="detail-capacity-text">5 von 8 Plätzen belegt</span>
+        <span class="badge badge-green">3 Plätze frei</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title detail-section-title">Teilnehmer</h2>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th>Bestandskunde</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cell-strong">Paul Krüger</td><td>Klinik am Stadtpark</td><td>paul.krüger@klinik-am-stadtpark.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Lea Becker</td><td>Klinik am Stadtpark</td><td>lea.becker@klinik-am-stadtpark.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Finn Neumann</td><td>Klinik am Stadtpark</td><td>finn.neumann@klinik-am-stadtpark.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Sarah Braun</td><td>Spedition Nordwind GmbH</td><td>sarah.braun@spedition-nordwind-gmbh.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Sarah Krüger</td><td>Spedition Nordwind GmbH</td><td>sarah.krüger@spedition-nordwind-gmbh.de</td><td><span class="badge badge-green">Bestätigt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== s8: Datenschutz-Auffrischung ===================== -->
+<div class="detail-panel" id="detail-s8" style="display:none;">
+  <div class="card detail-header">
+    <h1>Datenschutz-Auffrischung</h1>
+    <div class="detail-badges">
+      <span class="badge badge-gray">Datenschutz</span>
+      <span class="badge badge-amber">Geplant</span>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Datum</span>
+        <span class="detail-meta-value">27.08.2026</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Trainer</span>
+        <span class="detail-meta-value">Markus Feldmann</span>
+      </div>
+      <div class="detail-meta-item">
+        <span class="detail-meta-label">Format</span>
+        <span class="detail-meta-value">Online</span>
+      </div>
+    </div>
+    <div class="detail-capacity">
+      <div class="progress-track"><div class="progress-fill" style="width:12%;"></div></div>
+      <div class="detail-capacity-row">
+        <span class="detail-capacity-text">3 von 25 Plätzen belegt</span>
+        <span class="badge badge-green">22 Plätze frei</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title detail-section-title">Teilnehmer</h2>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th>Bestandskunde</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cell-strong">Mia Krause</td><td>Kanzlei Voss &amp; Partner</td><td>mia.krause@kanzlei-voss-und-partner.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+        <tr><td class="cell-strong">Finn Krüger</td><td>Café Lindenhof</td><td>finn.krüger@café-lindenhof.de</td><td><span class="badge badge-amber">Angemeldet</span></td><td><span class="badge badge-gray">Neukunde</span></td></tr>
+        <tr><td class="cell-strong">Jan Schmidt</td><td>IT-Systemhaus Bergmann</td><td>jan.schmidt@it-systemhaus-bergmann.de</td><td><span class="badge badge-red">Abgesagt</span></td><td><span class="badge badge-green">Bestandskunde</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== Fallback: keine Schulung ausgewählt ===================== -->
+<div class="detail-panel" id="detail-empty" style="display:block;">
+  <p class="empty-hint">Bitte wähle eine Schulung aus der Liste aus, um Details zu sehen.</p>
+</div>
+
+      </section>
+
+      <section id="page-teilnehmer" class="page">
+<div class="page-header">
+  <h1>Teilnehmer</h1>
+  <p class="subtitle">33 Teilnehmerinnen und Teilnehmer · schulungsübergreifend, nach Firma und Anmeldestatus filterbar</p>
+</div>
+
+<div class="filter-bar">
+  <input type="text" id="teilnehmer-search" class="filter-input" placeholder="Name oder Firma suchen …" />
+  <select id="teilnehmer-firma-filter" class="filter-select">
+    <option value="">Firma: Alle</option>
+    <option value="Autohaus Meyer &amp; Söhne">Autohaus Meyer &amp; Söhne</option>
+    <option value="Bäckerei Feinbrot GmbH">Bäckerei Feinbrot GmbH</option>
+    <option value="Café Lindenhof">Café Lindenhof</option>
+    <option value="Hotel Vier Jahreszeiten">Hotel Vier Jahreszeiten</option>
+    <option value="IT-Systemhaus Bergmann">IT-Systemhaus Bergmann</option>
+    <option value="Kanzlei Voss &amp; Partner">Kanzlei Voss &amp; Partner</option>
+    <option value="Klinik am Stadtpark">Klinik am Stadtpark</option>
+    <option value="Pflegedienst Sonnenschein">Pflegedienst Sonnenschein</option>
+    <option value="Spedition Nordwind GmbH">Spedition Nordwind GmbH</option>
+    <option value="Steuerberatung Lang">Steuerberatung Lang</option>
+  </select>
+  <select id="teilnehmer-status-filter" class="filter-select">
+    <option value="">Anmeldestatus: Alle</option>
+    <option value="angemeldet">Angemeldet</option>
+    <option value="bestätigt">Bestätigt</option>
+    <option value="abgesagt">Abgesagt</option>
+  </select>
+</div>
+
+<div class="card">
+  <table class="data-table" id="teilnehmer-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Firma</th>
+        <th>E-Mail</th>
+        <th>Anmeldestatus</th>
+        <th>Kundenstatus</th>
+        <th>Schulungen</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-name="Sarah Wagner" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
+        <td class="cell-strong">Sarah Wagner</td>
+        <td>Kanzlei Voss &amp; Partner</td>
+        <td>sarah.wagner@kanzlei-voss-und-partner.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Datenschutzbeauftragter Grundlagenschulung</td>
+      </tr>
+      <tr data-name="Paul Koch" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
+        <td class="cell-strong">Paul Koch</td>
+        <td>Kanzlei Voss &amp; Partner</td>
+        <td>paul.koch@kanzlei-voss-und-partner.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Datenschutzbeauftragter Grundlagenschulung</td>
+      </tr>
+      <tr data-name="Leon Krause" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
+        <td class="cell-strong">Leon Krause</td>
+        <td>Kanzlei Voss &amp; Partner</td>
+        <td>leon.krause@kanzlei-voss-und-partner.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Datenschutzbeauftragter Grundlagenschulung</td>
+      </tr>
+      <tr data-name="Lukas Schmidt" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
+        <td class="cell-strong">Lukas Schmidt</td>
+        <td>Kanzlei Voss &amp; Partner</td>
+        <td>lukas.schmidt@kanzlei-voss-und-partner.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>DSGVO Update für Führungskräfte</td>
+      </tr>
+      <tr data-name="Clara Peters" data-firma="Kanzlei Voss &amp; Partner" data-status="bestätigt">
+        <td class="cell-strong">Clara Peters</td>
+        <td>Kanzlei Voss &amp; Partner</td>
+        <td>clara.peters@kanzlei-voss-und-partner.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>DSGVO Update für Führungskräfte</td>
+      </tr>
+      <tr data-name="Mia Krause" data-firma="Kanzlei Voss &amp; Partner" data-status="angemeldet">
+        <td class="cell-strong">Mia Krause</td>
+        <td>Kanzlei Voss &amp; Partner</td>
+        <td>mia.krause@kanzlei-voss-und-partner.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Datenschutz-Auffrischung</td>
+      </tr>
+      <tr data-name="Paul Krüger" data-firma="Klinik am Stadtpark" data-status="angemeldet">
+        <td class="cell-strong">Paul Krüger</td>
+        <td>Klinik am Stadtpark</td>
+        <td>paul.krüger@klinik-am-stadtpark.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>
+          <div class="training-cell">
+            <span class="badge badge-amber training-flag">Mehrfach gebucht</span>
+            <div class="training-list">
+              <span class="training-chip">Arbeitssicherheit Basisschulung</span>
+              <span class="training-chip">Gefährdungsbeurteilung Workshop</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr data-name="Anna Hoffmann" data-firma="Klinik am Stadtpark" data-status="abgesagt">
+        <td class="cell-strong">Anna Hoffmann</td>
+        <td>Klinik am Stadtpark</td>
+        <td>anna.hoffmann@klinik-am-stadtpark.de</td>
+        <td><span class="badge badge-red"><span class="badge-dot"></span>Abgesagt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Arbeitssicherheit Basisschulung</td>
+      </tr>
+      <tr data-name="Lea Becker" data-firma="Klinik am Stadtpark" data-status="bestätigt">
+        <td class="cell-strong">Lea Becker</td>
+        <td>Klinik am Stadtpark</td>
+        <td>lea.becker@klinik-am-stadtpark.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>
+          <div class="training-cell">
+            <span class="badge badge-amber training-flag">Mehrfach gebucht</span>
+            <div class="training-list">
+              <span class="training-chip">Arbeitssicherheit Basisschulung</span>
+              <span class="training-chip">Gefährdungsbeurteilung Workshop</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr data-name="Hannah Wagner" data-firma="Klinik am Stadtpark" data-status="bestätigt">
+        <td class="cell-strong">Hannah Wagner</td>
+        <td>Klinik am Stadtpark</td>
+        <td>hannah.wagner@klinik-am-stadtpark.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>
+          <div class="training-cell">
+            <span class="badge badge-amber training-flag">Mehrfach gebucht</span>
+            <div class="training-list">
+              <span class="training-chip">Erste-Hilfe-Kurs</span>
+              <span class="training-chip">Brandschutzhelfer Ausbildung</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr data-name="David Neumann" data-firma="Klinik am Stadtpark" data-status="angemeldet">
+        <td class="cell-strong">David Neumann</td>
+        <td>Klinik am Stadtpark</td>
+        <td>david.neumann@klinik-am-stadtpark.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Erste-Hilfe-Kurs</td>
+      </tr>
+      <tr data-name="Lukas Krüger" data-firma="Klinik am Stadtpark" data-status="angemeldet">
+        <td class="cell-strong">Lukas Krüger</td>
+        <td>Klinik am Stadtpark</td>
+        <td>lukas.krüger@klinik-am-stadtpark.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Brandschutzhelfer Ausbildung</td>
+      </tr>
+      <tr data-name="Finn Neumann" data-firma="Klinik am Stadtpark" data-status="angemeldet">
+        <td class="cell-strong">Finn Neumann</td>
+        <td>Klinik am Stadtpark</td>
+        <td>finn.neumann@klinik-am-stadtpark.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Gefährdungsbeurteilung Workshop</td>
+      </tr>
+      <tr data-name="Lukas Koch" data-firma="IT-Systemhaus Bergmann" data-status="bestätigt">
+        <td class="cell-strong">Lukas Koch</td>
+        <td>IT-Systemhaus Bergmann</td>
+        <td>lukas.koch@it-systemhaus-bergmann.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Hinweisgeberschutz kompakt</td>
+      </tr>
+      <tr data-name="Paul Wagner" data-firma="IT-Systemhaus Bergmann" data-status="angemeldet">
+        <td class="cell-strong">Paul Wagner</td>
+        <td>IT-Systemhaus Bergmann</td>
+        <td>paul.wagner@it-systemhaus-bergmann.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Hinweisgeberschutz kompakt</td>
+      </tr>
+      <tr data-name="Sarah Neumann" data-firma="IT-Systemhaus Bergmann" data-status="bestätigt">
+        <td class="cell-strong">Sarah Neumann</td>
+        <td>IT-Systemhaus Bergmann</td>
+        <td>sarah.neumann@it-systemhaus-bergmann.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>DSGVO Update für Führungskräfte</td>
+      </tr>
+      <tr data-name="Marie Richter" data-firma="IT-Systemhaus Bergmann" data-status="abgesagt">
+        <td class="cell-strong">Marie Richter</td>
+        <td>IT-Systemhaus Bergmann</td>
+        <td>marie.richter@it-systemhaus-bergmann.de</td>
+        <td><span class="badge badge-red"><span class="badge-dot"></span>Abgesagt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>DSGVO Update für Führungskräfte</td>
+      </tr>
+      <tr data-name="Leon Weber" data-firma="Autohaus Meyer &amp; Söhne" data-status="angemeldet">
+        <td class="cell-strong">Leon Weber</td>
+        <td>Autohaus Meyer &amp; Söhne</td>
+        <td>leon.weber@autohaus-meyer-und-soehne.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Brandschutzhelfer Ausbildung</td>
+      </tr>
+      <tr data-name="Jan Koch" data-firma="Autohaus Meyer &amp; Söhne" data-status="bestätigt">
+        <td class="cell-strong">Jan Koch</td>
+        <td>Autohaus Meyer &amp; Söhne</td>
+        <td>jan.koch@autohaus-meyer-und-soehne.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Brandschutzhelfer Ausbildung</td>
+      </tr>
+      <tr data-name="Lea Krause" data-firma="Autohaus Meyer &amp; Söhne" data-status="bestätigt">
+        <td class="cell-strong">Lea Krause</td>
+        <td>Autohaus Meyer &amp; Söhne</td>
+        <td>lea.krause@autohaus-meyer-und-soehne.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Erste-Hilfe-Kurs</td>
+      </tr>
+      <tr data-name="Leon Wolf" data-firma="Spedition Nordwind GmbH" data-status="bestätigt">
+        <td class="cell-strong">Leon Wolf</td>
+        <td>Spedition Nordwind GmbH</td>
+        <td>leon.wolf@spedition-nordwind-gmbh.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Arbeitssicherheit Basisschulung</td>
+      </tr>
+      <tr data-name="Lukas Wolf" data-firma="Spedition Nordwind GmbH" data-status="angemeldet">
+        <td class="cell-strong">Lukas Wolf</td>
+        <td>Spedition Nordwind GmbH</td>
+        <td>lukas.wolf@spedition-nordwind-gmbh.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Arbeitssicherheit Basisschulung</td>
+      </tr>
+      <tr data-name="Marie Werner" data-firma="Spedition Nordwind GmbH" data-status="abgesagt">
+        <td class="cell-strong">Marie Werner</td>
+        <td>Spedition Nordwind GmbH</td>
+        <td>marie.werner@spedition-nordwind-gmbh.de</td>
+        <td><span class="badge badge-red"><span class="badge-dot"></span>Abgesagt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Arbeitssicherheit Basisschulung</td>
+      </tr>
+      <tr data-name="Sarah Braun" data-firma="Spedition Nordwind GmbH" data-status="angemeldet">
+        <td class="cell-strong">Sarah Braun</td>
+        <td>Spedition Nordwind GmbH</td>
+        <td>sarah.braun@spedition-nordwind-gmbh.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Gefährdungsbeurteilung Workshop</td>
+      </tr>
+      <tr data-name="Sarah Krüger" data-firma="Spedition Nordwind GmbH" data-status="bestätigt">
+        <td class="cell-strong">Sarah Krüger</td>
+        <td>Spedition Nordwind GmbH</td>
+        <td>sarah.krüger@spedition-nordwind-gmbh.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Gefährdungsbeurteilung Workshop</td>
+      </tr>
+      <tr data-name="Paul Krause" data-firma="Hotel Vier Jahreszeiten" data-status="angemeldet">
+        <td class="cell-strong">Paul Krause</td>
+        <td>Hotel Vier Jahreszeiten</td>
+        <td>paul.krause@hotel-vier-jahreszeiten.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Erste-Hilfe-Kurs</td>
+      </tr>
+      <tr data-name="Emma Zimmermann" data-firma="Hotel Vier Jahreszeiten" data-status="angemeldet">
+        <td class="cell-strong">Emma Zimmermann</td>
+        <td>Hotel Vier Jahreszeiten</td>
+        <td>emma.zimmermann@hotel-vier-jahreszeiten.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Brandschutzhelfer Ausbildung</td>
+      </tr>
+      <tr data-name="Julia Neumann" data-firma="Bäckerei Feinbrot GmbH" data-status="bestätigt">
+        <td class="cell-strong">Julia Neumann</td>
+        <td>Bäckerei Feinbrot GmbH</td>
+        <td>julia.neumann@baeckerei-feinbrot-gmbh.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-gray">Neukunde</span></td>
+        <td>Datenschutzbeauftragter Grundlagenschulung</td>
+      </tr>
+      <tr data-name="Laura Lehmann" data-firma="Bäckerei Feinbrot GmbH" data-status="angemeldet">
+        <td class="cell-strong">Laura Lehmann</td>
+        <td>Bäckerei Feinbrot GmbH</td>
+        <td>laura.lehmann@baeckerei-feinbrot-gmbh.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-gray">Neukunde</span></td>
+        <td>Datenschutzbeauftragter Grundlagenschulung</td>
+      </tr>
+      <tr data-name="Sophie Fischer" data-firma="Steuerberatung Lang" data-status="bestätigt">
+        <td class="cell-strong">Sophie Fischer</td>
+        <td>Steuerberatung Lang</td>
+        <td>sophie.fischer@steuerberatung-lang.de</td>
+        <td><span class="badge badge-green"><span class="badge-dot"></span>Bestätigt</span></td>
+        <td><span class="badge badge-gray">Neukunde</span></td>
+        <td>Hinweisgeberschutz kompakt</td>
+      </tr>
+      <tr data-name="Leon Zimmermann" data-firma="Pflegedienst Sonnenschein" data-status="angemeldet">
+        <td class="cell-strong">Leon Zimmermann</td>
+        <td>Pflegedienst Sonnenschein</td>
+        <td>leon.zimmermann@pflegedienst-sonnenschein.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-gray">Neukunde</span></td>
+        <td>Arbeitssicherheit Basisschulung</td>
+      </tr>
+      <tr data-name="Finn Krüger" data-firma="Café Lindenhof" data-status="angemeldet">
+        <td class="cell-strong">Finn Krüger</td>
+        <td>Café Lindenhof</td>
+        <td>finn.krüger@café-lindenhof.de</td>
+        <td><span class="badge badge-amber"><span class="badge-dot"></span>Angemeldet</span></td>
+        <td><span class="badge badge-gray">Neukunde</span></td>
+        <td>Datenschutz-Auffrischung</td>
+      </tr>
+      <tr data-name="Jan Schmidt" data-firma="IT-Systemhaus Bergmann" data-status="abgesagt">
+        <td class="cell-strong">Jan Schmidt</td>
+        <td>IT-Systemhaus Bergmann</td>
+        <td>jan.schmidt@it-systemhaus-bergmann.de</td>
+        <td><span class="badge badge-red"><span class="badge-dot"></span>Abgesagt</span></td>
+        <td><span class="badge badge-green">Bestandskunde</span></td>
+        <td>Datenschutz-Auffrischung</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="empty-hint" id="teilnehmer-empty-hint" style="display:none;">Keine Teilnehmer gefunden — Suchbegriff oder Filter anpassen.</p>
+</div>
+
+<script>
+(function () {
+  var searchInput = document.getElementById('teilnehmer-search');
+  var firmaFilter = document.getElementById('teilnehmer-firma-filter');
+  var statusFilter = document.getElementById('teilnehmer-status-filter');
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#teilnehmer-table tbody tr'));
+  var emptyHint = document.getElementById('teilnehmer-empty-hint');
+
+  function applyFilters() {
+    var query = searchInput.value.trim().toLowerCase();
+    var firma = firmaFilter.value;
+    var status = statusFilter.value;
+    var visibleCount = 0;
+
+    rows.forEach(function (row) {
+      var name = (row.getAttribute('data-name') || '').toLowerCase();
+      var rowFirma = row.getAttribute('data-firma') || '';
+      var matchesQuery = !query || name.indexOf(query) !== -1 || rowFirma.toLowerCase().indexOf(query) !== -1;
+      var matchesFirma = !firma || rowFirma === firma;
+      var matchesStatus = !status || row.getAttribute('data-status') === status;
+      var visible = matchesQuery && matchesFirma && matchesStatus;
+      row.style.display = visible ? '' : 'none';
+      if (visible) visibleCount++;
+    });
+
+    emptyHint.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+  firmaFilter.addEventListener('change', applyFilters);
+  statusFilter.addEventListener('change', applyFilters);
+})();
+</script>
+
+      </section>
+
+      <section id="page-kunden" class="page">
+<div class="page-header">
+  <h1>Kunden</h1>
+  <p class="subtitle">Übersicht aller Firmenkunden und ihrer bisherigen Schulungsbuchungen</p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi-tile">
+    <div class="kpi-label">Firmenkunden gesamt</div>
+    <div class="kpi-value">10</div>
+    <div class="kpi-sub">6 Bestandskunden · 4 Neukunden</div>
+  </div>
+  <div class="kpi-tile">
+    <div class="kpi-label">Buchungen gesamt</div>
+    <div class="kpi-value">36</div>
+    <div class="kpi-sub">über alle Firmen hinweg</div>
+  </div>
+  <div class="kpi-tile">
+    <div class="kpi-label">Top-Kunde</div>
+    <div class="kpi-value">10</div>
+    <div class="kpi-sub">Klinik am Stadtpark</div>
+  </div>
+</div>
+
+<div class="kunden-sort-hint">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+  Sortiert nach Buchungshäufigkeit
+</div>
+
+<div class="kunden-grid">
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-bestand">KS</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Klinik am Stadtpark</h3>
+        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">10</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Arbeitssicherheit Basisschulung</span><span class="kunden-breakdown-count">3x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:30%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Gefährdungsbeurteilung Workshop</span><span class="kunden-breakdown-count">3x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:30%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Erste-Hilfe-Kurs</span><span class="kunden-breakdown-count">2x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:20%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Brandschutzhelfer Ausbildung</span><span class="kunden-breakdown-count">2x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:20%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-bestand">KV</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Kanzlei Voss &amp; Partner</h3>
+        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">6</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutzbeauftragter Grundlagenschulung</span><span class="kunden-breakdown-count">3x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:50%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">DSGVO Update für Führungskräfte</span><span class="kunden-breakdown-count">2x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:33%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutz-Auffrischung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:17%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-bestand">IB</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">IT-Systemhaus Bergmann</h3>
+        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">5</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Hinweisgeberschutz kompakt</span><span class="kunden-breakdown-count">2x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:40%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">DSGVO Update für Führungskräfte</span><span class="kunden-breakdown-count">2x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:40%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutz-Auffrischung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:20%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-bestand">SN</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Spedition Nordwind GmbH</h3>
+        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">5</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Arbeitssicherheit Basisschulung</span><span class="kunden-breakdown-count">3x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:60%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Gefährdungsbeurteilung Workshop</span><span class="kunden-breakdown-count">2x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:40%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-bestand">AM</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Autohaus Meyer &amp; Söhne</h3>
+        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">3</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Brandschutzhelfer Ausbildung</span><span class="kunden-breakdown-count">2x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:67%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Erste-Hilfe-Kurs</span><span class="kunden-breakdown-count">1x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:33%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-bestand">HV</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Hotel Vier Jahreszeiten</h3>
+        <span class="badge badge-green"><span class="badge-dot"></span>Bestandskunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">2</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Erste-Hilfe-Kurs</span><span class="kunden-breakdown-count">1x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:50%"></div></div>
+      </div>
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Brandschutzhelfer Ausbildung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:50%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-neu">BF</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Bäckerei Feinbrot GmbH</h3>
+        <span class="badge badge-gray">Neukunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">2</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutzbeauftragter Grundlagenschulung</span><span class="kunden-breakdown-count">2x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-neu">SL</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Steuerberatung Lang</h3>
+        <span class="badge badge-gray">Neukunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">1</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Hinweisgeberschutz kompakt</span><span class="kunden-breakdown-count">1x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-neu">PS</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Pflegedienst Sonnenschein</h3>
+        <span class="badge badge-gray">Neukunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">1</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Arbeitssicherheit Basisschulung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card kunden-card">
+    <div class="kunden-card-head">
+      <div class="kunden-avatar kunden-avatar-neu">CL</div>
+      <div class="kunden-name-block">
+        <h3 class="kunden-name">Café Lindenhof</h3>
+        <span class="badge badge-gray">Neukunde</span>
+      </div>
+    </div>
+    <div class="kunden-kpi">
+      <span class="kunden-kpi-value">1</span>
+      <span class="kunden-kpi-label">Buchungen gesamt</span>
+    </div>
+    <div class="kunden-breakdown">
+      <div class="kunden-breakdown-row">
+        <div class="kunden-breakdown-top"><span class="kunden-breakdown-title">Datenschutz-Auffrischung</span><span class="kunden-breakdown-count">1x gebucht</span></div>
+        <div class="kunden-bar-track"><div class="kunden-bar-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+// Eingebettete Beispieldaten (verfuegbar als window.DATA, falls Seiten sie referenzieren)
+window.DATA = {"schulungen": [{"id": "s1", "titel": "Datenschutzbeauftragter Grundlagenschulung", "kategorie": "Datenschutz", "datum": "2026-08-12", "trainer": "Dr. Julia Berg", "format": "Vor Ort", "ort": "Hamburg", "kapazitaet": 10, "status": "geplant"}, {"id": "s2", "titel": "Hinweisgeberschutz kompakt", "kategorie": "Compliance", "datum": "2026-08-19", "trainer": "Markus Feldmann", "format": "Online", "ort": "—", "kapazitaet": 18, "status": "geplant"}, {"id": "s3", "titel": "Arbeitssicherheit Basisschulung", "kategorie": "Arbeitssicherheit", "datum": "2026-07-30", "trainer": "Sabine Kroll", "format": "Vor Ort", "ort": "München", "kapazitaet": 7, "status": "laufend"}, {"id": "s4", "titel": "Brandschutzhelfer Ausbildung", "kategorie": "Arbeitssicherheit", "datum": "2026-09-02", "trainer": "Thomas Weidner", "format": "Vor Ort", "ort": "Köln", "kapazitaet": 5, "status": "geplant"}, {"id": "s5", "titel": "DSGVO Update für Führungskräfte", "kategorie": "Datenschutz", "datum": "2026-06-18", "trainer": "Dr. Julia Berg", "format": "Online", "ort": "—", "kapazitaet": 12, "status": "abgeschlossen"}, {"id": "s6", "titel": "Erste-Hilfe-Kurs", "kategorie": "Arbeitssicherheit", "datum": "2026-09-10", "trainer": "Nina Vogel", "format": "Vor Ort", "ort": "Berlin", "kapazitaet": 8, "status": "geplant"}, {"id": "s7", "titel": "Gefährdungsbeurteilung Workshop", "kategorie": "Arbeitssicherheit", "datum": "2026-05-14", "trainer": "Sabine Kroll", "format": "Vor Ort", "ort": "Stuttgart", "kapazitaet": 8, "status": "abgeschlossen"}, {"id": "s8", "titel": "Datenschutz-Auffrischung", "kategorie": "Datenschutz", "datum": "2026-08-27", "trainer": "Markus Feldmann", "format": "Online", "ort": "—", "kapazitaet": 25, "status": "geplant"}], "teilnehmer": [{"id": "t1", "name": "Sarah Wagner", "firma": "Kanzlei Voss & Partner", "email": "sarah.wagner@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s1"]}, {"id": "t2", "name": "Paul Koch", "firma": "Kanzlei Voss & Partner", "email": "paul.koch@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s1"]}, {"id": "t3", "name": "Leon Krause", "firma": "Kanzlei Voss & Partner", "email": "leon.krause@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s1"]}, {"id": "t4", "name": "Lukas Schmidt", "firma": "Kanzlei Voss & Partner", "email": "lukas.schmidt@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s5"]}, {"id": "t5", "name": "Clara Peters", "firma": "Kanzlei Voss & Partner", "email": "clara.peters@kanzlei-voss-und-partner.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s5"]}, {"id": "t6", "name": "Mia Krause", "firma": "Kanzlei Voss & Partner", "email": "mia.krause@kanzlei-voss-und-partner.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s8"]}, {"id": "t7", "name": "Paul Krüger", "firma": "Klinik am Stadtpark", "email": "paul.krüger@klinik-am-stadtpark.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s3", "s7"]}, {"id": "t8", "name": "Anna Hoffmann", "firma": "Klinik am Stadtpark", "email": "anna.hoffmann@klinik-am-stadtpark.de", "anmeldestatus": "abgesagt", "bestandskunde": true, "schulungIds": ["s3"]}, {"id": "t9", "name": "Lea Becker", "firma": "Klinik am Stadtpark", "email": "lea.becker@klinik-am-stadtpark.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s3", "s7"]}, {"id": "t10", "name": "Hannah Wagner", "firma": "Klinik am Stadtpark", "email": "hannah.wagner@klinik-am-stadtpark.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s6", "s4"]}, {"id": "t11", "name": "David Neumann", "firma": "Klinik am Stadtpark", "email": "david.neumann@klinik-am-stadtpark.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s6"]}, {"id": "t12", "name": "Lukas Krüger", "firma": "Klinik am Stadtpark", "email": "lukas.krüger@klinik-am-stadtpark.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s4"]}, {"id": "t13", "name": "Finn Neumann", "firma": "Klinik am Stadtpark", "email": "finn.neumann@klinik-am-stadtpark.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s7"]}, {"id": "t14", "name": "Lukas Koch", "firma": "IT-Systemhaus Bergmann", "email": "lukas.koch@it-systemhaus-bergmann.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s2"]}, {"id": "t15", "name": "Paul Wagner", "firma": "IT-Systemhaus Bergmann", "email": "paul.wagner@it-systemhaus-bergmann.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s2"]}, {"id": "t16", "name": "Sarah Neumann", "firma": "IT-Systemhaus Bergmann", "email": "sarah.neumann@it-systemhaus-bergmann.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s5"]}, {"id": "t17", "name": "Marie Richter", "firma": "IT-Systemhaus Bergmann", "email": "marie.richter@it-systemhaus-bergmann.de", "anmeldestatus": "abgesagt", "bestandskunde": true, "schulungIds": ["s5"]}, {"id": "t18", "name": "Leon Weber", "firma": "Autohaus Meyer & Söhne", "email": "leon.weber@autohaus-meyer-und-soehne.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s4"]}, {"id": "t19", "name": "Jan Koch", "firma": "Autohaus Meyer & Söhne", "email": "jan.koch@autohaus-meyer-und-soehne.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s4"]}, {"id": "t20", "name": "Lea Krause", "firma": "Autohaus Meyer & Söhne", "email": "lea.krause@autohaus-meyer-und-soehne.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s6"]}, {"id": "t21", "name": "Leon Wolf", "firma": "Spedition Nordwind GmbH", "email": "leon.wolf@spedition-nordwind-gmbh.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s3"]}, {"id": "t22", "name": "Lukas Wolf", "firma": "Spedition Nordwind GmbH", "email": "lukas.wolf@spedition-nordwind-gmbh.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s3"]}, {"id": "t23", "name": "Marie Werner", "firma": "Spedition Nordwind GmbH", "email": "marie.werner@spedition-nordwind-gmbh.de", "anmeldestatus": "abgesagt", "bestandskunde": true, "schulungIds": ["s3"]}, {"id": "t24", "name": "Sarah Braun", "firma": "Spedition Nordwind GmbH", "email": "sarah.braun@spedition-nordwind-gmbh.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s7"]}, {"id": "t25", "name": "Sarah Krüger", "firma": "Spedition Nordwind GmbH", "email": "sarah.krüger@spedition-nordwind-gmbh.de", "anmeldestatus": "bestätigt", "bestandskunde": true, "schulungIds": ["s7"]}, {"id": "t26", "name": "Paul Krause", "firma": "Hotel Vier Jahreszeiten", "email": "paul.krause@hotel-vier-jahreszeiten.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s6"]}, {"id": "t27", "name": "Emma Zimmermann", "firma": "Hotel Vier Jahreszeiten", "email": "emma.zimmermann@hotel-vier-jahreszeiten.de", "anmeldestatus": "angemeldet", "bestandskunde": true, "schulungIds": ["s4"]}, {"id": "t28", "name": "Julia Neumann", "firma": "Bäckerei Feinbrot GmbH", "email": "julia.neumann@baeckerei-feinbrot-gmbh.de", "anmeldestatus": "bestätigt", "bestandskunde": false, "schulungIds": ["s1"]}, {"id": "t29", "name": "Laura Lehmann", "firma": "Bäckerei Feinbrot GmbH", "email": "laura.lehmann@baeckerei-feinbrot-gmbh.de", "anmeldestatus": "angemeldet", "bestandskunde": false, "schulungIds": ["s1"]}, {"id": "t30", "name": "Sophie Fischer", "firma": "Steuerberatung Lang", "email": "sophie.fischer@steuerberatung-lang.de", "anmeldestatus": "bestätigt", "bestandskunde": false, "schulungIds": ["s2"]}, {"id": "t31", "name": "Leon Zimmermann", "firma": "Pflegedienst Sonnenschein", "email": "leon.zimmermann@pflegedienst-sonnenschein.de", "anmeldestatus": "angemeldet", "bestandskunde": false, "schulungIds": ["s3"]}, {"id": "t32", "name": "Finn Krüger", "firma": "Café Lindenhof", "email": "finn.krüger@café-lindenhof.de", "anmeldestatus": "angemeldet", "bestandskunde": false, "schulungIds": ["s8"]}, {"id": "t33", "name": "Jan Schmidt", "firma": "IT-Systemhaus Bergmann", "email": "jan.schmidt@it-systemhaus-bergmann.de", "anmeldestatus": "abgesagt", "bestandskunde": true, "schulungIds": ["s8"]}], "kunden": [{"firma": "Klinik am Stadtpark", "bestandskunde": true, "gesamtBuchungen": 10, "buchungenJeSchulung": {"Arbeitssicherheit Basisschulung": 3, "Gefährdungsbeurteilung Workshop": 3, "Erste-Hilfe-Kurs": 2, "Brandschutzhelfer Ausbildung": 2}}, {"firma": "Kanzlei Voss & Partner", "bestandskunde": true, "gesamtBuchungen": 6, "buchungenJeSchulung": {"Datenschutzbeauftragter Grundlagenschulung": 3, "DSGVO Update für Führungskräfte": 2, "Datenschutz-Auffrischung": 1}}, {"firma": "IT-Systemhaus Bergmann", "bestandskunde": true, "gesamtBuchungen": 5, "buchungenJeSchulung": {"Hinweisgeberschutz kompakt": 2, "DSGVO Update für Führungskräfte": 2, "Datenschutz-Auffrischung": 1}}, {"firma": "Spedition Nordwind GmbH", "bestandskunde": true, "gesamtBuchungen": 5, "buchungenJeSchulung": {"Arbeitssicherheit Basisschulung": 3, "Gefährdungsbeurteilung Workshop": 2}}, {"firma": "Autohaus Meyer & Söhne", "bestandskunde": true, "gesamtBuchungen": 3, "buchungenJeSchulung": {"Brandschutzhelfer Ausbildung": 2, "Erste-Hilfe-Kurs": 1}}, {"firma": "Hotel Vier Jahreszeiten", "bestandskunde": true, "gesamtBuchungen": 2, "buchungenJeSchulung": {"Erste-Hilfe-Kurs": 1, "Brandschutzhelfer Ausbildung": 1}}, {"firma": "Bäckerei Feinbrot GmbH", "bestandskunde": false, "gesamtBuchungen": 2, "buchungenJeSchulung": {"Datenschutzbeauftragter Grundlagenschulung": 2}}, {"firma": "Steuerberatung Lang", "bestandskunde": false, "gesamtBuchungen": 1, "buchungenJeSchulung": {"Hinweisgeberschutz kompakt": 1}}, {"firma": "Pflegedienst Sonnenschein", "bestandskunde": false, "gesamtBuchungen": 1, "buchungenJeSchulung": {"Arbeitssicherheit Basisschulung": 1}}, {"firma": "Café Lindenhof", "bestandskunde": false, "gesamtBuchungen": 1, "buchungenJeSchulung": {"Datenschutz-Auffrischung": 1}}]};
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('active'));
+  var navBtn = document.querySelector('.sidebar-nav-item[data-nav="' + id + '"]');
+  if (navBtn) navBtn.classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+}
+
+// Von der Schulungen-Liste aufgerufen: navigiert zur Detailseite und zeigt
+// das passende, vorgerenderte Detail-Panel (id="detail-<schulungId>").
+function showSchulungDetail(id) {
+  showPage('schulungdetail');
+  document.querySelectorAll('.detail-panel').forEach(el => el.style.display = 'none');
+  var target = document.getElementById('detail-' + id);
+  if (target) target.style.display = 'block';
+}
+
+// Deep-Link ueber URL-Hash, z.B. index.html#schulungen oder index.html#detail-s3
+(function () {
+  var hash = location.hash.replace('#', '');
+  if (!hash) return;
+  if (hash.indexOf('detail-') === 0) {
+    showSchulungDetail(hash.replace('detail-', ''));
+  } else if (document.getElementById('page-' + hash)) {
+    showPage(hash);
+  }
+})();
+</script>
+</body>
+</html>

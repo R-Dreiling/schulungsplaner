@@ -1,0 +1,552 @@
+{
+  "schulungen": [
+    {
+      "id": "s1",
+      "titel": "Datenschutzbeauftragter Grundlagenschulung",
+      "kategorie": "Datenschutz",
+      "datum": "2026-08-12",
+      "trainer": "Dr. Julia Berg",
+      "format": "Vor Ort",
+      "ort": "Hamburg",
+      "kapazitaet": 10,
+      "status": "geplant"
+    },
+    {
+      "id": "s2",
+      "titel": "Hinweisgeberschutz kompakt",
+      "kategorie": "Compliance",
+      "datum": "2026-08-19",
+      "trainer": "Markus Feldmann",
+      "format": "Online",
+      "ort": "—",
+      "kapazitaet": 18,
+      "status": "geplant"
+    },
+    {
+      "id": "s3",
+      "titel": "Arbeitssicherheit Basisschulung",
+      "kategorie": "Arbeitssicherheit",
+      "datum": "2026-07-30",
+      "trainer": "Sabine Kroll",
+      "format": "Vor Ort",
+      "ort": "München",
+      "kapazitaet": 7,
+      "status": "laufend"
+    },
+    {
+      "id": "s4",
+      "titel": "Brandschutzhelfer Ausbildung",
+      "kategorie": "Arbeitssicherheit",
+      "datum": "2026-09-02",
+      "trainer": "Thomas Weidner",
+      "format": "Vor Ort",
+      "ort": "Köln",
+      "kapazitaet": 5,
+      "status": "geplant"
+    },
+    {
+      "id": "s5",
+      "titel": "DSGVO Update für Führungskräfte",
+      "kategorie": "Datenschutz",
+      "datum": "2026-06-18",
+      "trainer": "Dr. Julia Berg",
+      "format": "Online",
+      "ort": "—",
+      "kapazitaet": 12,
+      "status": "abgeschlossen"
+    },
+    {
+      "id": "s6",
+      "titel": "Erste-Hilfe-Kurs",
+      "kategorie": "Arbeitssicherheit",
+      "datum": "2026-09-10",
+      "trainer": "Nina Vogel",
+      "format": "Vor Ort",
+      "ort": "Berlin",
+      "kapazitaet": 8,
+      "status": "geplant"
+    },
+    {
+      "id": "s7",
+      "titel": "Gefährdungsbeurteilung Workshop",
+      "kategorie": "Arbeitssicherheit",
+      "datum": "2026-05-14",
+      "trainer": "Sabine Kroll",
+      "format": "Vor Ort",
+      "ort": "Stuttgart",
+      "kapazitaet": 8,
+      "status": "abgeschlossen"
+    },
+    {
+      "id": "s8",
+      "titel": "Datenschutz-Auffrischung",
+      "kategorie": "Datenschutz",
+      "datum": "2026-08-27",
+      "trainer": "Markus Feldmann",
+      "format": "Online",
+      "ort": "—",
+      "kapazitaet": 25,
+      "status": "geplant"
+    }
+  ],
+  "teilnehmer": [
+    {
+      "id": "t1",
+      "name": "Sarah Wagner",
+      "firma": "Kanzlei Voss & Partner",
+      "email": "sarah.wagner@kanzlei-voss-und-partner.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s1"
+      ]
+    },
+    {
+      "id": "t2",
+      "name": "Paul Koch",
+      "firma": "Kanzlei Voss & Partner",
+      "email": "paul.koch@kanzlei-voss-und-partner.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s1"
+      ]
+    },
+    {
+      "id": "t3",
+      "name": "Leon Krause",
+      "firma": "Kanzlei Voss & Partner",
+      "email": "leon.krause@kanzlei-voss-und-partner.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s1"
+      ]
+    },
+    {
+      "id": "t4",
+      "name": "Lukas Schmidt",
+      "firma": "Kanzlei Voss & Partner",
+      "email": "lukas.schmidt@kanzlei-voss-und-partner.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s5"
+      ]
+    },
+    {
+      "id": "t5",
+      "name": "Clara Peters",
+      "firma": "Kanzlei Voss & Partner",
+      "email": "clara.peters@kanzlei-voss-und-partner.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s5"
+      ]
+    },
+    {
+      "id": "t6",
+      "name": "Mia Krause",
+      "firma": "Kanzlei Voss & Partner",
+      "email": "mia.krause@kanzlei-voss-und-partner.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s8"
+      ]
+    },
+    {
+      "id": "t7",
+      "name": "Paul Krüger",
+      "firma": "Klinik am Stadtpark",
+      "email": "paul.krüger@klinik-am-stadtpark.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s3",
+        "s7"
+      ]
+    },
+    {
+      "id": "t8",
+      "name": "Anna Hoffmann",
+      "firma": "Klinik am Stadtpark",
+      "email": "anna.hoffmann@klinik-am-stadtpark.de",
+      "anmeldestatus": "abgesagt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "t9",
+      "name": "Lea Becker",
+      "firma": "Klinik am Stadtpark",
+      "email": "lea.becker@klinik-am-stadtpark.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s3",
+        "s7"
+      ]
+    },
+    {
+      "id": "t10",
+      "name": "Hannah Wagner",
+      "firma": "Klinik am Stadtpark",
+      "email": "hannah.wagner@klinik-am-stadtpark.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s6",
+        "s4"
+      ]
+    },
+    {
+      "id": "t11",
+      "name": "David Neumann",
+      "firma": "Klinik am Stadtpark",
+      "email": "david.neumann@klinik-am-stadtpark.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s6"
+      ]
+    },
+    {
+      "id": "t12",
+      "name": "Lukas Krüger",
+      "firma": "Klinik am Stadtpark",
+      "email": "lukas.krüger@klinik-am-stadtpark.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s4"
+      ]
+    },
+    {
+      "id": "t13",
+      "name": "Finn Neumann",
+      "firma": "Klinik am Stadtpark",
+      "email": "finn.neumann@klinik-am-stadtpark.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s7"
+      ]
+    },
+    {
+      "id": "t14",
+      "name": "Lukas Koch",
+      "firma": "IT-Systemhaus Bergmann",
+      "email": "lukas.koch@it-systemhaus-bergmann.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s2"
+      ]
+    },
+    {
+      "id": "t15",
+      "name": "Paul Wagner",
+      "firma": "IT-Systemhaus Bergmann",
+      "email": "paul.wagner@it-systemhaus-bergmann.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s2"
+      ]
+    },
+    {
+      "id": "t16",
+      "name": "Sarah Neumann",
+      "firma": "IT-Systemhaus Bergmann",
+      "email": "sarah.neumann@it-systemhaus-bergmann.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s5"
+      ]
+    },
+    {
+      "id": "t17",
+      "name": "Marie Richter",
+      "firma": "IT-Systemhaus Bergmann",
+      "email": "marie.richter@it-systemhaus-bergmann.de",
+      "anmeldestatus": "abgesagt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s5"
+      ]
+    },
+    {
+      "id": "t18",
+      "name": "Leon Weber",
+      "firma": "Autohaus Meyer & Söhne",
+      "email": "leon.weber@autohaus-meyer-und-soehne.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s4"
+      ]
+    },
+    {
+      "id": "t19",
+      "name": "Jan Koch",
+      "firma": "Autohaus Meyer & Söhne",
+      "email": "jan.koch@autohaus-meyer-und-soehne.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s4"
+      ]
+    },
+    {
+      "id": "t20",
+      "name": "Lea Krause",
+      "firma": "Autohaus Meyer & Söhne",
+      "email": "lea.krause@autohaus-meyer-und-soehne.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s6"
+      ]
+    },
+    {
+      "id": "t21",
+      "name": "Leon Wolf",
+      "firma": "Spedition Nordwind GmbH",
+      "email": "leon.wolf@spedition-nordwind-gmbh.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "t22",
+      "name": "Lukas Wolf",
+      "firma": "Spedition Nordwind GmbH",
+      "email": "lukas.wolf@spedition-nordwind-gmbh.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "t23",
+      "name": "Marie Werner",
+      "firma": "Spedition Nordwind GmbH",
+      "email": "marie.werner@spedition-nordwind-gmbh.de",
+      "anmeldestatus": "abgesagt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "t24",
+      "name": "Sarah Braun",
+      "firma": "Spedition Nordwind GmbH",
+      "email": "sarah.braun@spedition-nordwind-gmbh.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s7"
+      ]
+    },
+    {
+      "id": "t25",
+      "name": "Sarah Krüger",
+      "firma": "Spedition Nordwind GmbH",
+      "email": "sarah.krüger@spedition-nordwind-gmbh.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s7"
+      ]
+    },
+    {
+      "id": "t26",
+      "name": "Paul Krause",
+      "firma": "Hotel Vier Jahreszeiten",
+      "email": "paul.krause@hotel-vier-jahreszeiten.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s6"
+      ]
+    },
+    {
+      "id": "t27",
+      "name": "Emma Zimmermann",
+      "firma": "Hotel Vier Jahreszeiten",
+      "email": "emma.zimmermann@hotel-vier-jahreszeiten.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s4"
+      ]
+    },
+    {
+      "id": "t28",
+      "name": "Julia Neumann",
+      "firma": "Bäckerei Feinbrot GmbH",
+      "email": "julia.neumann@baeckerei-feinbrot-gmbh.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": false,
+      "schulungIds": [
+        "s1"
+      ]
+    },
+    {
+      "id": "t29",
+      "name": "Laura Lehmann",
+      "firma": "Bäckerei Feinbrot GmbH",
+      "email": "laura.lehmann@baeckerei-feinbrot-gmbh.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": false,
+      "schulungIds": [
+        "s1"
+      ]
+    },
+    {
+      "id": "t30",
+      "name": "Sophie Fischer",
+      "firma": "Steuerberatung Lang",
+      "email": "sophie.fischer@steuerberatung-lang.de",
+      "anmeldestatus": "bestätigt",
+      "bestandskunde": false,
+      "schulungIds": [
+        "s2"
+      ]
+    },
+    {
+      "id": "t31",
+      "name": "Leon Zimmermann",
+      "firma": "Pflegedienst Sonnenschein",
+      "email": "leon.zimmermann@pflegedienst-sonnenschein.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": false,
+      "schulungIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "t32",
+      "name": "Finn Krüger",
+      "firma": "Café Lindenhof",
+      "email": "finn.krüger@café-lindenhof.de",
+      "anmeldestatus": "angemeldet",
+      "bestandskunde": false,
+      "schulungIds": [
+        "s8"
+      ]
+    },
+    {
+      "id": "t33",
+      "name": "Jan Schmidt",
+      "firma": "IT-Systemhaus Bergmann",
+      "email": "jan.schmidt@it-systemhaus-bergmann.de",
+      "anmeldestatus": "abgesagt",
+      "bestandskunde": true,
+      "schulungIds": [
+        "s8"
+      ]
+    }
+  ],
+  "kunden": [
+    {
+      "firma": "Klinik am Stadtpark",
+      "bestandskunde": true,
+      "gesamtBuchungen": 10,
+      "buchungenJeSchulung": {
+        "Arbeitssicherheit Basisschulung": 3,
+        "Gefährdungsbeurteilung Workshop": 3,
+        "Erste-Hilfe-Kurs": 2,
+        "Brandschutzhelfer Ausbildung": 2
+      }
+    },
+    {
+      "firma": "Kanzlei Voss & Partner",
+      "bestandskunde": true,
+      "gesamtBuchungen": 6,
+      "buchungenJeSchulung": {
+        "Datenschutzbeauftragter Grundlagenschulung": 3,
+        "DSGVO Update für Führungskräfte": 2,
+        "Datenschutz-Auffrischung": 1
+      }
+    },
+    {
+      "firma": "IT-Systemhaus Bergmann",
+      "bestandskunde": true,
+      "gesamtBuchungen": 5,
+      "buchungenJeSchulung": {
+        "Hinweisgeberschutz kompakt": 2,
+        "DSGVO Update für Führungskräfte": 2,
+        "Datenschutz-Auffrischung": 1
+      }
+    },
+    {
+      "firma": "Spedition Nordwind GmbH",
+      "bestandskunde": true,
+      "gesamtBuchungen": 5,
+      "buchungenJeSchulung": {
+        "Arbeitssicherheit Basisschulung": 3,
+        "Gefährdungsbeurteilung Workshop": 2
+      }
+    },
+    {
+      "firma": "Autohaus Meyer & Söhne",
+      "bestandskunde": true,
+      "gesamtBuchungen": 3,
+      "buchungenJeSchulung": {
+        "Brandschutzhelfer Ausbildung": 2,
+        "Erste-Hilfe-Kurs": 1
+      }
+    },
+    {
+      "firma": "Hotel Vier Jahreszeiten",
+      "bestandskunde": true,
+      "gesamtBuchungen": 2,
+      "buchungenJeSchulung": {
+        "Erste-Hilfe-Kurs": 1,
+        "Brandschutzhelfer Ausbildung": 1
+      }
+    },
+    {
+      "firma": "Bäckerei Feinbrot GmbH",
+      "bestandskunde": false,
+      "gesamtBuchungen": 2,
+      "buchungenJeSchulung": {
+        "Datenschutzbeauftragter Grundlagenschulung": 2
+      }
+    },
+    {
+      "firma": "Steuerberatung Lang",
+      "bestandskunde": false,
+      "gesamtBuchungen": 1,
+      "buchungenJeSchulung": {
+        "Hinweisgeberschutz kompakt": 1
+      }
+    },
+    {
+      "firma": "Pflegedienst Sonnenschein",
+      "bestandskunde": false,
+      "gesamtBuchungen": 1,
+      "buchungenJeSchulung": {
+        "Arbeitssicherheit Basisschulung": 1
+      }
+    },
+    {
+      "firma": "Café Lindenhof",
+      "bestandskunde": false,
+      "gesamtBuchungen": 1,
+      "buchungenJeSchulung": {
+        "Datenschutz-Auffrischung": 1
+      }
+    }
+  ]
+}

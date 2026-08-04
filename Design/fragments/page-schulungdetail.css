@@ -1,0 +1,95 @@
+/* ========================================================================
+   Seite: Schulungsdetail
+   Alle Selektoren unter #page-schulungdetail gescopt.
+   ======================================================================== */
+
+#page-schulungdetail .back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  font-size: 13.5px;
+}
+
+/* ---------- Kopfbereich je Panel ---------- */
+#page-schulungdetail .detail-header {
+  padding: 24px 28px 26px 28px;
+  border-top: 3px solid var(--teal-deep);
+  margin-bottom: 26px;
+}
+
+#page-schulungdetail .detail-header h1 {
+  font-size: 20px;
+  line-height: 1.25;
+  margin: 0 0 12px 0;
+}
+
+#page-schulungdetail .detail-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+#page-schulungdetail .detail-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+
+#page-schulungdetail .detail-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#page-schulungdetail .detail-meta-label {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+#page-schulungdetail .detail-meta-value {
+  font-size: 13.5px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------- Auslastung ---------- */
+#page-schulungdetail .detail-capacity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+#page-schulungdetail .detail-capacity-text {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ---------- Teilnehmer-Abschnitt ---------- */
+#page-schulungdetail .detail-section-title {
+  margin-top: 4px;
+}
+
+/* ---------- Leerzustand (keine Auswahl) ---------- */
+/* Hinweis: #detail-empty traegt bewusst inline style="display:block" (siehe HTML),
+   damit es beim ersten Laden sichtbar ist; hier daher kein display: flex, das
+   von der Inline-Deklaration ueberschrieben wuerde. Zentrierung erfolgt ueber
+   Text-Alignment auf dem Absatz selbst. */
+#page-schulungdetail #detail-empty {
+  padding: 72px 0;
+}
+
+#page-schulungdetail #detail-empty .empty-hint {
+  font-size: 14px;
+  text-align: center;
+}
