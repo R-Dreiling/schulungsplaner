@@ -304,3 +304,19 @@ function buchungshistorieFirma(firma) {
     .map(([titel, anzahl]) => ({ titel, anzahl }))
     .sort((a, b) => b.anzahl - a.anzahl);
 }
+
+// -- Materialien-Referenzen (Datei-Inhalt liegt in IndexedDB, siehe file-store.js) --
+
+function materialHinzufuegen(kursId, bereich, referenz) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  kurs.materialien[bereich].push(referenz);
+  speichereState();
+}
+
+function materialEntfernen(kursId, bereich, dateiId) {
+  const kurs = findeKurs(kursId);
+  if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
+  kurs.materialien[bereich] = kurs.materialien[bereich].filter(d => d.id !== dateiId);
+  speichereState();
+}
