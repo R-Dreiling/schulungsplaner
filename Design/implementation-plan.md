@@ -1216,7 +1216,7 @@ git commit -m "refactor: Shell-Template auf 3-Punkte-Sidebar + JS-Module + Dialo
 
 **Interfaces:**
 - Produces: die folgenden CSS-Klassen, verbindlich für Task 7–10 (keine Seite darf eigene abweichende Varianten dieser Muster erfinden — das war genau das Problem in v1):
-  `.page-header` (jetzt Flex-Row mit `.page-header-text` + optional `.page-header-actions`), `.sidebar-tools`/`.sidebar-tool-btn`, `.dialog-overlay`/`.dialog`/`.dialog-head`/`.dialog-body`/`.dialog-foot`/`.field`/`.field-row2`, `.detail-layout`/`.detail-nav`/`.detail-main`, `.agenda-item`/`.agenda-time`/`.agenda-title`/`.agenda-desc`, `.check-row`/`.check-box`/`.check-box.done`, `.mat-group-label`/`.mat-row`/`.mat-icon`/`.mat-name`/`.mat-sub`/`.mat-actions`, `.goal-list`, `.pill`/`.pill-row`, `.chip-count`, `.badge-indigo`, `.expand-row`/`.expand-toggle`/`.expand-content`, `.termin-pair`/`.termin-col`, `table.data-table.fixed-rows`, `.truncate`, `.buchung-neu`, `.crumb`, `.uebersicht-grid`, `.btn-ghost-red`
+  `.page-header` (jetzt Flex-Row mit `.page-header-text` + optional `.page-header-actions`), `.sidebar-tools`/`.sidebar-tool-btn`, `.dialog-overlay`/`.dialog`/`.dialog-head`/`.dialog-body`/`.dialog-foot`/`.field`/`.field-row2`, `.detail-layout`/`.detail-nav`/`.detail-main`, `.agenda-item`/`.agenda-time`/`.agenda-title`/`.agenda-desc`, `.check-row`/`.check-box`/`.check-box.done`, `.mat-group-label`/`.mat-row`/`.mat-icon`/`.mat-name`/`.mat-sub`/`.mat-actions`, `.goal-list`, `.pill`/`.pill-row`, `.badge-indigo`, `.expand-row`/`.expand-toggle`/`.expand-content`, `.termin-pair`/`.termin-col`, `table.data-table.fixed-rows`, `.truncate`, `.buchung-neu`, `.crumb`, `.uebersicht-grid`, `.btn-ghost-red` (Hinweis: `.chip-count` wurde aus einem frühen Mockup übernommen, aber von keiner Seite tatsächlich genutzt — bewusst nicht definiert)
 
 - [ ] **Step 1: CSS-Ergänzungen anhängen**
 
@@ -1340,7 +1340,7 @@ Expected: `"232px"` — bestätigt, dass die bereits bestehenden Regeln (vor der
 - [ ] **Step 3: Commit**
 
 ```bash
-git add Design/styles.css
+git add Design/styles.css Berichte/index.html
 git commit -m "feat: Design-System um Dialog/Detail/Agenda/Checkliste/Materialien-Klassen erweitern"
 ```
 
@@ -1448,7 +1448,7 @@ function renderUebersicht() {
   naechsteContainer.innerHTML = alleTermineMitKurs.map(({ kurs, termin }) => {
     let chip;
     if (termin.status === 'laufend') {
-      chip = '<span class="badge badge-amber">Läuft</span>';
+      chip = '<span class="badge badge-green">Läuft</span>';
     } else {
       const tage = Math.round((new Date(termin.datum) - new Date(heute)) / 86400000);
       chip = `<span class="badge badge-gray">${tage === 0 ? 'Heute' : 'in ' + tage + ' Tagen'}</span>`;
@@ -1477,7 +1477,7 @@ Run: `python Design/assemble.py`
 Im Claude Browser Pane `Berichte/index.html` öffnen (bei Bedarf vorher `localStorage.clear()` in der Konsole und neu laden, falls Teststände aus früheren Tasks stören):
 - Übersicht zeigt 8 Kurszeilen, jede mit ein oder zwei Terminspalten
 - Bei „Datenschutzbeauftragter Grundlagenschulung": ein Termin am 12.08.2026 und ein zweiter am 18.11.2026 sichtbar
-- Bei „Arbeitssicherheit Basisschulung": ein Termin zeigt „Ausgebucht" (Indigo-Badge), der zweite (15.10.2026) zeigt „7 Plätze frei"
+- Bei „Arbeitssicherheit Basisschulung": ein Termin (30.07.2026) zeigt „2 Plätze frei" (5 von 7 belegt — 2 der 7 Buchungen sind „abgesagt" und zählen korrekt nicht zur Auslastung), der zweite (15.10.2026) zeigt „7 Plätze frei"
 - Klick auf eine Kurszeile klappt die Teilnehmerliste(n) auf, zweiter Klick klappt sie wieder zu
 - „Nächste anstehende Termine" zeigt eine sortierte Liste mit Chips
 - Keine Konsolenfehler (`read_console_messages`, `onlyErrors: true`)
@@ -2404,9 +2404,9 @@ Expected: keine Fehler; `window.STATE.kurse.length === 8`.
 - [ ] **Step 3: Kernszenario des Nutzers durchklicken (Teilnehmer bei zu geringer Auslastung verschieben)**
 
 1. „Übersicht" öffnen, Kurszeile „Arbeitssicherheit Basisschulung" aufklappen
-2. Prüfen: erster Termin (30.07.2026) zeigt „Ausgebucht" (Indigo-Badge), zweiter Termin (15.10.2026) zeigt „7 Plätze frei"
-3. Zu „Schulungen" wechseln, bei „Arbeitssicherheit Basisschulung" den ausgebuchten Termin öffnen
-4. Bei „Teilnehmer dieses Termins" eine Buchung per „Entfernen" löschen (simuliert das Verschieben aus dem vollen Termin)
+2. Prüfen: erster Termin (30.07.2026) zeigt „2 Plätze frei" (5 von 7 belegt, da 2 der ursprünglich 7 Buchungen den Anmeldestatus „abgesagt" haben und `terminAuslastung()` abgesagte Buchungen korrekt nicht mitzählt — bewusst kein „Ausgebucht" hier, das war eine falsche Annahme einer früheren Planversion, die auf der alten, fehlerhaften v1-Statik-Anzeige beruhte), zweiter Termin (15.10.2026) zeigt „7 Plätze frei"
+3. Zu „Schulungen" wechseln, bei „Arbeitssicherheit Basisschulung" den ersten (weniger ausgelasteten) Termin öffnen
+4. Bei „Teilnehmer dieses Termins" eine Buchung per „Entfernen" löschen (simuliert das Verschieben, weil der erste Termin zu gering ausgelastet ist)
 5. Zurück zu „Schulungen", den zweiten Termin (15.10.2026) öffnen, „+ Teilnehmer" klicken, dieselbe Person aus der Liste auswählen, Status „bestätigt", speichern
 6. Zurück zur Übersicht: der zweite Termin zeigt jetzt „6 Plätze frei" statt „7 Plätze frei"
 
