@@ -1641,7 +1641,14 @@ function oeffneKursBearbeitenDialog(kursId) {
     <form id="kurs-bearbeiten-form" onsubmit="return speichereKursBearbeiten(event, '${kursId}')">
       <div class="dialog-body">
         <div class="field"><label>Titel</label><input name="titel" value="${kurs.titel}" required /></div>
-        <div class="field"><label>Kategorie</label><input name="kategorie" value="${kurs.kategorie}" required /></div>
+        <div class="field">
+          <label>Kategorie</label>
+          <select name="kategorie" required>
+            <option ${kurs.kategorie === 'Datenschutz' ? 'selected' : ''}>Datenschutz</option>
+            <option ${kurs.kategorie === 'Compliance' ? 'selected' : ''}>Compliance</option>
+            <option ${kurs.kategorie === 'Arbeitssicherheit' ? 'selected' : ''}>Arbeitssicherheit</option>
+          </select>
+        </div>
         <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${kurs.beschreibung}</textarea></div>
         <div class="field"><label>Zielgruppe</label><input name="zielgruppe" value="${kurs.zielgruppe}" /></div>
       </div>
