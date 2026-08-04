@@ -143,9 +143,6 @@ button { font-family: var(--font-body); cursor: pointer; }
 }
 .page { display: none; padding: 28px 32px 40px 32px; }
 .page.active { display: block; }
-.page-header { margin-bottom: 22px; }
-.page-header h1 { font-size: 21px; font-weight: 700; margin: 0 0 4px 0; }
-.page-header .subtitle { font-size: 13px; color: var(--muted); margin: 0; }
 
 /* ---------- Reusable components ---------- */
 .card {
