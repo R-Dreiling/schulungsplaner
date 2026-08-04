@@ -22,6 +22,7 @@ function neueDateiId() {
 }
 
 async function speichereDatei(datei, { kursId, bereich }) {
+  if (!findeKurs(kursId)) throw new Error(`Kurs ${kursId} nicht gefunden`);
   const db = await oeffneDateiDB();
   const id = neueDateiId();
   await new Promise((resolve, reject) => {
@@ -47,6 +48,7 @@ async function ladeDateiBlob(dateiId) {
 }
 
 async function loescheDateiUndReferenz(dateiId, kursId, bereich) {
+  if (!findeKurs(kursId)) throw new Error(`Kurs ${kursId} nicht gefunden`);
   const db = await oeffneDateiDB();
   await new Promise((resolve, reject) => {
     const tx = db.transaction(DATEI_STORE, 'readwrite');
