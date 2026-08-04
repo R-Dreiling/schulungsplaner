@@ -1741,7 +1741,7 @@ function renderUebersicht() {
   naechsteContainer.innerHTML = alleTermineMitKurs.map(({ kurs, termin }) => {
     let chip;
     if (termin.status === 'laufend') {
-      chip = '<span class="badge badge-amber">Läuft</span>';
+      chip = '<span class="badge badge-green">Läuft</span>';
     } else {
       const tage = Math.round((new Date(termin.datum) - new Date(heute)) / 86400000);
       chip = `<span class="badge badge-gray">${tage === 0 ? 'Heute' : 'in ' + tage + ' Tagen'}</span>`;
