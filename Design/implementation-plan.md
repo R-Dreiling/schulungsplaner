@@ -478,7 +478,7 @@ git commit -m "feat: State-Engine Grundgerüst (laden/speichern/reset/export/imp
   - Checkliste: `checklistePunktToggeln(terminId, index)`; `checklistePunktHinzufuegen(terminId, label)`; `checklistePunktEntfernen(terminId, index)`
   - Agenda: `agendaPunktHinzufuegen(kursId, punkt)`; `agendaPunktEntfernen(kursId, index)`
   - Teilnehmer/Buchung: `erstelleTeilnehmer(felder)` → neue `id`; `erstelleBuchung(felder)` → neue `id`, setzt `gebuchtAm` auf heute; `aktualisiereBuchungStatus(buchungId, neuerStatus)`; `loescheBuchung(buchungId)`
-  - Abgeleitete Daten (reine Lesefunktionen, keine Persistenz): `terminAuslastung(terminId)` → `{belegt, kapazitaet, frei, prozent}`; `naechsteZweiTermine(kursId)` → `[Termin, Termin]` (bis zu 2, chronologisch ab heute, danach älteste zuerst falls keine zukünftigen mehr da sind); `buchungenFuerTermin(terminId)` → `[Buchung]`; `buchungenSortiertNeuesteZuerst()` → `[Buchung]`; `buchungshistorieFirma(firma)` → `[{titel, anzahl}]` absteigend sortiert
+  - Abgeleitete Daten (reine Lesefunktionen, keine Persistenz): `terminAuslastung(terminId)` → `{belegt, kapazitaet, frei, prozent}`; `naechsteZweiTermine(kursId)` → `[Termin, Termin]` (bis zu 2, chronologisch ab heute, danach zuletzt vergangene zuerst falls keine zukünftigen mehr da sind — für die Planung ist der jüngste vergangene Termin relevanter als der historisch älteste); `buchungenFuerTermin(terminId)` → `[Buchung]`; `buchungenSortiertNeuesteZuerst()` → `[Buchung]`; `buchungshistorieFirma(firma)` → `[{titel, anzahl}]` absteigend sortiert
 
 - [ ] **Step 1: Suchfunktionen und Kurs/Termin-CRUD anhängen**
 
@@ -547,7 +547,7 @@ function alleTermine() {
 function erstelleTermin(kursId, felder) {
   const kurs = findeKurs(kursId);
   if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
-  const id = naechsteId('t', alleTermine());
+  const id = naechsteId('tm', alleTermine());
   kurs.termine.push({
     id,
     datum: felder.datum,
@@ -802,6 +802,7 @@ function neueDateiId() {
 }
 
 async function speichereDatei(datei, { kursId, bereich }) {
+  if (!findeKurs(kursId)) throw new Error(`Kurs ${kursId} nicht gefunden`);
   const db = await oeffneDateiDB();
   const id = neueDateiId();
   await new Promise((resolve, reject) => {
@@ -827,6 +828,7 @@ async function ladeDateiBlob(dateiId) {
 }
 
 async function loescheDateiUndReferenz(dateiId, kursId, bereich) {
+  if (!findeKurs(kursId)) throw new Error(`Kurs ${kursId} nicht gefunden`);
   const db = await oeffneDateiDB();
   await new Promise((resolve, reject) => {
     const tx = db.transaction(DATEI_STORE, 'readwrite');
@@ -1200,7 +1202,7 @@ Im Claude Browser Pane öffnen (`file:///…/Berichte/index.html`), dann:
 - [ ] **Step 5: Commit**
 
 ```bash
-git add Design/ui-helpers.js Design/shell-template.html Design/assemble.py Design/fragments/page-buchungen.html
+git add Design/ui-helpers.js Design/shell-template.html Design/assemble.py Design/fragments/page-buchungen.html Berichte/index.html
 git rm Design/fragments/page-teilnehmer.html Design/fragments/page-teilnehmer.css Design/fragments/page-kunden.html Design/fragments/page-kunden.css
 git commit -m "refactor: Shell-Template auf 3-Punkte-Sidebar + JS-Module + Dialog-Infrastruktur umgebaut"
 ```
