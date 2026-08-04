@@ -1,1 +1,28 @@
-<div class="page-header"><h1>Buchungen</h1><p class="subtitle">Wird in Task 10 gebaut.</p></div>
+<div class="page-header">
+  <div class="page-header-text">
+    <h1>Buchungen</h1>
+    <p class="subtitle">Alle Anmeldungen, neueste zuerst.</p>
+  </div>
+  <div class="page-header-actions">
+    <button class="btn btn-primary" onclick="oeffneNeueBuchungDialog()">+ Neue Buchung</button>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <select id="buchungen-status-filter" class="filter-select" onchange="renderBuchungen()">
+    <option value="">Anmeldestatus: Alle</option>
+    <option value="angemeldet">angemeldet</option>
+    <option value="bestätigt">bestätigt</option>
+    <option value="abgesagt">abgesagt</option>
+  </select>
+  <select id="buchungen-kurs-filter" class="filter-select" onchange="renderBuchungen()">
+    <option value="">Kurs: Alle</option>
+  </select>
+</div>
+
+<div class="card" style="padding:6px 22px;">
+  <table class="data-table fixed-rows">
+    <thead><tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Status</th><th>Kurs / Termin</th><th></th></tr></thead>
+    <tbody id="buchungen-tabelle"></tbody>
+  </table>
+</div>
