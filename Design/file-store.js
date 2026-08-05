@@ -74,3 +74,45 @@ async function herunterladeDatei(dateiId, dateiName) {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+async function speichereTrainerDokument(datei, trainerId, gueltigBis) {
+  if (!findeTrainer(trainerId)) throw new Error(`Trainer ${trainerId} nicht gefunden`);
+  const db = await oeffneDateiDB();
+  const id = neueDateiId();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(DATEI_STORE, 'readwrite');
+    tx.objectStore(DATEI_STORE).put({ id, blob: datei });
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+  trainerDokumentHinzufuegen(trainerId, {
+    id,
+    name: datei.name,
+    typ: datei.type || 'application/octet-stream',
+    groesse: datei.size,
+    gueltigBis: gueltigBis || null,
+  });
+  return id;
+}
+
+async function loescheTrainerDokumentUndDatei(dateiId, trainerId) {
+  if (!findeTrainer(trainerId)) throw new Error(`Trainer ${trainerId} nicht gefunden`);
+  const db = await oeffneDateiDB();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(DATEI_STORE, 'readwrite');
+    tx.objectStore(DATEI_STORE).delete(dateiId);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+  trainerDokumentEntfernen(trainerId, dateiId);
+}
+
+async function alleDateienLoeschen() {
+  const db = await oeffneDateiDB();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(DATEI_STORE, 'readwrite');
+    tx.objectStore(DATEI_STORE).clear();
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+}

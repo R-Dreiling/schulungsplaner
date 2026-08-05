@@ -284,6 +284,9 @@ function aktualisiereBuchungStatus(buchungId, neuerStatus) {
   const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
   if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
   buchung.anmeldestatus = neuerStatus;
+  // Manuell hat immer Vorrang: ab jetzt fasst die Automatik diese Buchung
+  // nicht mehr an.
+  buchung.statusManuell = true;
   speichereState();
 }
 
@@ -479,4 +482,71 @@ function trainerDokumentStatus(trainer) {
     else if (dok.gueltigBis <= grenze) laeuftBaldAb++;
   }
   return { abgelaufen, laeuftBaldAb };
+}
+
+// -- Status-Automatik --
+// Laeuft als eigener Schritt beim Laden und nach dem Anlegen einer Buchung,
+// bewusst NICHT waehrend des Renderns (Rendern bleibt seiteneffektfrei).
+
+function statusAutomatikAnwenden() {
+  const fristTage = einstellungen().bestaetigungsfristTage;
+  const heute = new Date().toISOString().slice(0, 10);
+  let geaendert = 0;
+
+  for (const buchung of window.STATE.buchungen) {
+    if (buchung.statusManuell) continue;
+    if (buchung.anmeldestatus !== 'angemeldet') continue;
+    const gefunden = findeTerminMitKurs(buchung.terminId);
+    if (!gefunden) continue;
+    if (gefunden.termin.abschluss) continue;
+    if (gefunden.termin.datum < heute) continue;
+    const tageBisTermin = Math.round(
+      (new Date(gefunden.termin.datum) - new Date(heute)) / 86400000
+    );
+    if (tageBisTermin <= fristTage) {
+      buchung.anmeldestatus = 'bestätigt';
+      geaendert++;
+    }
+  }
+
+  if (geaendert > 0) speichereState();
+  return geaendert;
+}
+
+// -- Trainer-Dokumente (Dateiinhalt liegt in IndexedDB, siehe file-store.js) --
+
+function trainerDokumentHinzufuegen(trainerId, referenz) {
+  const trainer = findeTrainer(trainerId);
+  if (!trainer) throw new Error(`Trainer ${trainerId} nicht gefunden`);
+  if (!Array.isArray(trainer.dokumente)) trainer.dokumente = [];
+  trainer.dokumente.push(referenz);
+  speichereState();
+}
+
+function trainerDokumentEntfernen(trainerId, dateiId) {
+  const trainer = findeTrainer(trainerId);
+  if (!trainer) throw new Error(`Trainer ${trainerId} nicht gefunden`);
+  trainer.dokumente = (trainer.dokumente || []).filter(d => d.id !== dateiId);
+  speichereState();
+}
+
+// -- Produktivstart: alles leeren --
+
+function alleDatenLeeren() {
+  if (!confirm(
+    'Wirklich ALLE Daten unwiderruflich löschen?\n\n'
+    + 'Kurse, Termine, Buchungen, Teilnehmer, Trainer und alle hochgeladenen '
+    + 'Dateien werden entfernt. Das lässt sich nicht rückgängig machen.\n\n'
+    + 'Tipp: Vorher „Exportieren“ anklicken, falls du eine Sicherung möchtest.'
+  )) {
+    return;
+  }
+  window.STATE.kurse = [];
+  window.STATE.teilnehmer = [];
+  window.STATE.buchungen = [];
+  window.STATE.trainer = [];
+  speichereState();
+  if (typeof alleDateienLoeschen === 'function') {
+    alleDateienLoeschen().catch(err => console.warn('Dateien konnten nicht geleert werden.', err));
+  }
 }
