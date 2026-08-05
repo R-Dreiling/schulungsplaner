@@ -1719,15 +1719,18 @@ git commit -m "feat: Trainer-Seite mit Nachweisdokumenten und Termin-Zuordnung"
 
 ---
 
-## Task 8: Unterbesetzung in der Übersicht, Automatik-Kennzeichen in den Buchungen
+## Task 8: Unterbesetzung, Automatik-Kennzeichen und die letzten veralteten Trainer-Referenzen
 
 **Files:**
 - Modify: `Design/fragments/page-uebersicht.js`
 - Modify: `Design/fragments/page-buchungen.js`
+- Modify: `Design/fragments/page-schulungdetail.js` (nur die Terminauswahl im Verschieben-Dialog)
 
 **Interfaces:**
-- Consumes: `terminAuslastung()` (jetzt mit `unterbesetzt`/`minTeilnehmer`), `escAttr()`
+- Consumes: `terminAuslastung()` (jetzt mit `unterbesetzt`/`minTeilnehmer`), `escAttr()`, `trainerName()`
 - Produces: keine neuen globalen Funktionen
+
+**Hintergrund zu Step 3:** Task 6 hat die Schulungen-Seite auf das v3-Schema umgestellt, dabei aber drei Stellen in anderen Dateien nicht erfasst, die weiterhin das entfallene Feld `termin.trainer` lesen und deshalb „undefined" anzeigen. Diese drei Stellen werden hier mit erledigt, weil dieser Task ohnehin zwei der drei Dateien anfasst.
 
 - [ ] **Step 1: „Unterbesetzt"-Kennzeichnung in der Übersicht ergänzen**
 
@@ -1769,20 +1772,65 @@ Ersetze in `Design/fragments/page-buchungen.js` innerhalb von `buchungenZeile` d
       }</td>
 ```
 
-- [ ] **Step 3: Build und Browser-Verifikation**
+- [ ] **Step 3: Die drei veralteten `termin.trainer`-Referenzen beheben**
+
+Das Feld `termin.trainer` existiert seit der v3-Migration nicht mehr; stattdessen liefert `trainerName(termin.trainerId)` den Namen. An diesen drei Stellen steht noch der alte Zugriff und erzeugt „undefined":
+
+**(a)** `Design/fragments/page-uebersicht.js`, in der Liste „Nächste anstehende Termine" — ersetze
+
+```javascript
+          <div style="font-size:12px; color:var(--muted);">${termin.trainer} · ${formatiereDatum(termin.datum)}</div>
+```
+
+durch
+
+```javascript
+          <div style="font-size:12px; color:var(--muted);">${escAttr(trainerName(termin.trainerId) || 'Kein Trainer')} · ${formatiereDatum(termin.datum)}</div>
+```
+
+**(b)** `Design/fragments/page-buchungen.js`, in der Terminauswahl von `oeffneNeueBuchungDialog` — ersetze
+
+```javascript
+      ${k.termine.map(t => `<option value="${t.id}">${formatiereDatum(t.datum)} · ${t.trainer}</option>`).join('')}
+```
+
+durch
+
+```javascript
+      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
+```
+
+**(c)** `Design/fragments/page-schulungdetail.js`, in der Terminauswahl des Verschieben-Dialogs — ersetze
+
+```javascript
+    return `<option value="${t.id}">${formatiereDatum(t.datum)} · ${escAttr(t.trainer)} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
+```
+
+durch
+
+```javascript
+    return `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
+```
+
+Prüfe abschließend mit `grep -rn "\.trainer\b" Design/fragments/`, dass keine Treffer mehr übrig sind, die nicht `trainerId`, `trainerName`, `alleTrainer`, `findeTrainer`, `trainerDokument…` oder `termineFuerTrainer` heißen.
+
+- [ ] **Step 4: Build und Browser-Verifikation**
 
 Run: `python Design/assemble.py`
 
 Im Claude Browser Pane, nach `localStorage.clear()` und Neuladen:
 - Übersicht: Termin `18.11.2026` (Datenschutzbeauftragter, 0 Buchungen, min 5) zeigt „Unterbesetzt (0 von mind. 5)" in Amber; Termin `12.08.2026` (5 Buchungen, min 5) zeigt „5 Plätze frei" in Grün; „Brandschutzhelfer Ausbildung" (5 von 5) zeigt weiterhin „Ausgebucht" in Indigo
+- Übersicht: In „Nächste anstehende Termine" steht bei jedem Eintrag ein echter Trainername statt „undefined"
 - Buchungen: Zeilen zeigen hinter dem Status ein Uhr-Symbol, solange der Status nicht manuell gesetzt wurde. Nach Ändern eines Status per Dropdown auf der Schulungsdetailseite verschwindet das Symbol bei dieser Buchung
+- Buchungen: „+ Neue Buchung" öffnen — die Terminauswahl zeigt je Eintrag Datum und echten Trainernamen, kein „undefined"
+- Schulungsdetail: bei einem Kurs mit zwei Terminen (z. B. „Datenschutzbeauftragter Grundlagenschulung") in der Teilnehmertabelle „Verschieben" öffnen — die Auswahl zeigt Datum, echten Trainernamen und Belegung, kein „undefined"
 - Konsole ohne Fehler
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add Design/fragments/page-uebersicht.js Design/fragments/page-buchungen.js Berichte/index.html
-git commit -m "feat: Unterbesetzt-Kennzeichnung in der Uebersicht, Automatik-Kennzeichen in den Buchungen"
+git add Design/fragments/page-uebersicht.js Design/fragments/page-buchungen.js Design/fragments/page-schulungdetail.js Berichte/index.html
+git commit -m "feat: Unterbesetzt-Kennzeichnung, Automatik-Kennzeichen und letzte veraltete Trainer-Referenzen beheben"
 ```
 
 ---
