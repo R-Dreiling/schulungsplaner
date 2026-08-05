@@ -158,27 +158,6 @@ button { font-family: var(--font-body); cursor: pointer; }
   box-shadow: var(--shadow-card);
 }
 
-.kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
-.kpi-tile {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
-  box-shadow: var(--shadow-card);
-  border-top: 3px solid var(--teal-deep);
-}
-.kpi-label {
-  font-family: var(--font-display);
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom: 6px;
-}
-.kpi-value { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--ink); }
-.kpi-sub { font-size: 12px; color: var(--muted2); margin-top: 4px; }
-
 .section-title {
   font-family: var(--font-display);
   font-size: 14.5px;
@@ -203,7 +182,6 @@ button { font-family: var(--font-body); cursor: pointer; }
 .badge-amber { background: var(--status-amber-bg); color: var(--status-amber-fg); }
 .badge-gray  { background: var(--status-gray-bg); color: var(--status-gray-fg); }
 .badge-red   { background: var(--status-red-bg); color: var(--status-red-fg); }
-.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
 /* Progress / Auslastung */
 .progress-track {
@@ -238,7 +216,6 @@ table.data-table tbody td {
 table.data-table tbody tr:hover { background: var(--card-2); }
 table.data-table tbody tr:last-child td { border-bottom: none; }
 table.data-table .cell-strong { color: var(--ink); font-weight: 600; }
-table.data-table.clickable tbody tr { cursor: pointer; }
 
 /* Filter bar */
 .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -403,187 +380,6 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
   #page-uebersicht .uebersicht-grid {
     grid-template-columns: 1fr;
   }
-}
-
-#page-uebersicht .uebersicht-col .section-title {
-  margin-top: 0;
-}
-
-#page-uebersicht .util-card,
-#page-uebersicht .next-card {
-  padding: 4px 22px;
-}
-
-/* Auslastung je Schulung */
-#page-uebersicht .util-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
-}
-#page-uebersicht .util-row:last-child {
-  border-bottom: none;
-}
-#page-uebersicht .util-info {
-  flex: 1;
-  min-width: 0;
-}
-#page-uebersicht .util-title {
-  font-family: var(--font-display);
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-#page-uebersicht .util-kat {
-  font-size: 11.5px;
-  color: var(--muted2);
-  margin-bottom: 9px;
-}
-#page-uebersicht .util-track-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-#page-uebersicht .util-track-wrap .progress-track {
-  flex: 1;
-}
-#page-uebersicht .util-count {
-  flex: none;
-  font-size: 11.5px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-#page-uebersicht .util-row > .badge {
-  flex: none;
-}
-
-/* Naechste anstehende Schulungen */
-#page-uebersicht .next-card .list-row {
-  gap: 12px;
-}
-#page-uebersicht .lr-main {
-  min-width: 0;
-}
-#page-uebersicht .lr-title {
-  font-family: var(--font-display);
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-#page-uebersicht .lr-meta {
-  font-size: 12px;
-  color: var(--muted);
-}
-#page-uebersicht .next-card .badge {
-  flex: none;
-}
-
-
-/* ---- page-schulungdetail.css ---- */
-/* ========================================================================
-   Seite: Schulungsdetail
-   Alle Selektoren unter #page-schulungdetail gescopt.
-   ======================================================================== */
-
-#page-schulungdetail .back-link {
-  display: inline-block;
-  margin-bottom: 20px;
-  font-size: 13.5px;
-}
-
-/* ---------- Kopfbereich je Panel ---------- */
-#page-schulungdetail .detail-header {
-  padding: 24px 28px 26px 28px;
-  border-top: 3px solid var(--teal-deep);
-  margin-bottom: 26px;
-}
-
-#page-schulungdetail .detail-header h1 {
-  font-size: 20px;
-  line-height: 1.25;
-  margin: 0 0 12px 0;
-}
-
-#page-schulungdetail .detail-badges {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-#page-schulungdetail .detail-meta {
-  display: flex;
-  gap: 32px;
-  flex-wrap: wrap;
-  padding: 16px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 20px;
-}
-
-#page-schulungdetail .detail-meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-#page-schulungdetail .detail-meta-label {
-  font-family: var(--font-display);
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--muted2);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-#page-schulungdetail .detail-meta-value {
-  font-size: 13.5px;
-  color: var(--ink);
-  font-weight: 600;
-}
-
-/* ---------- Auslastung ---------- */
-#page-schulungdetail .detail-capacity-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-#page-schulungdetail .detail-capacity-text {
-  font-size: 13px;
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* ---------- Teilnehmer-Abschnitt ---------- */
-#page-schulungdetail .detail-section-title {
-  margin-top: 4px;
-}
-
-/* ---------- Leerzustand (keine Auswahl) ---------- */
-/* Hinweis: #detail-empty traegt bewusst inline style="display:block" (siehe HTML),
-   damit es beim ersten Laden sichtbar ist; hier daher kein display: flex, das
-   von der Inline-Deklaration ueberschrieben wuerde. Zentrierung erfolgt ueber
-   Text-Alignment auf dem Absatz selbst. */
-#page-schulungdetail #detail-empty {
-  padding: 72px 0;
-}
-
-#page-schulungdetail #detail-empty .empty-hint {
-  font-size: 14px;
-  text-align: center;
 }
 
 
@@ -779,17 +575,41 @@ function exportiereJSON() {
   URL.revokeObjectURL(url);
 }
 
+// Prueft die Grobstruktur einer importierten Datei, BEVOR der bestehende
+// State ueberschrieben wird. Wirft mit klarer Meldung, wenn etwas fehlt.
+function pruefeImportStruktur(geparst) {
+  if (!geparst || typeof geparst !== 'object') {
+    throw new Error('Datei enthält kein gültiges JSON-Objekt.');
+  }
+  if (!Array.isArray(geparst.kurse) || !Array.isArray(geparst.teilnehmer) || !Array.isArray(geparst.buchungen)) {
+    throw new Error('Datei enthält nicht die erwarteten Listen (kurse/teilnehmer/buchungen).');
+  }
+  for (const kurs of geparst.kurse) {
+    if (!kurs || typeof kurs !== 'object' || !Array.isArray(kurs.termine)) {
+      throw new Error(`Kurs "${kurs && kurs.titel ? kurs.titel : kurs && kurs.id}" hat keine gültige Terminliste.`);
+    }
+  }
+}
+
 function importiereJSON(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
+      // Vorherigen State sichern: schlaegt speichereState()/renderAll() trotz
+      // Strukturpruefung fehl, wird er zurueckgerollt - ein fehlerhafter
+      // Import darf die echten Daten des Nutzers nie verlieren.
+      const vorheriger = window.STATE;
       try {
         const geparst = JSON.parse(reader.result);
-        if (!geparst.kurse || !geparst.teilnehmer || !geparst.buchungen) {
-          throw new Error('Datei enthält nicht die erwarteten Felder (kurse/teilnehmer/buchungen).');
-        }
+        pruefeImportStruktur(geparst);
         window.STATE = geparst;
-        speichereState();
+        try {
+          speichereState();
+        } catch (fehler) {
+          window.STATE = vorheriger;
+          speichereState();
+          throw new Error('Datei konnte nicht dargestellt werden, alte Daten wiederhergestellt: ' + fehler.message);
+        }
         resolve();
       } catch (e) {
         reject(e);
@@ -981,6 +801,16 @@ function aktualisiereBuchungStatus(buchungId, neuerStatus) {
   speichereState();
 }
 
+// Verschiebt eine bestehende Buchung auf einen anderen Termin. gebuchtAm und
+// anmeldestatus bleiben bewusst erhalten - nur die Termin-Zuordnung aendert
+// sich (sonst waere es dasselbe wie Loeschen + neu anlegen).
+function verschiebeBuchung(buchungId, neuerTerminId) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  buchung.terminId = neuerTerminId;
+  speichereState();
+}
+
 function loescheBuchung(buchungId) {
   window.STATE.buchungen = window.STATE.buchungen.filter(b => b.id !== buchungId);
   speichereState();
@@ -1156,6 +986,20 @@ function formularWerte(formElement) {
   return Object.fromEntries(new FormData(formElement).entries());
 }
 
+// Maskiert Werte, die in ein HTML-Attribut interpoliert werden (value="...",
+// title="...", label="..."). Ohne das kuerzt ein " im Kurstitel das Feld ab.
+function escAttr(text) {
+  return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Fuer Werte, die zusaetzlich in einem JS-String-Argument eines inline
+// onclick="..." landen. Der Browser dekodiert Entities BEVOR das JS geparst
+// wird - escAttr allein wuerde ein &#39; wieder zu ' machen und den Handler
+// zerbrechen. Daher zuerst JS-escapen (Backslash), dann Attribut-escapen.
+function escJsArg(text) {
+  return escAttr(String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+}
+
 function formatiereDatum(isoDatum) {
   const [jahr, monat, tag] = isoDatum.split('-');
   return `${tag}.${monat}.${jahr}`;
@@ -1218,7 +1062,9 @@ function uebersichtTerminSpalte(termin) {
 }
 
 function uebersichtTeilnehmerListe(termin) {
-  const buchungen = buchungenFuerTermin(termin.id);
+  // Abgesagte Buchungen zaehlen nicht zur Auslastung und haben hier keine
+  // Statusspalte - sie wuerden als normaler Name erscheinen und taeuschen.
+  const buchungen = buchungenFuerTermin(termin.id).filter(b => b.anmeldestatus !== 'abgesagt');
   if (buchungen.length === 0) {
     return '<p class="empty-hint">Noch keine Teilnehmer zugeordnet.</p>';
   }
@@ -1259,7 +1105,9 @@ function renderUebersicht() {
   const heute = new Date().toISOString().slice(0, 10);
   const alleTermineMitKurs = window.STATE.kurse.flatMap(kurs =>
     kurs.termine.map(termin => ({ kurs, termin }))
-  ).filter(({ termin }) => termin.status === 'laufend' || termin.datum >= heute)
+  ).filter(({ termin }) =>
+    (termin.status === 'laufend' || termin.datum >= heute) && termin.status !== 'abgeschlossen'
+  )
    .sort((a, b) => a.termin.datum.localeCompare(b.termin.datum))
    .slice(0, 6);
 
@@ -1393,7 +1241,7 @@ function oeffneKursBearbeitenDialog(kursId) {
     <div class="dialog-head"><h3>Kurs bearbeiten</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
     <form id="kurs-bearbeiten-form" onsubmit="return speichereKursBearbeiten(event, '${kursId}')">
       <div class="dialog-body">
-        <div class="field"><label>Titel</label><input name="titel" value="${kurs.titel}" required /></div>
+        <div class="field"><label>Titel</label><input name="titel" value="${escAttr(kurs.titel)}" required /></div>
         <div class="field">
           <label>Kategorie</label>
           <select name="kategorie" required>
@@ -1403,7 +1251,7 @@ function oeffneKursBearbeitenDialog(kursId) {
           </select>
         </div>
         <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${kurs.beschreibung}</textarea></div>
-        <div class="field"><label>Zielgruppe</label><input name="zielgruppe" value="${kurs.zielgruppe}" /></div>
+        <div class="field"><label>Zielgruppe</label><input name="zielgruppe" value="${escAttr(kurs.zielgruppe)}" /></div>
       </div>
       <div class="dialog-foot">
         <button type="button" class="btn" onclick="schliesseDialog()">Abbrechen</button>
@@ -1471,7 +1319,7 @@ function oeffneTerminBearbeitenDialog(terminId) {
           <div class="field"><label>Kapazität</label><input type="number" name="kapazitaet" min="1" value="${termin.kapazitaet}" required /></div>
         </div>
         <div class="field-row2">
-          <div class="field"><label>Trainer</label><input name="trainer" value="${termin.trainer}" required /></div>
+          <div class="field"><label>Trainer</label><input name="trainer" value="${escAttr(termin.trainer)}" required /></div>
           <div class="field">
             <label>Format</label>
             <select name="format">
@@ -1480,7 +1328,7 @@ function oeffneTerminBearbeitenDialog(terminId) {
             </select>
           </div>
         </div>
-        <div class="field"><label>Ort</label><input name="ort" value="${termin.ort}" /></div>
+        <div class="field"><label>Ort</label><input name="ort" value="${escAttr(termin.ort)}" /></div>
         <div class="field">
           <label>Status</label>
           <select name="status">
@@ -1554,7 +1402,7 @@ function renderSchulungdetail(terminId) {
       <div style="display:flex; align-items:flex-start; justify-content:space-between;">
         <div>
           <div style="display:flex; gap:8px; margin-bottom:10px;">
-            <span class="badge badge-indigo">${kurs.kategorie}</span>
+            <span class="badge badge-gray">${kurs.kategorie}</span>
             ${statusBadgeHtml(termin.status)}
           </div>
           <h2 style="font-size:20px; margin:0 0 8px 0;">${kurs.titel}</h2>
@@ -1586,9 +1434,20 @@ function renderSchulungdetail(terminId) {
         ${detailAbschnittAgenda(kurs)}
         ${detailAbschnittMaterialien(kurs)}
         ${detailAbschnittCheckliste(termin)}
-        ${detailAbschnittTeilnehmer(termin)}
+        ${detailAbschnittTeilnehmer(kurs, termin)}
       </div>
     </div>`;
+}
+
+// Beschreibung, Agenda und Materialien haengen am Kurs, nicht am Termin -
+// eine Aenderung wirkt sich auf alle Termine des Kurses aus. Ohne Hinweis ist
+// das bei mehreren Terminen nicht erkennbar.
+function detailKursweitHinweis(kurs) {
+  const anzahl = kurs.termine.length;
+  const text = anzahl === 1
+    ? 'Gilt für alle Termine dieses Kurses'
+    : `Gilt für alle ${anzahl} Termine dieses Kurses`;
+  return `<div style="font-size:11px; color:var(--muted2); margin:-8px 0 12px 0;">${text}</div>`;
 }
 
 function detailAbschnittBeschreibung(kurs) {
@@ -1597,6 +1456,7 @@ function detailAbschnittBeschreibung(kurs) {
       <div class="section-title">Beschreibung &amp; Lernziele
         <button class="btn" onclick="detailOeffneBeschreibungBearbeitenDialog('${kurs.id}')">Bearbeiten</button>
       </div>
+      ${detailKursweitHinweis(kurs)}
       <p class="desc-text" style="font-size:13px; line-height:1.55;">${kurs.beschreibung || '<em>Noch keine Beschreibung.</em>'}</p>
       <ul class="goal-list">${(kurs.lernziele || []).map(z => `<li>${z}</li>`).join('') || '<li style="color:var(--muted2);">Noch keine Lernziele.</li>'}</ul>
       <div class="pill-row">
@@ -1615,8 +1475,8 @@ function detailOeffneBeschreibungBearbeitenDialog(kursId) {
         <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${kurs.beschreibung}</textarea></div>
         <div class="field"><label>Lernziele (ein Punkt pro Zeile)</label><textarea name="lernzieleText" rows="4">${(kurs.lernziele || []).join('\n')}</textarea></div>
         <div class="field-row2">
-          <div class="field"><label>Zielgruppe</label><input name="zielgruppe" value="${kurs.zielgruppe}" /></div>
-          <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${kurs.voraussetzungen}" /></div>
+          <div class="field"><label>Zielgruppe</label><input name="zielgruppe" value="${escAttr(kurs.zielgruppe)}" /></div>
+          <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${escAttr(kurs.voraussetzungen)}" /></div>
         </div>
       </div>
       <div class="dialog-foot">
@@ -1653,6 +1513,7 @@ function detailAbschnittAgenda(kurs) {
       <div class="section-title">Agenda <small>${kurs.agenda.length} Programmpunkte</small>
         <button class="btn" onclick="detailOeffneAgendaDialog('${kurs.id}')">+ Programmpunkt</button>
       </div>
+      ${detailKursweitHinweis(kurs)}
       ${punkte}
     </div>`;
 }
@@ -1697,7 +1558,7 @@ function detailMaterialListe(kurs, bereich) {
         <div class="mat-sub">${detailFormatiereGroesse(d.groesse)}</div>
       </div>
       <div class="mat-actions">
-        <button class="btn" onclick="herunterladeDatei('${d.id}', '${d.name}')">↓</button>
+        <button class="btn" onclick="herunterladeDatei('${d.id}', '${escJsArg(d.name)}')">↓</button>
         <button class="btn btn-ghost-red" onclick="detailMaterialEntfernen('${kurs.id}', '${bereich}', '${d.id}')">Entfernen</button>
       </div>
     </div>`).join('');
@@ -1707,6 +1568,7 @@ function detailAbschnittMaterialien(kurs) {
   return `
     <div class="card" id="abschnitt-materialien">
       <div class="section-title">Materialien</div>
+      ${detailKursweitHinweis(kurs)}
       <div class="mat-group-label">Seminarunterlagen</div>
       ${detailMaterialListe(kurs, 'seminarunterlagen')}
       <div style="margin:10px 0 18px 0;">
@@ -1723,7 +1585,9 @@ function detailAbschnittMaterialien(kurs) {
 function detailMaterialUpload(ev, kursId, bereich) {
   const datei = ev.target.files[0];
   if (!datei) return;
-  speichereDatei(datei, { kursId, bereich }).then(() => { ev.target.value = ''; });
+  speichereDatei(datei, { kursId, bereich })
+    .then(() => { ev.target.value = ''; })
+    .catch(err => alert('Datei-Upload fehlgeschlagen: ' + err.message));
 }
 
 function detailMaterialEntfernen(kursId, bereich, dateiId) {
@@ -1762,8 +1626,12 @@ function detailChecklisteEntfernen(terminId, index) {
   }
 }
 
-function detailAbschnittTeilnehmer(termin) {
+function detailAbschnittTeilnehmer(kurs, termin) {
   const buchungen = buchungenFuerTermin(termin.id);
+  // Abgesagte bleiben als Zeile sichtbar (sie muessen verwaltbar sein), zaehlen
+  // aber nicht mit - so passt die Kopfzahl zur Kapazitaetsanzeige oben.
+  const aktivAnzahl = buchungen.filter(b => b.anmeldestatus !== 'abgesagt').length;
+  const mehrereTermine = kurs.termine.length > 1;
   const zeilen = buchungen.map(b => {
     const t = window.STATE.teilnehmer.find(p => p.id === b.teilnehmerId);
     return `
@@ -1778,17 +1646,61 @@ function detailAbschnittTeilnehmer(termin) {
             <option value="abgesagt" ${b.anmeldestatus === 'abgesagt' ? 'selected' : ''}>abgesagt</option>
           </select>
         </td>
-        <td><button class="btn btn-ghost-red" onclick="detailBuchungEntfernen('${b.id}')">Entfernen</button></td>
+        <td style="text-align:right; white-space:nowrap;">
+          ${mehrereTermine ? `<button class="btn" onclick="detailOeffneVerschiebenDialog('${b.id}')">Verschieben</button>` : ''}
+          <button class="btn btn-ghost-red" onclick="detailBuchungEntfernen('${b.id}')">Entfernen</button>
+        </td>
       </tr>`;
   }).join('') || '<tr><td colspan="5" class="empty-hint">Noch keine Teilnehmer.</td></tr>';
   return `
     <div class="card" id="abschnitt-teilnehmer">
-      <div class="section-title">Teilnehmer dieses Termins <small>${buchungen.length}</small></div>
+      <div class="section-title">Teilnehmer dieses Termins <small>${aktivAnzahl} aktiv von ${buchungen.length}</small></div>
       <table class="data-table fixed-rows">
         <thead><tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th></th></tr></thead>
         <tbody>${zeilen}</tbody>
       </table>
     </div>`;
+}
+
+// Verschiebt eine Buchung auf einen anderen Termin DESSELBEN Kurses - der
+// eigentliche Zweck der Zwei-Termine-Ansicht (unterbelegten Termin auffuellen).
+function detailOeffneVerschiebenDialog(buchungId) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (!buchung) return;
+  const { kurs, termin } = findeTerminMitKurs(buchung.terminId);
+  const teilnehmer = window.STATE.teilnehmer.find(p => p.id === buchung.teilnehmerId);
+  const andere = kurs.termine.filter(t => t.id !== termin.id);
+  const optionen = andere.map(t => {
+    const a = terminAuslastung(t.id);
+    return `<option value="${t.id}">${formatiereDatum(t.datum)} · ${escAttr(t.trainer)} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
+  }).join('');
+  const koerper = andere.length === 0
+    ? '<p class="empty-hint">Dieser Kurs hat keine weiteren Termine.</p>'
+    : `<div class="field"><label>Neuer Termin</label><select name="neuerTerminId" required>${optionen}</select></div>`;
+  oeffneDialog(`
+    <div class="dialog-head"><h3>Teilnehmer verschieben</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
+    <form onsubmit="return detailSpeichereVerschieben(event, '${buchungId}')">
+      <div class="dialog-body">
+        <div style="font-size:12.5px; color:var(--muted);">
+          <strong style="color:var(--ink);">${teilnehmer ? teilnehmer.name : '(unbekannt)'}</strong>
+          von ${formatiereDatum(termin.datum)} auf einen anderen Termin von „${kurs.titel}" verschieben.
+          Buchungsdatum und Anmeldestatus bleiben erhalten.
+        </div>
+        ${koerper}
+      </div>
+      <div class="dialog-foot">
+        <button type="button" class="btn" onclick="schliesseDialog()">Abbrechen</button>
+        ${andere.length === 0 ? '' : '<button type="submit" class="btn btn-primary">Verschieben</button>'}
+      </div>
+    </form>`);
+}
+
+function detailSpeichereVerschieben(ev, buchungId) {
+  ev.preventDefault();
+  const felder = formularWerte(ev.target);
+  verschiebeBuchung(buchungId, felder.neuerTerminId);
+  schliesseDialog();
+  return false;
 }
 
 function detailBuchungEntfernen(buchungId) {
@@ -1812,9 +1724,9 @@ function detailOeffneTeilnehmerHinzufuegenDialog(terminId) {
           </select>
         </div>
         <div id="detail-neue-person-felder">
-          <div class="field"><label>Name</label><input name="name" /></div>
-          <div class="field"><label>Firma</label><input name="firma" /></div>
-          <div class="field"><label>E-Mail</label><input type="email" name="email" /></div>
+          <div class="field"><label>Name</label><input name="name" required /></div>
+          <div class="field"><label>Firma</label><input name="firma" required /></div>
+          <div class="field"><label>E-Mail</label><input type="email" name="email" required /></div>
         </div>
         <div class="field">
           <label>Anmeldestatus</label>
@@ -1832,12 +1744,23 @@ function detailOeffneTeilnehmerHinzufuegenDialog(terminId) {
 }
 
 function detailToggleNeuePersonFelder(wert) {
-  document.getElementById('detail-neue-person-felder').style.display = wert === '__neu__' ? 'flex' : 'none';
+  const felder = document.getElementById('detail-neue-person-felder');
+  const sichtbar = wert === '__neu__';
+  // '' statt 'flex': der Wrapper hat keine flex-direction, mit 'flex' stuenden
+  // Name/Firma/E-Mail nebeneinander statt untereinander.
+  felder.style.display = sichtbar ? '' : 'none';
+  // required nur solange die Felder sichtbar sind - ein required-Feld in einem
+  // display:none-Container blockiert das Absenden ("not focusable").
+  felder.querySelectorAll('input').forEach(i => { i.required = sichtbar; });
 }
 
 function detailSpeichereTeilnehmerHinzufuegen(ev, terminId) {
   ev.preventDefault();
   const felder = formularWerte(ev.target);
+  const a = terminAuslastung(terminId);
+  if (a.frei <= 0 && !confirm(`Dieser Termin hat keine freien Plätze mehr (${a.belegt} von ${a.kapazitaet} belegt). Trotzdem buchen?`)) {
+    return false;
+  }
   let teilnehmerId = felder.teilnehmerId;
   if (teilnehmerId === '__neu__') {
     teilnehmerId = erstelleTeilnehmer({
@@ -1867,8 +1790,10 @@ function buchungenAktualisiereKursFilterOptionen() {
 function buchungenIstNeu(gebuchtAm) {
   const heute = new Date();
   const datum = new Date(gebuchtAm);
-  const tageDiff = Math.abs((heute - datum) / 86400000);
-  return tageDiff <= 14;
+  // Ohne Vorzeichenpruefung wuerde auch ein in der Zukunft liegendes
+  // Buchungsdatum als "neu" markiert - "neu" heisst kuerzlich gebucht.
+  const tageDiff = (heute - datum) / 86400000;
+  return tageDiff >= 0 && tageDiff <= 14;
 }
 
 function buchungenZeile(buchung) {
@@ -1880,13 +1805,13 @@ function buchungenZeile(buchung) {
   const historie = buchungshistorieFirma(teilnehmer.firma);
   const historieHtml = historie.length
     ? `<ul style="margin:0; padding-left:18px;">${historie.map(h => `<li>${h.titel}: ${h.anzahl}×</li>`).join('')}</ul>`
-    : '<p class="empty-hint" style="padding:0;">Keine weiteren Buchungen dieser Firma.</p>';
+    : '<p class="empty-hint" style="padding:0;">Bisher keine anderen Buchungen dieser Firma.</p>';
 
   return `
     <tr class="expand-row ${neu ? 'buchung-neu' : ''}" onclick="buchungenToggleVerlauf('${buchung.id}')">
       <td class="cell-strong">${teilnehmer.name}</td>
-      <td>${teilnehmer.firma} ${teilnehmer.bestandskunde ? '<span class="badge badge-green">Bestandskunde</span>' : ''}</td>
-      <td class="truncate" style="max-width:200px;" title="${teilnehmer.email}">${teilnehmer.email}</td>
+      <td>${teilnehmer.firma} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
+      <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${teilnehmer.email}</td>
       <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}</td>
       <td>${kurs.titel} <span style="color:var(--muted2);">· ${formatiereDatum(termin.datum)}</span></td>
       <td onclick="event.stopPropagation();"><button class="btn btn-ghost-red" onclick="buchungenEntfernen('${buchung.id}')">Entfernen</button></td>
@@ -1935,7 +1860,7 @@ function oeffneNeueBuchungDialog() {
   const personenOptionen = window.STATE.teilnehmer
     .map(t => `<option value="${t.id}">${t.name} — ${t.firma}</option>`).join('');
   const terminOptionen = window.STATE.kurse.map(k => `
-    <optgroup label="${k.titel}">
+    <optgroup label="${escAttr(k.titel)}">
       ${k.termine.map(t => `<option value="${t.id}">${formatiereDatum(t.datum)} · ${t.trainer}</option>`).join('')}
     </optgroup>`).join('');
 
@@ -1951,9 +1876,9 @@ function oeffneNeueBuchungDialog() {
           </select>
         </div>
         <div id="buchungen-neue-person-felder">
-          <div class="field"><label>Name</label><input name="name" /></div>
-          <div class="field"><label>Firma</label><input name="firma" /></div>
-          <div class="field"><label>E-Mail</label><input type="email" name="email" /></div>
+          <div class="field"><label>Name</label><input name="name" required /></div>
+          <div class="field"><label>Firma</label><input name="firma" required /></div>
+          <div class="field"><label>E-Mail</label><input type="email" name="email" required /></div>
         </div>
         <div class="field"><label>Termin</label><select name="terminId" required>${terminOptionen}</select></div>
         <div class="field">
@@ -1972,12 +1897,23 @@ function oeffneNeueBuchungDialog() {
 }
 
 function buchungenToggleNeuePersonFelder(wert) {
-  document.getElementById('buchungen-neue-person-felder').style.display = wert === '__neu__' ? 'flex' : 'none';
+  const felder = document.getElementById('buchungen-neue-person-felder');
+  const sichtbar = wert === '__neu__';
+  // '' statt 'flex': der Wrapper hat keine flex-direction, mit 'flex' stuenden
+  // Name/Firma/E-Mail nebeneinander statt untereinander.
+  felder.style.display = sichtbar ? '' : 'none';
+  // required nur solange die Felder sichtbar sind - ein required-Feld in einem
+  // display:none-Container blockiert das Absenden ("not focusable").
+  felder.querySelectorAll('input').forEach(i => { i.required = sichtbar; });
 }
 
 function speichereNeueBuchung(ev) {
   ev.preventDefault();
   const felder = formularWerte(ev.target);
+  const a = terminAuslastung(felder.terminId);
+  if (a.frei <= 0 && !confirm(`Dieser Termin hat keine freien Plätze mehr (${a.belegt} von ${a.kapazitaet} belegt). Trotzdem buchen?`)) {
+    return false;
+  }
   let teilnehmerId = felder.teilnehmerId;
   if (teilnehmerId === '__neu__') {
     teilnehmerId = erstelleTeilnehmer({

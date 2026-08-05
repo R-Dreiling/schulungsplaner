@@ -102,7 +102,7 @@ function oeffneKursBearbeitenDialog(kursId) {
     <div class="dialog-head"><h3>Kurs bearbeiten</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
     <form id="kurs-bearbeiten-form" onsubmit="return speichereKursBearbeiten(event, '${kursId}')">
       <div class="dialog-body">
-        <div class="field"><label>Titel</label><input name="titel" value="${kurs.titel}" required /></div>
+        <div class="field"><label>Titel</label><input name="titel" value="${escAttr(kurs.titel)}" required /></div>
         <div class="field">
           <label>Kategorie</label>
           <select name="kategorie" required>
@@ -112,7 +112,7 @@ function oeffneKursBearbeitenDialog(kursId) {
           </select>
         </div>
         <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${kurs.beschreibung}</textarea></div>
-        <div class="field"><label>Zielgruppe</label><input name="zielgruppe" value="${kurs.zielgruppe}" /></div>
+        <div class="field"><label>Zielgruppe</label><input name="zielgruppe" value="${escAttr(kurs.zielgruppe)}" /></div>
       </div>
       <div class="dialog-foot">
         <button type="button" class="btn" onclick="schliesseDialog()">Abbrechen</button>
@@ -180,7 +180,7 @@ function oeffneTerminBearbeitenDialog(terminId) {
           <div class="field"><label>Kapazität</label><input type="number" name="kapazitaet" min="1" value="${termin.kapazitaet}" required /></div>
         </div>
         <div class="field-row2">
-          <div class="field"><label>Trainer</label><input name="trainer" value="${termin.trainer}" required /></div>
+          <div class="field"><label>Trainer</label><input name="trainer" value="${escAttr(termin.trainer)}" required /></div>
           <div class="field">
             <label>Format</label>
             <select name="format">
@@ -189,7 +189,7 @@ function oeffneTerminBearbeitenDialog(terminId) {
             </select>
           </div>
         </div>
-        <div class="field"><label>Ort</label><input name="ort" value="${termin.ort}" /></div>
+        <div class="field"><label>Ort</label><input name="ort" value="${escAttr(termin.ort)}" /></div>
         <div class="field">
           <label>Status</label>
           <select name="status">

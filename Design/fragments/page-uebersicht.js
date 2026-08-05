@@ -17,7 +17,9 @@ function uebersichtTerminSpalte(termin) {
 }
 
 function uebersichtTeilnehmerListe(termin) {
-  const buchungen = buchungenFuerTermin(termin.id);
+  // Abgesagte Buchungen zaehlen nicht zur Auslastung und haben hier keine
+  // Statusspalte - sie wuerden als normaler Name erscheinen und taeuschen.
+  const buchungen = buchungenFuerTermin(termin.id).filter(b => b.anmeldestatus !== 'abgesagt');
   if (buchungen.length === 0) {
     return '<p class="empty-hint">Noch keine Teilnehmer zugeordnet.</p>';
   }
@@ -58,7 +60,9 @@ function renderUebersicht() {
   const heute = new Date().toISOString().slice(0, 10);
   const alleTermineMitKurs = window.STATE.kurse.flatMap(kurs =>
     kurs.termine.map(termin => ({ kurs, termin }))
-  ).filter(({ termin }) => termin.status === 'laufend' || termin.datum >= heute)
+  ).filter(({ termin }) =>
+    (termin.status === 'laufend' || termin.datum >= heute) && termin.status !== 'abgeschlossen'
+  )
    .sort((a, b) => a.termin.datum.localeCompare(b.termin.datum))
    .slice(0, 6);
 

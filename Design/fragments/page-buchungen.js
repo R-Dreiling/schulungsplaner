@@ -14,8 +14,10 @@ function buchungenAktualisiereKursFilterOptionen() {
 function buchungenIstNeu(gebuchtAm) {
   const heute = new Date();
   const datum = new Date(gebuchtAm);
-  const tageDiff = Math.abs((heute - datum) / 86400000);
-  return tageDiff <= 14;
+  // Ohne Vorzeichenpruefung wuerde auch ein in der Zukunft liegendes
+  // Buchungsdatum als "neu" markiert - "neu" heisst kuerzlich gebucht.
+  const tageDiff = (heute - datum) / 86400000;
+  return tageDiff >= 0 && tageDiff <= 14;
 }
 
 function buchungenZeile(buchung) {
@@ -27,13 +29,13 @@ function buchungenZeile(buchung) {
   const historie = buchungshistorieFirma(teilnehmer.firma);
   const historieHtml = historie.length
     ? `<ul style="margin:0; padding-left:18px;">${historie.map(h => `<li>${h.titel}: ${h.anzahl}×</li>`).join('')}</ul>`
-    : '<p class="empty-hint" style="padding:0;">Keine weiteren Buchungen dieser Firma.</p>';
+    : '<p class="empty-hint" style="padding:0;">Bisher keine anderen Buchungen dieser Firma.</p>';
 
   return `
     <tr class="expand-row ${neu ? 'buchung-neu' : ''}" onclick="buchungenToggleVerlauf('${buchung.id}')">
       <td class="cell-strong">${teilnehmer.name}</td>
-      <td>${teilnehmer.firma} ${teilnehmer.bestandskunde ? '<span class="badge badge-green">Bestandskunde</span>' : ''}</td>
-      <td class="truncate" style="max-width:200px;" title="${teilnehmer.email}">${teilnehmer.email}</td>
+      <td>${teilnehmer.firma} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
+      <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${teilnehmer.email}</td>
       <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}</td>
       <td>${kurs.titel} <span style="color:var(--muted2);">· ${formatiereDatum(termin.datum)}</span></td>
       <td onclick="event.stopPropagation();"><button class="btn btn-ghost-red" onclick="buchungenEntfernen('${buchung.id}')">Entfernen</button></td>
@@ -82,7 +84,7 @@ function oeffneNeueBuchungDialog() {
   const personenOptionen = window.STATE.teilnehmer
     .map(t => `<option value="${t.id}">${t.name} — ${t.firma}</option>`).join('');
   const terminOptionen = window.STATE.kurse.map(k => `
-    <optgroup label="${k.titel}">
+    <optgroup label="${escAttr(k.titel)}">
       ${k.termine.map(t => `<option value="${t.id}">${formatiereDatum(t.datum)} · ${t.trainer}</option>`).join('')}
     </optgroup>`).join('');
 
@@ -98,9 +100,9 @@ function oeffneNeueBuchungDialog() {
           </select>
         </div>
         <div id="buchungen-neue-person-felder">
-          <div class="field"><label>Name</label><input name="name" /></div>
-          <div class="field"><label>Firma</label><input name="firma" /></div>
-          <div class="field"><label>E-Mail</label><input type="email" name="email" /></div>
+          <div class="field"><label>Name</label><input name="name" required /></div>
+          <div class="field"><label>Firma</label><input name="firma" required /></div>
+          <div class="field"><label>E-Mail</label><input type="email" name="email" required /></div>
         </div>
         <div class="field"><label>Termin</label><select name="terminId" required>${terminOptionen}</select></div>
         <div class="field">
@@ -119,12 +121,23 @@ function oeffneNeueBuchungDialog() {
 }
 
 function buchungenToggleNeuePersonFelder(wert) {
-  document.getElementById('buchungen-neue-person-felder').style.display = wert === '__neu__' ? 'flex' : 'none';
+  const felder = document.getElementById('buchungen-neue-person-felder');
+  const sichtbar = wert === '__neu__';
+  // '' statt 'flex': der Wrapper hat keine flex-direction, mit 'flex' stuenden
+  // Name/Firma/E-Mail nebeneinander statt untereinander.
+  felder.style.display = sichtbar ? '' : 'none';
+  // required nur solange die Felder sichtbar sind - ein required-Feld in einem
+  // display:none-Container blockiert das Absenden ("not focusable").
+  felder.querySelectorAll('input').forEach(i => { i.required = sichtbar; });
 }
 
 function speichereNeueBuchung(ev) {
   ev.preventDefault();
   const felder = formularWerte(ev.target);
+  const a = terminAuslastung(felder.terminId);
+  if (a.frei <= 0 && !confirm(`Dieser Termin hat keine freien Plätze mehr (${a.belegt} von ${a.kapazitaet} belegt). Trotzdem buchen?`)) {
+    return false;
+  }
   let teilnehmerId = felder.teilnehmerId;
   if (teilnehmerId === '__neu__') {
     teilnehmerId = erstelleTeilnehmer({

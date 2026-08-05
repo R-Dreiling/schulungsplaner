@@ -21,6 +21,20 @@ function formularWerte(formElement) {
   return Object.fromEntries(new FormData(formElement).entries());
 }
 
+// Maskiert Werte, die in ein HTML-Attribut interpoliert werden (value="...",
+// title="...", label="..."). Ohne das kuerzt ein " im Kurstitel das Feld ab.
+function escAttr(text) {
+  return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Fuer Werte, die zusaetzlich in einem JS-String-Argument eines inline
+// onclick="..." landen. Der Browser dekodiert Entities BEVOR das JS geparst
+// wird - escAttr allein wuerde ein &#39; wieder zu ' machen und den Handler
+// zerbrechen. Daher zuerst JS-escapen (Backslash), dann Attribut-escapen.
+function escJsArg(text) {
+  return escAttr(String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+}
+
 function formatiereDatum(isoDatum) {
   const [jahr, monat, tag] = isoDatum.split('-');
   return `${tag}.${monat}.${jahr}`;

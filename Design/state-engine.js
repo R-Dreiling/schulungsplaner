@@ -48,17 +48,41 @@ function exportiereJSON() {
   URL.revokeObjectURL(url);
 }
 
+// Prueft die Grobstruktur einer importierten Datei, BEVOR der bestehende
+// State ueberschrieben wird. Wirft mit klarer Meldung, wenn etwas fehlt.
+function pruefeImportStruktur(geparst) {
+  if (!geparst || typeof geparst !== 'object') {
+    throw new Error('Datei enthält kein gültiges JSON-Objekt.');
+  }
+  if (!Array.isArray(geparst.kurse) || !Array.isArray(geparst.teilnehmer) || !Array.isArray(geparst.buchungen)) {
+    throw new Error('Datei enthält nicht die erwarteten Listen (kurse/teilnehmer/buchungen).');
+  }
+  for (const kurs of geparst.kurse) {
+    if (!kurs || typeof kurs !== 'object' || !Array.isArray(kurs.termine)) {
+      throw new Error(`Kurs "${kurs && kurs.titel ? kurs.titel : kurs && kurs.id}" hat keine gültige Terminliste.`);
+    }
+  }
+}
+
 function importiereJSON(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
+      // Vorherigen State sichern: schlaegt speichereState()/renderAll() trotz
+      // Strukturpruefung fehl, wird er zurueckgerollt - ein fehlerhafter
+      // Import darf die echten Daten des Nutzers nie verlieren.
+      const vorheriger = window.STATE;
       try {
         const geparst = JSON.parse(reader.result);
-        if (!geparst.kurse || !geparst.teilnehmer || !geparst.buchungen) {
-          throw new Error('Datei enthält nicht die erwarteten Felder (kurse/teilnehmer/buchungen).');
-        }
+        pruefeImportStruktur(geparst);
         window.STATE = geparst;
-        speichereState();
+        try {
+          speichereState();
+        } catch (fehler) {
+          window.STATE = vorheriger;
+          speichereState();
+          throw new Error('Datei konnte nicht dargestellt werden, alte Daten wiederhergestellt: ' + fehler.message);
+        }
         resolve();
       } catch (e) {
         reject(e);
@@ -247,6 +271,16 @@ function aktualisiereBuchungStatus(buchungId, neuerStatus) {
   const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
   if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
   buchung.anmeldestatus = neuerStatus;
+  speichereState();
+}
+
+// Verschiebt eine bestehende Buchung auf einen anderen Termin. gebuchtAm und
+// anmeldestatus bleiben bewusst erhalten - nur die Termin-Zuordnung aendert
+// sich (sonst waere es dasselbe wie Loeschen + neu anlegen).
+function verschiebeBuchung(buchungId, neuerTerminId) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  buchung.terminId = neuerTerminId;
   speichereState();
 }
 
