@@ -532,7 +532,10 @@ function trainerDokumentEntfernen(trainerId, dateiId) {
 
 // -- Produktivstart: alles leeren --
 
-function alleDatenLeeren() {
+// Reihenfolge ist bewusst: erst die Dateien loeschen, dann den State. Sonst
+// waeren die Verweise auf die Dateien schon weg, wenn das Loeschen in
+// IndexedDB fehlschlaegt - die Blobs blieben unerreichbar liegen.
+async function alleDatenLeeren() {
   if (!confirm(
     'Wirklich ALLE Daten unwiderruflich löschen?\n\n'
     + 'Kurse, Termine, Buchungen, Teilnehmer, Trainer und alle hochgeladenen '
@@ -541,12 +544,20 @@ function alleDatenLeeren() {
   )) {
     return;
   }
+
+  if (typeof alleDateienLoeschen === 'function') {
+    try {
+      await alleDateienLoeschen();
+    } catch (err) {
+      alert('Die hochgeladenen Dateien konnten nicht gelöscht werden: ' + err.message
+        + '\n\nEs wurde nichts geleert. Bitte erneut versuchen.');
+      return;
+    }
+  }
+
   window.STATE.kurse = [];
   window.STATE.teilnehmer = [];
   window.STATE.buchungen = [];
   window.STATE.trainer = [];
   speichereState();
-  if (typeof alleDateienLoeschen === 'function') {
-    alleDateienLoeschen().catch(err => console.warn('Dateien konnten nicht geleert werden.', err));
-  }
 }
