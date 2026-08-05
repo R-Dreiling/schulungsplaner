@@ -17,7 +17,7 @@ base_css = read(BASE / "styles.css")
 logo_b64 = read(BASE / "logo-invers.b64.txt").strip()
 
 page_css_parts = []
-for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-buchungen"]:
+for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-buchungen", "page-trainer", "page-hilfe"]:
     css = read(FRAGMENTS / f"{name}.css")
     if css.strip():
         page_css_parts.append(f"/* ---- {name}.css ---- */\n{css}")
@@ -30,7 +30,7 @@ for name in ["state-engine", "file-store", "ui-helpers"]:
 core_js = "\n\n".join(core_js_parts)
 
 page_js_parts = []
-for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-buchungen"]:
+for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-buchungen", "page-trainer", "page-hilfe"]:
     js = read(FRAGMENTS / f"{name}.js")
     if js.strip():
         page_js_parts.append(f"// ---- {name}.js ----\n{js}")
@@ -42,6 +42,8 @@ for key, fname in [
     ("PAGE_SCHULUNGEN", "page-schulungen.html"),
     ("PAGE_SCHULUNGDETAIL", "page-schulungdetail.html"),
     ("PAGE_BUCHUNGEN", "page-buchungen.html"),
+    ("PAGE_TRAINER", "page-trainer.html"),
+    ("PAGE_HILFE", "page-hilfe.html"),
 ]:
     pages[key] = read(FRAGMENTS / fname, f"<p>FEHLT: {fname}</p>")
 
