@@ -552,7 +552,10 @@ function statusAutomatikAnwenden() {
     if (buchung.anmeldestatus !== 'angemeldet') continue;
     const gefunden = findeTerminMitKurs(buchung.terminId);
     if (!gefunden) continue;
-    if (gefunden.termin.abschluss) continue;
+    // istTerminAbgeschlossen, nicht termin.abschluss: nach dem Wiederoeffnen
+    // bleibt das abschluss-Objekt als Historie stehen, der Termin ist aber
+    // wieder offen - die Automatik muss dann auch wieder greifen duerfen.
+    if (istTerminAbgeschlossen(gefunden.termin.id)) continue;
     if (gefunden.termin.datum < heute) continue;
     const tageBisTermin = Math.round(
       (new Date(gefunden.termin.datum) - new Date(heute)) / 86400000

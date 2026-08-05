@@ -354,14 +354,15 @@ function speichereTerminBearbeiten(ev, terminId) {
   ev.preventDefault();
   const felder = schulungenTerminFelderLesen(ev.target);
   if (!felder) return false;
-  aktualisiereTermin(terminId, felder);
-  schliesseDialog();
+  // Ueber detailVersuche, damit die Schreibschutz-Meldung sichtbar wird statt
+  // nur in der Konsole zu landen. Der Dialog bleibt bei Ablehnung offen.
+  if (detailVersuche(() => aktualisiereTermin(terminId, felder))) schliesseDialog();
   return false;
 }
 
 function terminLoeschenBestaetigen(terminId) {
   const { kurs, termin } = findeTerminMitKurs(terminId);
   if (confirm(`Termin "${kurs.titel}" am ${formatiereDatum(termin.datum)} mit allen Buchungen wirklich löschen?`)) {
-    loescheTermin(terminId);
+    detailVersuche(() => loescheTermin(terminId));
   }
 }

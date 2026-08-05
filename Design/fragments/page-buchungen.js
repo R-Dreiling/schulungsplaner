@@ -80,7 +80,9 @@ function buchungenToggleVerlauf(buchungId) {
 
 function buchungenEntfernen(buchungId) {
   if (confirm('Diese Buchung wirklich entfernen?')) {
-    loescheBuchung(buchungId);
+    // Ueber detailVersuche: gehoert die Buchung zu einem abgeschlossenen
+    // Termin, lehnt der Mutator ab - das muss die Nutzerin sehen.
+    detailVersuche(() => loescheBuchung(buchungId));
   }
 }
 
@@ -89,7 +91,12 @@ function oeffneNeueBuchungDialog() {
     .map(t => `<option value="${escAttr(t.id)}">${escHtml(t.name)} — ${escHtml(t.firma)}</option>`).join('');
   const terminOptionen = window.STATE.kurse.map(k => `
     <optgroup label="${escAttr(k.titel)}">
-      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
+      ${k.termine.map(t => {
+        // Abgeschlossene Termine gar nicht erst waehlbar machen - eine Buchung
+        // darauf wuerde ohnehin abgelehnt.
+        const zu = istTerminAbgeschlossen(t.id);
+        return `<option value="${escAttr(t.id)}" ${zu ? 'disabled' : ''}>${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')}${zu ? ' · abgeschlossen' : ''}</option>`;
+      }).join('')}
     </optgroup>`).join('');
 
   oeffneDialog(`
@@ -142,6 +149,15 @@ function speichereNeueBuchung(ev) {
   if (a.frei <= 0 && !confirm(`Dieser Termin hat keine freien Plätze mehr (${a.belegt} von ${a.kapazitaet} belegt). Trotzdem buchen?`)) {
     return false;
   }
+  // Riegel VOR erstelleTeilnehmer: waere er erst an erstelleBuchung, stuende
+  // die neue Person bereits gespeichert im Bestand, waehrend die Buchung
+  // abgelehnt wird - eine verwaiste Person ohne jede Buchung.
+  if (istTerminAbgeschlossen(felder.terminId)) {
+    alert('Dieser Termin ist abgeschlossen und schreibgeschützt – es lässt sich niemand mehr dazubuchen. '
+      + 'Über „Wieder öffnen" auf der Detailseite des Termins lässt sich der Schutz aufheben.');
+    return false;
+  }
+
   let teilnehmerId = felder.teilnehmerId;
   if (teilnehmerId === '__neu__') {
     teilnehmerId = erstelleTeilnehmer({
@@ -150,12 +166,11 @@ function speichereNeueBuchung(ev) {
   }
   // Ein bewusst abweichend gewaehlter Status gilt als manuell gesetzt - sonst
   // wuerde die Automatik ihn spaeter als ihren eigenen ausweisen.
-  erstelleBuchung({
+  if (detailVersuche(() => erstelleBuchung({
     teilnehmerId,
     terminId: felder.terminId,
     anmeldestatus: felder.anmeldestatus,
     statusManuell: felder.anmeldestatus !== 'angemeldet',
-  });
-  schliesseDialog();
+  }))) schliesseDialog();
   return false;
 }

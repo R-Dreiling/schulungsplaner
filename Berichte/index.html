@@ -1340,7 +1340,10 @@ function statusAutomatikAnwenden() {
     if (buchung.anmeldestatus !== 'angemeldet') continue;
     const gefunden = findeTerminMitKurs(buchung.terminId);
     if (!gefunden) continue;
-    if (gefunden.termin.abschluss) continue;
+    // istTerminAbgeschlossen, nicht termin.abschluss: nach dem Wiederoeffnen
+    // bleibt das abschluss-Objekt als Historie stehen, der Termin ist aber
+    // wieder offen - die Automatik muss dann auch wieder greifen duerfen.
+    if (istTerminAbgeschlossen(gefunden.termin.id)) continue;
     if (gefunden.termin.datum < heute) continue;
     const tageBisTermin = Math.round(
       (new Date(gefunden.termin.datum) - new Date(heute)) / 86400000
@@ -2418,15 +2421,16 @@ function speichereTerminBearbeiten(ev, terminId) {
   ev.preventDefault();
   const felder = schulungenTerminFelderLesen(ev.target);
   if (!felder) return false;
-  aktualisiereTermin(terminId, felder);
-  schliesseDialog();
+  // Ueber detailVersuche, damit die Schreibschutz-Meldung sichtbar wird statt
+  // nur in der Konsole zu landen. Der Dialog bleibt bei Ablehnung offen.
+  if (detailVersuche(() => aktualisiereTermin(terminId, felder))) schliesseDialog();
   return false;
 }
 
 function terminLoeschenBestaetigen(terminId) {
   const { kurs, termin } = findeTerminMitKurs(terminId);
   if (confirm(`Termin "${kurs.titel}" am ${formatiereDatum(termin.datum)} mit allen Buchungen wirklich löschen?`)) {
-    loescheTermin(terminId);
+    detailVersuche(() => loescheTermin(terminId));
   }
 }
 
@@ -2457,11 +2461,16 @@ function detailScrollZu(anker) {
 // der Konsole zu hinterlassen. Seit dem Schreibschutz werfen die Mutatoren bei
 // einem abgeschlossenen Termin - die Nutzerin soll erfahren, warum nichts
 // passiert ist, statt vor einer scheinbar toten Schaltflaeche zu sitzen.
+// Der Rueckgabewert sagt, ob die Aenderung durchging - Aufrufer aus einem
+// Dialog schliessen ihn nur dann, damit die Eingabe bei einer Ablehnung
+// stehen bleibt.
 function detailVersuche(aktion) {
   try {
     aktion();
+    return true;
   } catch (e) {
     alert(e.message);
+    return false;
   }
 }
 
@@ -3166,7 +3175,9 @@ function buchungenToggleVerlauf(buchungId) {
 
 function buchungenEntfernen(buchungId) {
   if (confirm('Diese Buchung wirklich entfernen?')) {
-    loescheBuchung(buchungId);
+    // Ueber detailVersuche: gehoert die Buchung zu einem abgeschlossenen
+    // Termin, lehnt der Mutator ab - das muss die Nutzerin sehen.
+    detailVersuche(() => loescheBuchung(buchungId));
   }
 }
 
@@ -3175,7 +3186,12 @@ function oeffneNeueBuchungDialog() {
     .map(t => `<option value="${escAttr(t.id)}">${escHtml(t.name)} — ${escHtml(t.firma)}</option>`).join('');
   const terminOptionen = window.STATE.kurse.map(k => `
     <optgroup label="${escAttr(k.titel)}">
-      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
+      ${k.termine.map(t => {
+        // Abgeschlossene Termine gar nicht erst waehlbar machen - eine Buchung
+        // darauf wuerde ohnehin abgelehnt.
+        const zu = istTerminAbgeschlossen(t.id);
+        return `<option value="${escAttr(t.id)}" ${zu ? 'disabled' : ''}>${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')}${zu ? ' · abgeschlossen' : ''}</option>`;
+      }).join('')}
     </optgroup>`).join('');
 
   oeffneDialog(`
@@ -3228,6 +3244,15 @@ function speichereNeueBuchung(ev) {
   if (a.frei <= 0 && !confirm(`Dieser Termin hat keine freien Plätze mehr (${a.belegt} von ${a.kapazitaet} belegt). Trotzdem buchen?`)) {
     return false;
   }
+  // Riegel VOR erstelleTeilnehmer: waere er erst an erstelleBuchung, stuende
+  // die neue Person bereits gespeichert im Bestand, waehrend die Buchung
+  // abgelehnt wird - eine verwaiste Person ohne jede Buchung.
+  if (istTerminAbgeschlossen(felder.terminId)) {
+    alert('Dieser Termin ist abgeschlossen und schreibgeschützt – es lässt sich niemand mehr dazubuchen. '
+      + 'Über „Wieder öffnen" auf der Detailseite des Termins lässt sich der Schutz aufheben.');
+    return false;
+  }
+
   let teilnehmerId = felder.teilnehmerId;
   if (teilnehmerId === '__neu__') {
     teilnehmerId = erstelleTeilnehmer({
@@ -3236,13 +3261,12 @@ function speichereNeueBuchung(ev) {
   }
   // Ein bewusst abweichend gewaehlter Status gilt als manuell gesetzt - sonst
   // wuerde die Automatik ihn spaeter als ihren eigenen ausweisen.
-  erstelleBuchung({
+  if (detailVersuche(() => erstelleBuchung({
     teilnehmerId,
     terminId: felder.terminId,
     anmeldestatus: felder.anmeldestatus,
     statusManuell: felder.anmeldestatus !== 'angemeldet',
-  });
-  schliesseDialog();
+  }))) schliesseDialog();
   return false;
 }
 

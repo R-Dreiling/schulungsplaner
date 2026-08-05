@@ -23,11 +23,16 @@ function detailScrollZu(anker) {
 // der Konsole zu hinterlassen. Seit dem Schreibschutz werfen die Mutatoren bei
 // einem abgeschlossenen Termin - die Nutzerin soll erfahren, warum nichts
 // passiert ist, statt vor einer scheinbar toten Schaltflaeche zu sitzen.
+// Der Rueckgabewert sagt, ob die Aenderung durchging - Aufrufer aus einem
+// Dialog schliessen ihn nur dann, damit die Eingabe bei einer Ablehnung
+// stehen bleibt.
 function detailVersuche(aktion) {
   try {
     aktion();
+    return true;
   } catch (e) {
     alert(e.message);
+    return false;
   }
 }
 
