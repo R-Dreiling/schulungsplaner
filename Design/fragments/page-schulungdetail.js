@@ -303,6 +303,7 @@ function detailAnwesenheitZeile(termin, buchung, gesperrt) {
       <div class="anw-name">
         <strong>${escHtml(teilnehmer ? teilnehmer.name : '(unbekannt)')}</strong>
         <div class="anw-firma">${escHtml(teilnehmer ? teilnehmer.firma : '')}</div>
+        ${unter ? `<div class="anw-hinweis">unter ${MINDEST_ANWESENHEIT} % — keine Bescheinigung</div>` : ''}
       </div>
       <div class="anw-prozent">
         <input type="number" min="0" max="100" step="1"
@@ -326,7 +327,8 @@ function detailAnwesenheitZeile(termin, buchung, gesperrt) {
           }
           return `<button class="btn" onclick="druckeZertifikat('${escJsArg(buchung.id)}')">Bescheinigung</button>`;
         })()}
-      </div>`;
+      </div>
+    </div>`;
 }
 
 function detailAbschnittAnwesenheit(termin) {
@@ -503,7 +505,8 @@ function detailAbschlussBanner(termin) {
       <div style="display:flex; gap:8px; flex:none;">
         <button class="btn btn-primary" onclick="druckeAbschlussbericht('${escJsArg(termin.id)}')">Abschlussbericht</button>
         <button class="btn" onclick="detailWiedereroeffnen('${escJsArg(termin.id)}')">Wieder öffnen</button>
-      </div>`;
+      </div>
+    </div>`;
 }
 
 function detailOeffneAbschlussDialog(terminId) {
