@@ -65,6 +65,28 @@ function pruefeImportStruktur(geparst) {
       throw new Error(`Kurs "${kurs && kurs.titel ? kurs.titel : kurs && kurs.id}" hat keine gültige Terminliste.`);
     }
   }
+  // Symmetrisch zum STORAGE_KEY-Wechsel auf v3: ein v2-Stand erfuellt zwar alle
+  // Pruefungen oben, wuerde die App aber unbrauchbar machen (undefined-Kapazitaet,
+  // NaN-Plaetze). Daher hier ausdruecklich abweisen, BEVOR etwas ueberschrieben wird.
+  if (!Array.isArray(geparst.trainer) || !geparst.einstellungen) {
+    throw new Error('Diese Datei stammt aus einer älteren Version des Schulungsplaners '
+      + '(es fehlen Trainer und Einstellungen). Sie kann nicht importiert werden. '
+      + 'Deine aktuellen Daten wurden nicht verändert.');
+  }
+  for (const kurs of geparst.kurse) {
+    if (kurs.zielgruppe !== undefined || kurs.maxTeilnehmer === undefined) {
+      throw new Error(`Kurs "${kurs.titel || kurs.id}" hat ein veraltetes Format. `
+        + 'Die Datei stammt aus einer älteren Version und kann nicht importiert werden. '
+        + 'Deine aktuellen Daten wurden nicht verändert.');
+    }
+    for (const termin of kurs.termine) {
+      if (termin.trainer !== undefined || termin.kapazitaet !== undefined) {
+        throw new Error(`Termin am ${termin.datum || '?'} hat ein veraltetes Format. `
+          + 'Die Datei stammt aus einer älteren Version und kann nicht importiert werden. '
+          + 'Deine aktuellen Daten wurden nicht verändert.');
+      }
+    }
+  }
 }
 
 function importiereJSON(file) {
@@ -123,6 +145,11 @@ function findeTerminMitKurs(terminId) {
 
 // -- Kurs-CRUD --
 
+// Wortlaut der bestehenden tribeta-Vorlage. Greift, wenn das Feld leer bleibt -
+// eine Bescheinigung ohne Bestaetigungstext waere wertlos.
+const STANDARD_BESTAETIGUNGSTEXT =
+  'an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.';
+
 function erstelleKurs(felder) {
   const id = naechsteId('k', window.STATE.kurse);
   window.STATE.kurse.push({
@@ -139,8 +166,7 @@ function erstelleKurs(felder) {
       kuerzel: felder.kuerzel || '',
       umfangUE: felder.umfangUE || 8,
       ueberschrift: felder.ueberschrift || felder.titel,
-      bestaetigungstext: felder.bestaetigungstext
-        || 'an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.',
+      bestaetigungstext: felder.bestaetigungstext || STANDARD_BESTAETIGUNGSTEXT,
       gueltigkeit: felder.gueltigkeit || 'unbefristet',
     },
     agenda: [],
@@ -267,6 +293,9 @@ function erstelleTeilnehmer(felder) {
   return id;
 }
 
+// felder.statusManuell (optional, Vorgabe false): true, wenn der Status beim
+// Anlegen bewusst abweichend vom Standard gesetzt wurde - dann laesst die
+// Automatik die Buchung in Ruhe und es erscheint kein Automatik-Kennzeichen.
 function erstelleBuchung(felder) {
   const id = naechsteId('b', window.STATE.buchungen);
   window.STATE.buchungen.push({
@@ -275,8 +304,16 @@ function erstelleBuchung(felder) {
     terminId: felder.terminId,
     anmeldestatus: felder.anmeldestatus || 'angemeldet',
     gebuchtAm: new Date().toISOString().slice(0, 10),
+    anwesenheitProzent: null,
+    fehlgrund: null,
+    zertifikatNr: null,
+    statusManuell: felder.statusManuell === true,
   });
   speichereState();
+  // Zweiter Ausloeser der Status-Automatik (siehe design-spec-v3.md §8): eine
+  // Buchung auf einen Termin innerhalb der Bestaetigungsfrist wird sofort
+  // bestaetigt, nicht erst beim naechsten Laden.
+  statusAutomatikAnwenden();
   return id;
 }
 
@@ -315,13 +352,19 @@ function terminAuslastung(terminId) {
   ).length;
   const kapazitaet = gefunden.kurs.maxTeilnehmer;
   const minTeilnehmer = gefunden.kurs.minTeilnehmer;
+  // "Unterbesetzt" ist ein Handlungshinweis (Teilnehmer ansprechen, verschieben).
+  // Bei einem vergangenen oder bereits abgeschlossenen Termin gibt es nichts mehr
+  // zu tun - dort waere das Kennzeichen nur ein Dauer-Fehlalarm.
+  const heute = new Date().toISOString().slice(0, 10);
+  const nochAktionsrelevant = gefunden.termin.status !== 'abgeschlossen'
+    && gefunden.termin.datum >= heute;
   return {
     belegt,
     kapazitaet,
     minTeilnehmer,
     frei: Math.max(0, kapazitaet - belegt),
     prozent: kapazitaet > 0 ? Math.round((belegt / kapazitaet) * 100) : 0,
-    unterbesetzt: belegt < minTeilnehmer,
+    unterbesetzt: nochAktionsrelevant && belegt < minTeilnehmer,
   };
 }
 

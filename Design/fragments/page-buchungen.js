@@ -4,7 +4,7 @@ function buchungenAktualisiereKursFilterOptionen() {
   const select = document.getElementById('buchungen-kurs-filter');
   const aktuellerWert = select.value;
   const optionen = window.STATE.kurse
-    .map(k => `<option value="${k.id}">${k.titel}</option>`).join('');
+    .map(k => `<option value="${escAttr(k.id)}">${escHtml(k.titel)}</option>`).join('');
   select.innerHTML = '<option value="">Kurs: Alle</option>' + optionen;
   if ([...select.options].some(o => o.value === aktuellerWert)) {
     select.value = aktuellerWert;
@@ -28,25 +28,25 @@ function buchungenZeile(buchung) {
   const neu = buchungenIstNeu(buchung.gebuchtAm);
   const historie = buchungshistorieFirma(teilnehmer.firma);
   const historieHtml = historie.length
-    ? `<ul style="margin:0; padding-left:18px;">${historie.map(h => `<li>${h.titel}: ${h.anzahl}×</li>`).join('')}</ul>`
+    ? `<ul style="margin:0; padding-left:18px;">${historie.map(h => `<li>${escHtml(h.titel)}: ${h.anzahl}×</li>`).join('')}</ul>`
     : '<p class="empty-hint" style="padding:0;">Bisher keine anderen Buchungen dieser Firma.</p>';
 
   return `
     <tr class="expand-row ${neu ? 'buchung-neu' : ''}" onclick="buchungenToggleVerlauf('${buchung.id}')">
-      <td class="cell-strong">${teilnehmer.name}</td>
-      <td>${teilnehmer.firma} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
-      <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${teilnehmer.email}</td>
+      <td class="cell-strong">${escHtml(teilnehmer.name)}</td>
+      <td>${escHtml(teilnehmer.firma)} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
+      <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${escHtml(teilnehmer.email)}</td>
       <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}${
-        buchung.statusManuell
-          ? ''
-          : '<span class="auto-marker" title="Status wurde automatisch gesetzt">⏱</span>'
+        (!buchung.statusManuell && buchung.anmeldestatus === 'bestätigt')
+          ? '<span class="auto-marker" title="Status wurde automatisch bestätigt">⏱</span>'
+          : ''
       }</td>
-      <td>${kurs.titel} <span style="color:var(--muted2);">· ${formatiereDatum(termin.datum)}</span></td>
+      <td>${escHtml(kurs.titel)} <span style="color:var(--muted2);">· ${formatiereDatum(termin.datum)}</span></td>
       <td onclick="event.stopPropagation();"><button class="btn btn-ghost-red" onclick="buchungenEntfernen('${buchung.id}')">Entfernen</button></td>
     </tr>
     <tr id="buchung-verlauf-${buchung.id}" style="display:none;">
       <td colspan="6" style="background:var(--card-2); padding:10px 14px 14px 34px;">
-        <div class="mat-group-label" style="margin:0 0 6px 0;">Buchungshistorie ${teilnehmer.firma}</div>
+        <div class="mat-group-label" style="margin:0 0 6px 0;">Buchungshistorie ${escHtml(teilnehmer.firma)}</div>
         ${historieHtml}
       </td>
     </tr>`;
@@ -86,10 +86,10 @@ function buchungenEntfernen(buchungId) {
 
 function oeffneNeueBuchungDialog() {
   const personenOptionen = window.STATE.teilnehmer
-    .map(t => `<option value="${t.id}">${t.name} — ${t.firma}</option>`).join('');
+    .map(t => `<option value="${escAttr(t.id)}">${escHtml(t.name)} — ${escHtml(t.firma)}</option>`).join('');
   const terminOptionen = window.STATE.kurse.map(k => `
     <optgroup label="${escAttr(k.titel)}">
-      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
+      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
     </optgroup>`).join('');
 
   oeffneDialog(`
@@ -148,7 +148,14 @@ function speichereNeueBuchung(ev) {
       name: felder.name, firma: felder.firma, email: felder.email, bestandskunde: false,
     });
   }
-  erstelleBuchung({ teilnehmerId, terminId: felder.terminId, anmeldestatus: felder.anmeldestatus });
+  // Ein bewusst abweichend gewaehlter Status gilt als manuell gesetzt - sonst
+  // wuerde die Automatik ihn spaeter als ihren eigenen ausweisen.
+  erstelleBuchung({
+    teilnehmerId,
+    terminId: felder.terminId,
+    anmeldestatus: felder.anmeldestatus,
+    statusManuell: felder.anmeldestatus !== 'angemeldet',
+  });
   schliesseDialog();
   return false;
 }

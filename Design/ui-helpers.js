@@ -27,6 +27,18 @@ function escAttr(text) {
   return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// Fuer Text, der als Inhalt (nicht als Attributwert) ins HTML kommt: escaped
+// zusaetzlich < und >, damit z. B. ein Kurstitel "Erste Hilfe <Auffrischung>"
+// vollstaendig sichtbar bleibt statt stillschweigend verschluckt zu werden.
+function escHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Fuer Werte, die zusaetzlich in einem JS-String-Argument eines inline
 // onclick="..." landen. Der Browser dekodiert Entities BEVOR das JS geparst
 // wird - escAttr allein wuerde ein &#39; wieder zu ' machen und den Handler

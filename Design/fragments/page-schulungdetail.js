@@ -37,10 +37,10 @@ function renderSchulungdetail(terminId) {
       <div style="display:flex; align-items:flex-start; justify-content:space-between;">
         <div>
           <div style="display:flex; gap:8px; margin-bottom:10px;">
-            <span class="badge badge-gray">${kurs.kategorie}</span>
+            <span class="badge badge-gray">${escHtml(kurs.kategorie)}</span>
             ${statusBadgeHtml(termin.status)}
           </div>
-          <h2 style="font-size:20px; margin:0 0 8px 0;">${kurs.titel}</h2>
+          <h2 style="font-size:20px; margin:0 0 8px 0;">${escHtml(kurs.titel)}</h2>
         </div>
         <div style="display:flex; gap:8px;">
           <button class="btn" onclick="oeffneTerminBearbeitenDialog('${termin.id}')">Bearbeiten</button>
@@ -51,14 +51,14 @@ function renderSchulungdetail(terminId) {
         <div><div class="mat-group-label" style="margin:0 0 3px 0;">Datum</div><div style="color:var(--ink); font-weight:600;">${formatiereDatum(termin.datum)}</div></div>
         <div><div class="mat-group-label" style="margin:0 0 3px 0;">Trainer</div><div style="color:var(--ink); font-weight:600;">${
           termin.trainerId
-            ? escAttr(trainerName(termin.trainerId))
+            ? escHtml(trainerName(termin.trainerId))
             : '<span style="color:var(--status-red-fg);">Kein Trainer zugeordnet</span>'
         }${
           termin.vertretungTrainerId
-            ? `<div style="font-size:11.5px; font-weight:400; color:var(--muted);">Vertretung: ${escAttr(trainerName(termin.vertretungTrainerId))}</div>`
+            ? `<div style="font-size:11.5px; font-weight:400; color:var(--muted);">Vertretung: ${escHtml(trainerName(termin.vertretungTrainerId))}</div>`
             : ''
         }</div></div>
-        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Format</div><div style="color:var(--ink); font-weight:600;">${escAttr(kurs.format)} · ${escAttr(termin.ort)}</div></div>
+        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Format</div><div style="color:var(--ink); font-weight:600;">${escHtml(kurs.format)} · ${escHtml(termin.ort)}</div></div>
         <div><div class="mat-group-label" style="margin:0 0 3px 0;">Kapazität</div><div style="color:var(--ink); font-weight:600;">${a.belegt} von ${a.kapazitaet} belegt</div></div>
       </div>
       <div class="progress-track"><div class="progress-fill ${a.belegt >= a.kapazitaet ? 'full' : ''}" style="width:${a.prozent}%"></div></div>
@@ -100,13 +100,13 @@ function detailAbschnittBeschreibung(kurs) {
         <button class="btn" onclick="detailOeffneBeschreibungBearbeitenDialog('${kurs.id}')">Bearbeiten</button>
       </div>
       ${detailKursweitHinweis(kurs)}
-      <p class="desc-text" style="font-size:13px; line-height:1.55;">${kurs.beschreibung || '<em>Noch keine Beschreibung.</em>'}</p>
-      <ul class="goal-list">${(kurs.lernziele || []).map(z => `<li>${z}</li>`).join('') || '<li style="color:var(--muted2);">Noch keine Lernziele.</li>'}</ul>
+      <p class="desc-text" style="font-size:13px; line-height:1.55;">${kurs.beschreibung ? escHtml(kurs.beschreibung) : '<em>Noch keine Beschreibung.</em>'}</p>
+      <ul class="goal-list">${(kurs.lernziele || []).map(z => `<li>${escHtml(z)}</li>`).join('') || '<li style="color:var(--muted2);">Noch keine Lernziele.</li>'}</ul>
       <div class="pill-row">
-        <span class="pill">Format: ${escAttr(kurs.format)}</span>
+        <span class="pill">Format: ${escHtml(kurs.format)}</span>
         <span class="pill">${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer</span>
         <span class="pill">Umfang: ${kurs.zertifikat && kurs.zertifikat.umfangUE ? kurs.zertifikat.umfangUE : '—'} UE</span>
-        <span class="pill">Voraussetzung: ${escAttr(kurs.voraussetzungen || '—')}</span>
+        <span class="pill">Voraussetzung: ${escHtml(kurs.voraussetzungen || '—')}</span>
       </div>
     </div>`;
 }
@@ -117,8 +117,8 @@ function detailOeffneBeschreibungBearbeitenDialog(kursId) {
     <div class="dialog-head"><h3>Beschreibung &amp; Lernziele bearbeiten</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
     <form onsubmit="return detailSpeichereBeschreibung(event, '${kursId}')">
       <div class="dialog-body">
-        <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${kurs.beschreibung}</textarea></div>
-        <div class="field"><label>Lernziele (ein Punkt pro Zeile)</label><textarea name="lernzieleText" rows="4">${(kurs.lernziele || []).join('\n')}</textarea></div>
+        <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${escHtml(kurs.beschreibung)}</textarea></div>
+        <div class="field"><label>Lernziele (ein Punkt pro Zeile)</label><textarea name="lernzieleText" rows="4">${escHtml((kurs.lernziele || []).join('\n'))}</textarea></div>
         <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${escAttr(kurs.voraussetzungen)}" /></div>
       </div>
       <div class="dialog-foot">
@@ -144,10 +144,10 @@ function detailSpeichereBeschreibung(ev, kursId) {
 function detailAbschnittAgenda(kurs) {
   const punkte = kurs.agenda.map((p, i) => `
     <div class="agenda-item">
-      <div class="agenda-time">${p.zeit}</div>
+      <div class="agenda-time">${escHtml(p.zeit)}</div>
       <div style="flex:1;">
-        <div class="agenda-title">${p.titel}</div>
-        <div class="agenda-desc">${p.beschreibung}</div>
+        <div class="agenda-title">${escHtml(p.titel)}</div>
+        <div class="agenda-desc">${escHtml(p.beschreibung)}</div>
       </div>
       <button class="btn-link" style="color:var(--status-red-fg);" onclick="detailAgendaEntfernen('${kurs.id}', ${i})">Entfernen</button>
     </div>`).join('') || '<p class="empty-hint">Noch keine Agenda-Punkte.</p>';
@@ -197,7 +197,7 @@ function detailMaterialListe(kurs, bereich) {
     <div class="mat-row">
       <div class="mat-icon">${detailDateiIcon(d.typ)}</div>
       <div>
-        <div class="mat-name">${d.name}</div>
+        <div class="mat-name">${escHtml(d.name)}</div>
         <div class="mat-sub">${detailFormatiereGroesse(d.groesse)}</div>
       </div>
       <div class="mat-actions">
@@ -243,7 +243,7 @@ function detailAbschnittCheckliste(termin) {
   const zeilen = termin.checkliste.map((p, i) => `
     <div class="check-row ${p.erledigt ? 'done' : ''}">
       <button class="check-box ${p.erledigt ? 'done' : ''}" onclick="checklistePunktToggeln('${termin.id}', ${i})">${p.erledigt ? '✓' : ''}</button>
-      <span class="lbl" style="flex:1;">${p.label}</span>
+      <span class="lbl" style="flex:1;">${escHtml(p.label)}</span>
       <button class="btn-link" style="color:var(--status-red-fg);" onclick="detailChecklisteEntfernen('${termin.id}', ${i})">Entfernen</button>
     </div>`).join('');
   const erledigtAnzahl = termin.checkliste.filter(p => p.erledigt).length;
@@ -279,9 +279,9 @@ function detailAbschnittTeilnehmer(kurs, termin) {
     const t = window.STATE.teilnehmer.find(p => p.id === b.teilnehmerId);
     return `
       <tr>
-        <td class="cell-strong">${t ? t.name : '(unbekannt)'}</td>
-        <td>${t ? t.firma : ''}</td>
-        <td>${t ? t.email : ''}</td>
+        <td class="cell-strong">${t ? escHtml(t.name) : '(unbekannt)'}</td>
+        <td>${t ? escHtml(t.firma) : ''}</td>
+        <td>${t ? escHtml(t.email) : ''}</td>
         <td>
           <select onchange="aktualisiereBuchungStatus('${b.id}', this.value)">
             <option value="angemeldet" ${b.anmeldestatus === 'angemeldet' ? 'selected' : ''}>angemeldet</option>
@@ -315,7 +315,7 @@ function detailOeffneVerschiebenDialog(buchungId) {
   const andere = kurs.termine.filter(t => t.id !== termin.id);
   const optionen = andere.map(t => {
     const a = terminAuslastung(t.id);
-    return `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
+    return `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
   }).join('');
   const koerper = andere.length === 0
     ? '<p class="empty-hint">Dieser Kurs hat keine weiteren Termine.</p>'
@@ -325,8 +325,8 @@ function detailOeffneVerschiebenDialog(buchungId) {
     <form onsubmit="return detailSpeichereVerschieben(event, '${buchungId}')">
       <div class="dialog-body">
         <div style="font-size:12.5px; color:var(--muted);">
-          <strong style="color:var(--ink);">${teilnehmer ? teilnehmer.name : '(unbekannt)'}</strong>
-          von ${formatiereDatum(termin.datum)} auf einen anderen Termin von „${kurs.titel}" verschieben.
+          <strong style="color:var(--ink);">${teilnehmer ? escHtml(teilnehmer.name) : '(unbekannt)'}</strong>
+          von ${formatiereDatum(termin.datum)} auf einen anderen Termin von „${escHtml(kurs.titel)}" verschieben.
           Buchungsdatum und Anmeldestatus bleiben erhalten.
         </div>
         ${koerper}
@@ -354,7 +354,7 @@ function detailBuchungEntfernen(buchungId) {
 
 function detailOeffneTeilnehmerHinzufuegenDialog(terminId) {
   const optionen = window.STATE.teilnehmer
-    .map(t => `<option value="${t.id}">${t.name} — ${t.firma}</option>`).join('');
+    .map(t => `<option value="${escAttr(t.id)}">${escHtml(t.name)} — ${escHtml(t.firma)}</option>`).join('');
   oeffneDialog(`
     <div class="dialog-head"><h3>Teilnehmer hinzufügen</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
     <form onsubmit="return detailSpeichereTeilnehmerHinzufuegen(event, '${terminId}')">
@@ -410,7 +410,14 @@ function detailSpeichereTeilnehmerHinzufuegen(ev, terminId) {
       name: felder.name, firma: felder.firma, email: felder.email, bestandskunde: false,
     });
   }
-  erstelleBuchung({ teilnehmerId, terminId, anmeldestatus: felder.anmeldestatus });
+  // Ein bewusst abweichend gewaehlter Status gilt als manuell gesetzt - sonst
+  // wuerde die Automatik ihn spaeter als ihren eigenen ausweisen.
+  erstelleBuchung({
+    teilnehmerId,
+    terminId,
+    anmeldestatus: felder.anmeldestatus,
+    statusManuell: felder.anmeldestatus !== 'angemeldet',
+  });
   schliesseDialog();
   return false;
 }

@@ -31,7 +31,7 @@ function uebersichtTeilnehmerListe(termin) {
   }
   const zeilen = buchungen.map(b => {
     const t = window.STATE.teilnehmer.find(p => p.id === b.teilnehmerId);
-    return `<li>${t ? t.name : '(unbekannt)'} <span style="color:var(--muted2);">· ${t ? t.firma : ''}</span></li>`;
+    return `<li>${t ? escHtml(t.name) : '(unbekannt)'} <span style="color:var(--muted2);">· ${t ? escHtml(t.firma) : ''}</span></li>`;
   }).join('');
   return `<ul style="margin:0; padding-left:18px; font-size:12.5px; color:var(--text);">${zeilen}</ul>`;
 }
@@ -39,6 +39,15 @@ function uebersichtTeilnehmerListe(termin) {
 function renderUebersicht() {
   const container = document.getElementById('uebersicht-kursliste');
   if (!container) return;
+  const naechsteContainer = document.getElementById('uebersicht-naechste-termine');
+
+  // Nach „Alle Daten leeren" waere die Startseite sonst vollstaendig leer -
+  // ausgerechnet auf dem Weg, der bewusst bei null anfaengt.
+  if (window.STATE.kurse.length === 0) {
+    container.innerHTML = '<div class="leer-hinweis">Noch keine Kurse angelegt. Lege unter „Schulungen“ deinen ersten Kurs an.</div>';
+    naechsteContainer.innerHTML = '<div class="leer-hinweis">Sobald Termine angelegt sind, stehen die nächsten hier.</div>';
+    return;
+  }
 
   container.innerHTML = window.STATE.kurse.map(kurs => {
     const termine = naechsteZweiTermine(kurs.id);
@@ -52,8 +61,8 @@ function renderUebersicht() {
       <div style="border-bottom:1px solid var(--line); padding:14px 0;">
         <div class="expand-row" onclick="uebersichtToggle('${kurs.id}')">
           <span class="expand-toggle" id="toggle-${kurs.id}">▸</span>
-          <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${kurs.titel}</strong>
-          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${kurs.kategorie}</span>
+          <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${escHtml(kurs.titel)}</strong>
+          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${escHtml(kurs.kategorie)}</span>
         </div>
         <div class="termin-pair" style="margin-top:10px;">${spalten}</div>
         <div class="expand-content" id="expand-${kurs.id}" style="margin-top:10px;">
@@ -62,7 +71,6 @@ function renderUebersicht() {
       </div>`;
   }).join('');
 
-  const naechsteContainer = document.getElementById('uebersicht-naechste-termine');
   const heute = new Date().toISOString().slice(0, 10);
   const alleTermineMitKurs = window.STATE.kurse.flatMap(kurs =>
     kurs.termine.map(termin => ({ kurs, termin }))
@@ -83,8 +91,8 @@ function renderUebersicht() {
     return `
       <div class="list-row">
         <div>
-          <div style="font-weight:600; color:var(--ink); font-size:13px;">${kurs.titel}</div>
-          <div style="font-size:12px; color:var(--muted);">${escAttr(trainerName(termin.trainerId) || 'Kein Trainer')} · ${formatiereDatum(termin.datum)}</div>
+          <div style="font-weight:600; color:var(--ink); font-size:13px;">${escHtml(kurs.titel)}</div>
+          <div style="font-size:12px; color:var(--muted);">${escHtml(trainerName(termin.trainerId) || 'Kein Trainer')} · ${formatiereDatum(termin.datum)}</div>
         </div>
         ${chip}
       </div>`;

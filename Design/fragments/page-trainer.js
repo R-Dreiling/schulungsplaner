@@ -26,10 +26,10 @@ function trainerListeHtml() {
     return `
       <div class="trainer-card" onclick="showTrainerDetail('${escJsArg(t.id)}')">
         <div class="trainer-card-head">
-          <div class="trainer-avatar">${escAttr(trainerInitialen(t.name))}</div>
+          <div class="trainer-avatar">${escHtml(trainerInitialen(t.name))}</div>
           <div>
-            <div class="trainer-card-name">${escAttr(t.name)}</div>
-            <div class="trainer-card-sub">${escAttr(t.qualifikation || 'Keine Qualifikation hinterlegt')}</div>
+            <div class="trainer-card-name">${escHtml(t.name)}</div>
+            <div class="trainer-card-sub">${escHtml(t.qualifikation || 'Keine Qualifikation hinterlegt')}</div>
           </div>
         </div>
         <div class="trainer-card-body">
@@ -58,7 +58,7 @@ function trainerDokumentZeile(trainer, dok) {
     <div class="dok-row">
       <div class="mat-icon">📄</div>
       <div>
-        <div class="mat-name">${escAttr(dok.name)}</div>
+        <div class="mat-name">${escHtml(dok.name)}</div>
         <div class="mat-sub">${Math.max(1, Math.round(dok.groesse / 1024))} KB · ${fristHtml}</div>
       </div>
       <div class="mat-actions">
@@ -78,8 +78,8 @@ function trainerDetailHtml(trainer) {
     ? termine.map(({ kurs, termin, rolle }) => `
         <tr>
           <td class="cell-strong" style="cursor:pointer;" onclick="showSchulungDetail('${escJsArg(termin.id)}')">${formatiereDatum(termin.datum)}</td>
-          <td>${escAttr(kurs.titel)}</td>
-          <td>${escAttr(termin.ort)}</td>
+          <td>${escHtml(kurs.titel)}</td>
+          <td>${escHtml(termin.ort)}</td>
           <td>${rolle === 'vertretung' ? '<span class="pill">Vertretung</span>' : '<span class="pill">Trainer</span>'}</td>
         </tr>`).join('')
     : '<tr><td colspan="4" class="empty-hint">Diese Person ist keinem Termin zugeordnet.</td></tr>';
@@ -90,10 +90,10 @@ function trainerDetailHtml(trainer) {
     <div class="card" style="padding:20px 24px; margin-bottom:20px;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between;">
         <div style="display:flex; align-items:center; gap:14px;">
-          <div class="trainer-avatar" style="width:52px; height:52px; font-size:17px;">${escAttr(trainerInitialen(trainer.name))}</div>
+          <div class="trainer-avatar" style="width:52px; height:52px; font-size:17px;">${escHtml(trainerInitialen(trainer.name))}</div>
           <div>
-            <h2 style="font-size:20px; margin:0 0 4px 0;">${escAttr(trainer.name)}</h2>
-            <div style="font-size:12.5px; color:var(--muted);">${escAttr(trainer.qualifikation || 'Keine Qualifikation hinterlegt')}</div>
+            <h2 style="font-size:20px; margin:0 0 4px 0;">${escHtml(trainer.name)}</h2>
+            <div style="font-size:12.5px; color:var(--muted);">${escHtml(trainer.qualifikation || 'Keine Qualifikation hinterlegt')}</div>
           </div>
         </div>
         <div style="display:flex; gap:8px;">
@@ -102,10 +102,10 @@ function trainerDetailHtml(trainer) {
         </div>
       </div>
       <div style="display:flex; gap:32px; font-size:13px; margin-top:14px;">
-        <div><div class="mat-group-label" style="margin:0 0 3px 0;">E-Mail</div><div style="color:var(--ink);">${escAttr(trainer.email || '—')}</div></div>
-        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Telefon</div><div style="color:var(--ink);">${escAttr(trainer.telefon || '—')}</div></div>
+        <div><div class="mat-group-label" style="margin:0 0 3px 0;">E-Mail</div><div style="color:var(--ink);">${escHtml(trainer.email || '—')}</div></div>
+        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Telefon</div><div style="color:var(--ink);">${escHtml(trainer.telefon || '—')}</div></div>
       </div>
-      ${trainer.notizen ? `<div style="margin-top:14px; font-size:13px; color:var(--text);">${escAttr(trainer.notizen)}</div>` : ''}
+      ${trainer.notizen ? `<div style="margin-top:14px; font-size:13px; color:var(--text);">${escHtml(trainer.notizen)}</div>` : ''}
     </div>
 
     <div class="card">
@@ -171,7 +171,7 @@ function trainerFormularFelder(trainer) {
       <div class="field"><label>Telefon</label><input name="telefon" value="${escAttr(t.telefon)}" /></div>
     </div>
     <div class="field"><label>Qualifikation / Schwerpunkte</label><input name="qualifikation" value="${escAttr(t.qualifikation)}" /></div>
-    <div class="field"><label>Notizen</label><textarea name="notizen" rows="3">${escAttr(t.notizen)}</textarea></div>`;
+    <div class="field"><label>Notizen</label><textarea name="notizen" rows="3">${escHtml(t.notizen)}</textarea></div>`;
 }
 
 function oeffneNeuerTrainerDialog() {

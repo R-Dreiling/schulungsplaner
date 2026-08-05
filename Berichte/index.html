@@ -725,6 +725,28 @@ function pruefeImportStruktur(geparst) {
       throw new Error(`Kurs "${kurs && kurs.titel ? kurs.titel : kurs && kurs.id}" hat keine gültige Terminliste.`);
     }
   }
+  // Symmetrisch zum STORAGE_KEY-Wechsel auf v3: ein v2-Stand erfuellt zwar alle
+  // Pruefungen oben, wuerde die App aber unbrauchbar machen (undefined-Kapazitaet,
+  // NaN-Plaetze). Daher hier ausdruecklich abweisen, BEVOR etwas ueberschrieben wird.
+  if (!Array.isArray(geparst.trainer) || !geparst.einstellungen) {
+    throw new Error('Diese Datei stammt aus einer älteren Version des Schulungsplaners '
+      + '(es fehlen Trainer und Einstellungen). Sie kann nicht importiert werden. '
+      + 'Deine aktuellen Daten wurden nicht verändert.');
+  }
+  for (const kurs of geparst.kurse) {
+    if (kurs.zielgruppe !== undefined || kurs.maxTeilnehmer === undefined) {
+      throw new Error(`Kurs "${kurs.titel || kurs.id}" hat ein veraltetes Format. `
+        + 'Die Datei stammt aus einer älteren Version und kann nicht importiert werden. '
+        + 'Deine aktuellen Daten wurden nicht verändert.');
+    }
+    for (const termin of kurs.termine) {
+      if (termin.trainer !== undefined || termin.kapazitaet !== undefined) {
+        throw new Error(`Termin am ${termin.datum || '?'} hat ein veraltetes Format. `
+          + 'Die Datei stammt aus einer älteren Version und kann nicht importiert werden. '
+          + 'Deine aktuellen Daten wurden nicht verändert.');
+      }
+    }
+  }
 }
 
 function importiereJSON(file) {
@@ -783,6 +805,11 @@ function findeTerminMitKurs(terminId) {
 
 // -- Kurs-CRUD --
 
+// Wortlaut der bestehenden tribeta-Vorlage. Greift, wenn das Feld leer bleibt -
+// eine Bescheinigung ohne Bestaetigungstext waere wertlos.
+const STANDARD_BESTAETIGUNGSTEXT =
+  'an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.';
+
 function erstelleKurs(felder) {
   const id = naechsteId('k', window.STATE.kurse);
   window.STATE.kurse.push({
@@ -799,8 +826,7 @@ function erstelleKurs(felder) {
       kuerzel: felder.kuerzel || '',
       umfangUE: felder.umfangUE || 8,
       ueberschrift: felder.ueberschrift || felder.titel,
-      bestaetigungstext: felder.bestaetigungstext
-        || 'an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.',
+      bestaetigungstext: felder.bestaetigungstext || STANDARD_BESTAETIGUNGSTEXT,
       gueltigkeit: felder.gueltigkeit || 'unbefristet',
     },
     agenda: [],
@@ -927,6 +953,9 @@ function erstelleTeilnehmer(felder) {
   return id;
 }
 
+// felder.statusManuell (optional, Vorgabe false): true, wenn der Status beim
+// Anlegen bewusst abweichend vom Standard gesetzt wurde - dann laesst die
+// Automatik die Buchung in Ruhe und es erscheint kein Automatik-Kennzeichen.
 function erstelleBuchung(felder) {
   const id = naechsteId('b', window.STATE.buchungen);
   window.STATE.buchungen.push({
@@ -935,8 +964,16 @@ function erstelleBuchung(felder) {
     terminId: felder.terminId,
     anmeldestatus: felder.anmeldestatus || 'angemeldet',
     gebuchtAm: new Date().toISOString().slice(0, 10),
+    anwesenheitProzent: null,
+    fehlgrund: null,
+    zertifikatNr: null,
+    statusManuell: felder.statusManuell === true,
   });
   speichereState();
+  // Zweiter Ausloeser der Status-Automatik (siehe design-spec-v3.md §8): eine
+  // Buchung auf einen Termin innerhalb der Bestaetigungsfrist wird sofort
+  // bestaetigt, nicht erst beim naechsten Laden.
+  statusAutomatikAnwenden();
   return id;
 }
 
@@ -975,13 +1012,19 @@ function terminAuslastung(terminId) {
   ).length;
   const kapazitaet = gefunden.kurs.maxTeilnehmer;
   const minTeilnehmer = gefunden.kurs.minTeilnehmer;
+  // "Unterbesetzt" ist ein Handlungshinweis (Teilnehmer ansprechen, verschieben).
+  // Bei einem vergangenen oder bereits abgeschlossenen Termin gibt es nichts mehr
+  // zu tun - dort waere das Kennzeichen nur ein Dauer-Fehlalarm.
+  const heute = new Date().toISOString().slice(0, 10);
+  const nochAktionsrelevant = gefunden.termin.status !== 'abgeschlossen'
+    && gefunden.termin.datum >= heute;
   return {
     belegt,
     kapazitaet,
     minTeilnehmer,
     frei: Math.max(0, kapazitaet - belegt),
     prozent: kapazitaet > 0 ? Math.round((belegt / kapazitaet) * 100) : 0,
-    unterbesetzt: belegt < minTeilnehmer,
+    unterbesetzt: nochAktionsrelevant && belegt < minTeilnehmer,
   };
 }
 
@@ -1374,6 +1417,18 @@ function escAttr(text) {
   return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// Fuer Text, der als Inhalt (nicht als Attributwert) ins HTML kommt: escaped
+// zusaetzlich < und >, damit z. B. ein Kurstitel "Erste Hilfe <Auffrischung>"
+// vollstaendig sichtbar bleibt statt stillschweigend verschluckt zu werden.
+function escHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Fuer Werte, die zusaetzlich in einem JS-String-Argument eines inline
 // onclick="..." landen. Der Browser dekodiert Entities BEVOR das JS geparst
 // wird - escAttr allein wuerde ein &#39; wieder zu ' machen und den Handler
@@ -1458,7 +1513,7 @@ function uebersichtTeilnehmerListe(termin) {
   }
   const zeilen = buchungen.map(b => {
     const t = window.STATE.teilnehmer.find(p => p.id === b.teilnehmerId);
-    return `<li>${t ? t.name : '(unbekannt)'} <span style="color:var(--muted2);">· ${t ? t.firma : ''}</span></li>`;
+    return `<li>${t ? escHtml(t.name) : '(unbekannt)'} <span style="color:var(--muted2);">· ${t ? escHtml(t.firma) : ''}</span></li>`;
   }).join('');
   return `<ul style="margin:0; padding-left:18px; font-size:12.5px; color:var(--text);">${zeilen}</ul>`;
 }
@@ -1466,6 +1521,15 @@ function uebersichtTeilnehmerListe(termin) {
 function renderUebersicht() {
   const container = document.getElementById('uebersicht-kursliste');
   if (!container) return;
+  const naechsteContainer = document.getElementById('uebersicht-naechste-termine');
+
+  // Nach „Alle Daten leeren" waere die Startseite sonst vollstaendig leer -
+  // ausgerechnet auf dem Weg, der bewusst bei null anfaengt.
+  if (window.STATE.kurse.length === 0) {
+    container.innerHTML = '<div class="leer-hinweis">Noch keine Kurse angelegt. Lege unter „Schulungen“ deinen ersten Kurs an.</div>';
+    naechsteContainer.innerHTML = '<div class="leer-hinweis">Sobald Termine angelegt sind, stehen die nächsten hier.</div>';
+    return;
+  }
 
   container.innerHTML = window.STATE.kurse.map(kurs => {
     const termine = naechsteZweiTermine(kurs.id);
@@ -1479,8 +1543,8 @@ function renderUebersicht() {
       <div style="border-bottom:1px solid var(--line); padding:14px 0;">
         <div class="expand-row" onclick="uebersichtToggle('${kurs.id}')">
           <span class="expand-toggle" id="toggle-${kurs.id}">▸</span>
-          <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${kurs.titel}</strong>
-          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${kurs.kategorie}</span>
+          <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${escHtml(kurs.titel)}</strong>
+          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${escHtml(kurs.kategorie)}</span>
         </div>
         <div class="termin-pair" style="margin-top:10px;">${spalten}</div>
         <div class="expand-content" id="expand-${kurs.id}" style="margin-top:10px;">
@@ -1489,7 +1553,6 @@ function renderUebersicht() {
       </div>`;
   }).join('');
 
-  const naechsteContainer = document.getElementById('uebersicht-naechste-termine');
   const heute = new Date().toISOString().slice(0, 10);
   const alleTermineMitKurs = window.STATE.kurse.flatMap(kurs =>
     kurs.termine.map(termin => ({ kurs, termin }))
@@ -1510,8 +1573,8 @@ function renderUebersicht() {
     return `
       <div class="list-row">
         <div>
-          <div style="font-weight:600; color:var(--ink); font-size:13px;">${kurs.titel}</div>
-          <div style="font-size:12px; color:var(--muted);">${escAttr(trainerName(termin.trainerId) || 'Kein Trainer')} · ${formatiereDatum(termin.datum)}</div>
+          <div style="font-weight:600; color:var(--ink); font-size:13px;">${escHtml(kurs.titel)}</div>
+          <div style="font-size:12px; color:var(--muted);">${escHtml(trainerName(termin.trainerId) || 'Kein Trainer')} · ${formatiereDatum(termin.datum)}</div>
         </div>
         ${chip}
       </div>`;
@@ -1550,7 +1613,7 @@ function schulungenTrainerOptionen(ausgewaehlt, mitLeer) {
     ? `<option value="" ${!ausgewaehlt ? 'selected' : ''}>— keine —</option>`
     : '';
   const rest = alleTrainer().map(t =>
-    `<option value="${escAttr(t.id)}" ${t.id === ausgewaehlt ? 'selected' : ''}>${escAttr(t.name)}</option>`
+    `<option value="${escAttr(t.id)}" ${t.id === ausgewaehlt ? 'selected' : ''}>${escHtml(t.name)}</option>`
   ).join('');
   return leer + rest;
 }
@@ -1567,17 +1630,17 @@ function schulungenTerminZeile(kurs, termin) {
   }
 
   const trainer = termin.trainerId
-    ? escAttr(trainerName(termin.trainerId))
+    ? escHtml(trainerName(termin.trainerId))
     : '<span style="color:var(--status-red-fg);">Kein Trainer zugeordnet</span>';
   const vertretung = termin.vertretungTrainerId
-    ? `<div style="font-size:11.5px; color:var(--muted);">Vertretung: ${escAttr(trainerName(termin.vertretungTrainerId))}</div>`
+    ? `<div style="font-size:11.5px; color:var(--muted);">Vertretung: ${escHtml(trainerName(termin.vertretungTrainerId))}</div>`
     : '';
 
   return `
     <tr>
       <td class="cell-strong" style="cursor:pointer;" onclick="showSchulungDetail('${termin.id}')">${formatiereDatum(termin.datum)}</td>
       <td>${trainer}${vertretung}</td>
-      <td>${escAttr(kurs.format)} · ${escAttr(termin.ort)}</td>
+      <td>${escHtml(kurs.format)} · ${escHtml(termin.ort)}</td>
       <td>${statusBadgeHtml(termin.status)}</td>
       <td>${auslastungText}</td>
       <td style="text-align:right; white-space:nowrap;">
@@ -1593,7 +1656,7 @@ function schulungenAktualisiereKategorieFilter() {
   if (!select) return;
   const aktuell = select.value;
   select.innerHTML = '<option value="">Kategorie: Alle</option>'
-    + kategorienListe().map(k => `<option value="${escAttr(k)}">${escAttr(k)}</option>`).join('');
+    + kategorienListe().map(k => `<option value="${escAttr(k)}">${escHtml(k)}</option>`).join('');
   if ([...select.options].some(o => o.value === aktuell)) select.value = aktuell;
 }
 
@@ -1615,8 +1678,8 @@ function renderSchulungen() {
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <div class="expand-row" style="flex:1;" onclick="schulungenToggle('${kurs.id}')">
           <span class="expand-toggle" id="s-toggle-${kurs.id}">▸</span>
-          <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${escAttr(kurs.titel)}</strong>
-          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${escAttr(kurs.kategorie)} · ${escAttr(kurs.format)} · ${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer · ${kurs.termine.length} Termin(e)</span>
+          <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${escHtml(kurs.titel)}</strong>
+          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${escHtml(kurs.kategorie)} · ${escHtml(kurs.format)} · ${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer · ${kurs.termine.length} Termin(e)</span>
         </div>
         <div style="display:flex; gap:6px;">
           <button class="btn" onclick="oeffneNeuerTerminDialog('${kurs.id}')">+ Termin</button>
@@ -1672,10 +1735,19 @@ function schulungenKursFormularFelder(kurs) {
       <div class="field"><label>Mindestteilnehmer</label><input type="number" name="minTeilnehmer" min="1" value="${k.minTeilnehmer}" required /></div>
       <div class="field"><label>Maximalteilnehmer</label><input type="number" name="maxTeilnehmer" min="1" value="${k.maxTeilnehmer}" required /></div>
     </div>
-    <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${escAttr(k.beschreibung)}</textarea></div>
+    <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${escHtml(k.beschreibung)}</textarea></div>
     <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${escAttr(k.voraussetzungen)}" /></div>
     <div class="field"><label>Kürzel für Zertifikatsnummer</label><input name="kuerzel" value="${escAttr(z.kuerzel || '')}" placeholder="z. B. DSB" /></div>
-    <div class="field"><label>Gültigkeit der Bescheinigung</label><input name="gueltigkeit" value="${escAttr(z.gueltigkeit || 'unbefristet')}" /></div>`;
+    <div class="field"><label>Gültigkeit der Bescheinigung</label><input name="gueltigkeit" value="${escAttr(z.gueltigkeit || 'unbefristet')}" /></div>
+    <div class="field">
+      <label>Überschrift auf der Bescheinigung</label>
+      <input name="ueberschrift" value="${escAttr(z.ueberschrift || '')}" placeholder="z. B. Zertifizierungslehrgang Datenschutzbeauftragte:r" />
+    </div>
+    <div class="field">
+      <label>Bestätigungstext auf der Bescheinigung</label>
+      <textarea name="bestaetigungstext" rows="3">${escHtml(z.bestaetigungstext || '')}</textarea>
+      <div class="field-hint">Platzhalter: {teilnehmer}, {kurs}, {umfang}, {datum}, {ort}, {trainer}</div>
+    </div>`;
 }
 
 // Liest die Zahlenfelder als Zahlen und prueft min <= max.
@@ -1745,6 +1817,10 @@ function speichereKursBearbeiten(ev, kursId) {
       kuerzel: felder.kuerzel,
       umfangUE: felder.umfangUE,
       gueltigkeit: felder.gueltigkeit,
+      // Leer gelassen heisst "wie der Kurs heisst" bzw. "Standardwortlaut" -
+      // eine Bescheinigung ohne Ueberschrift oder Text waere nicht brauchbar.
+      ueberschrift: felder.ueberschrift.trim() || felder.titel,
+      bestaetigungstext: felder.bestaetigungstext.trim() || STANDARD_BESTAETIGUNGSTEXT,
     },
   });
   schliesseDialog();
@@ -1890,10 +1966,10 @@ function renderSchulungdetail(terminId) {
       <div style="display:flex; align-items:flex-start; justify-content:space-between;">
         <div>
           <div style="display:flex; gap:8px; margin-bottom:10px;">
-            <span class="badge badge-gray">${kurs.kategorie}</span>
+            <span class="badge badge-gray">${escHtml(kurs.kategorie)}</span>
             ${statusBadgeHtml(termin.status)}
           </div>
-          <h2 style="font-size:20px; margin:0 0 8px 0;">${kurs.titel}</h2>
+          <h2 style="font-size:20px; margin:0 0 8px 0;">${escHtml(kurs.titel)}</h2>
         </div>
         <div style="display:flex; gap:8px;">
           <button class="btn" onclick="oeffneTerminBearbeitenDialog('${termin.id}')">Bearbeiten</button>
@@ -1904,14 +1980,14 @@ function renderSchulungdetail(terminId) {
         <div><div class="mat-group-label" style="margin:0 0 3px 0;">Datum</div><div style="color:var(--ink); font-weight:600;">${formatiereDatum(termin.datum)}</div></div>
         <div><div class="mat-group-label" style="margin:0 0 3px 0;">Trainer</div><div style="color:var(--ink); font-weight:600;">${
           termin.trainerId
-            ? escAttr(trainerName(termin.trainerId))
+            ? escHtml(trainerName(termin.trainerId))
             : '<span style="color:var(--status-red-fg);">Kein Trainer zugeordnet</span>'
         }${
           termin.vertretungTrainerId
-            ? `<div style="font-size:11.5px; font-weight:400; color:var(--muted);">Vertretung: ${escAttr(trainerName(termin.vertretungTrainerId))}</div>`
+            ? `<div style="font-size:11.5px; font-weight:400; color:var(--muted);">Vertretung: ${escHtml(trainerName(termin.vertretungTrainerId))}</div>`
             : ''
         }</div></div>
-        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Format</div><div style="color:var(--ink); font-weight:600;">${escAttr(kurs.format)} · ${escAttr(termin.ort)}</div></div>
+        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Format</div><div style="color:var(--ink); font-weight:600;">${escHtml(kurs.format)} · ${escHtml(termin.ort)}</div></div>
         <div><div class="mat-group-label" style="margin:0 0 3px 0;">Kapazität</div><div style="color:var(--ink); font-weight:600;">${a.belegt} von ${a.kapazitaet} belegt</div></div>
       </div>
       <div class="progress-track"><div class="progress-fill ${a.belegt >= a.kapazitaet ? 'full' : ''}" style="width:${a.prozent}%"></div></div>
@@ -1953,13 +2029,13 @@ function detailAbschnittBeschreibung(kurs) {
         <button class="btn" onclick="detailOeffneBeschreibungBearbeitenDialog('${kurs.id}')">Bearbeiten</button>
       </div>
       ${detailKursweitHinweis(kurs)}
-      <p class="desc-text" style="font-size:13px; line-height:1.55;">${kurs.beschreibung || '<em>Noch keine Beschreibung.</em>'}</p>
-      <ul class="goal-list">${(kurs.lernziele || []).map(z => `<li>${z}</li>`).join('') || '<li style="color:var(--muted2);">Noch keine Lernziele.</li>'}</ul>
+      <p class="desc-text" style="font-size:13px; line-height:1.55;">${kurs.beschreibung ? escHtml(kurs.beschreibung) : '<em>Noch keine Beschreibung.</em>'}</p>
+      <ul class="goal-list">${(kurs.lernziele || []).map(z => `<li>${escHtml(z)}</li>`).join('') || '<li style="color:var(--muted2);">Noch keine Lernziele.</li>'}</ul>
       <div class="pill-row">
-        <span class="pill">Format: ${escAttr(kurs.format)}</span>
+        <span class="pill">Format: ${escHtml(kurs.format)}</span>
         <span class="pill">${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer</span>
         <span class="pill">Umfang: ${kurs.zertifikat && kurs.zertifikat.umfangUE ? kurs.zertifikat.umfangUE : '—'} UE</span>
-        <span class="pill">Voraussetzung: ${escAttr(kurs.voraussetzungen || '—')}</span>
+        <span class="pill">Voraussetzung: ${escHtml(kurs.voraussetzungen || '—')}</span>
       </div>
     </div>`;
 }
@@ -1970,8 +2046,8 @@ function detailOeffneBeschreibungBearbeitenDialog(kursId) {
     <div class="dialog-head"><h3>Beschreibung &amp; Lernziele bearbeiten</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
     <form onsubmit="return detailSpeichereBeschreibung(event, '${kursId}')">
       <div class="dialog-body">
-        <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${kurs.beschreibung}</textarea></div>
-        <div class="field"><label>Lernziele (ein Punkt pro Zeile)</label><textarea name="lernzieleText" rows="4">${(kurs.lernziele || []).join('\n')}</textarea></div>
+        <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${escHtml(kurs.beschreibung)}</textarea></div>
+        <div class="field"><label>Lernziele (ein Punkt pro Zeile)</label><textarea name="lernzieleText" rows="4">${escHtml((kurs.lernziele || []).join('\n'))}</textarea></div>
         <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${escAttr(kurs.voraussetzungen)}" /></div>
       </div>
       <div class="dialog-foot">
@@ -1997,10 +2073,10 @@ function detailSpeichereBeschreibung(ev, kursId) {
 function detailAbschnittAgenda(kurs) {
   const punkte = kurs.agenda.map((p, i) => `
     <div class="agenda-item">
-      <div class="agenda-time">${p.zeit}</div>
+      <div class="agenda-time">${escHtml(p.zeit)}</div>
       <div style="flex:1;">
-        <div class="agenda-title">${p.titel}</div>
-        <div class="agenda-desc">${p.beschreibung}</div>
+        <div class="agenda-title">${escHtml(p.titel)}</div>
+        <div class="agenda-desc">${escHtml(p.beschreibung)}</div>
       </div>
       <button class="btn-link" style="color:var(--status-red-fg);" onclick="detailAgendaEntfernen('${kurs.id}', ${i})">Entfernen</button>
     </div>`).join('') || '<p class="empty-hint">Noch keine Agenda-Punkte.</p>';
@@ -2050,7 +2126,7 @@ function detailMaterialListe(kurs, bereich) {
     <div class="mat-row">
       <div class="mat-icon">${detailDateiIcon(d.typ)}</div>
       <div>
-        <div class="mat-name">${d.name}</div>
+        <div class="mat-name">${escHtml(d.name)}</div>
         <div class="mat-sub">${detailFormatiereGroesse(d.groesse)}</div>
       </div>
       <div class="mat-actions">
@@ -2096,7 +2172,7 @@ function detailAbschnittCheckliste(termin) {
   const zeilen = termin.checkliste.map((p, i) => `
     <div class="check-row ${p.erledigt ? 'done' : ''}">
       <button class="check-box ${p.erledigt ? 'done' : ''}" onclick="checklistePunktToggeln('${termin.id}', ${i})">${p.erledigt ? '✓' : ''}</button>
-      <span class="lbl" style="flex:1;">${p.label}</span>
+      <span class="lbl" style="flex:1;">${escHtml(p.label)}</span>
       <button class="btn-link" style="color:var(--status-red-fg);" onclick="detailChecklisteEntfernen('${termin.id}', ${i})">Entfernen</button>
     </div>`).join('');
   const erledigtAnzahl = termin.checkliste.filter(p => p.erledigt).length;
@@ -2132,9 +2208,9 @@ function detailAbschnittTeilnehmer(kurs, termin) {
     const t = window.STATE.teilnehmer.find(p => p.id === b.teilnehmerId);
     return `
       <tr>
-        <td class="cell-strong">${t ? t.name : '(unbekannt)'}</td>
-        <td>${t ? t.firma : ''}</td>
-        <td>${t ? t.email : ''}</td>
+        <td class="cell-strong">${t ? escHtml(t.name) : '(unbekannt)'}</td>
+        <td>${t ? escHtml(t.firma) : ''}</td>
+        <td>${t ? escHtml(t.email) : ''}</td>
         <td>
           <select onchange="aktualisiereBuchungStatus('${b.id}', this.value)">
             <option value="angemeldet" ${b.anmeldestatus === 'angemeldet' ? 'selected' : ''}>angemeldet</option>
@@ -2168,7 +2244,7 @@ function detailOeffneVerschiebenDialog(buchungId) {
   const andere = kurs.termine.filter(t => t.id !== termin.id);
   const optionen = andere.map(t => {
     const a = terminAuslastung(t.id);
-    return `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
+    return `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
   }).join('');
   const koerper = andere.length === 0
     ? '<p class="empty-hint">Dieser Kurs hat keine weiteren Termine.</p>'
@@ -2178,8 +2254,8 @@ function detailOeffneVerschiebenDialog(buchungId) {
     <form onsubmit="return detailSpeichereVerschieben(event, '${buchungId}')">
       <div class="dialog-body">
         <div style="font-size:12.5px; color:var(--muted);">
-          <strong style="color:var(--ink);">${teilnehmer ? teilnehmer.name : '(unbekannt)'}</strong>
-          von ${formatiereDatum(termin.datum)} auf einen anderen Termin von „${kurs.titel}" verschieben.
+          <strong style="color:var(--ink);">${teilnehmer ? escHtml(teilnehmer.name) : '(unbekannt)'}</strong>
+          von ${formatiereDatum(termin.datum)} auf einen anderen Termin von „${escHtml(kurs.titel)}" verschieben.
           Buchungsdatum und Anmeldestatus bleiben erhalten.
         </div>
         ${koerper}
@@ -2207,7 +2283,7 @@ function detailBuchungEntfernen(buchungId) {
 
 function detailOeffneTeilnehmerHinzufuegenDialog(terminId) {
   const optionen = window.STATE.teilnehmer
-    .map(t => `<option value="${t.id}">${t.name} — ${t.firma}</option>`).join('');
+    .map(t => `<option value="${escAttr(t.id)}">${escHtml(t.name)} — ${escHtml(t.firma)}</option>`).join('');
   oeffneDialog(`
     <div class="dialog-head"><h3>Teilnehmer hinzufügen</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
     <form onsubmit="return detailSpeichereTeilnehmerHinzufuegen(event, '${terminId}')">
@@ -2263,7 +2339,14 @@ function detailSpeichereTeilnehmerHinzufuegen(ev, terminId) {
       name: felder.name, firma: felder.firma, email: felder.email, bestandskunde: false,
     });
   }
-  erstelleBuchung({ teilnehmerId, terminId, anmeldestatus: felder.anmeldestatus });
+  // Ein bewusst abweichend gewaehlter Status gilt als manuell gesetzt - sonst
+  // wuerde die Automatik ihn spaeter als ihren eigenen ausweisen.
+  erstelleBuchung({
+    teilnehmerId,
+    terminId,
+    anmeldestatus: felder.anmeldestatus,
+    statusManuell: felder.anmeldestatus !== 'angemeldet',
+  });
   schliesseDialog();
   return false;
 }
@@ -2276,7 +2359,7 @@ function buchungenAktualisiereKursFilterOptionen() {
   const select = document.getElementById('buchungen-kurs-filter');
   const aktuellerWert = select.value;
   const optionen = window.STATE.kurse
-    .map(k => `<option value="${k.id}">${k.titel}</option>`).join('');
+    .map(k => `<option value="${escAttr(k.id)}">${escHtml(k.titel)}</option>`).join('');
   select.innerHTML = '<option value="">Kurs: Alle</option>' + optionen;
   if ([...select.options].some(o => o.value === aktuellerWert)) {
     select.value = aktuellerWert;
@@ -2300,25 +2383,25 @@ function buchungenZeile(buchung) {
   const neu = buchungenIstNeu(buchung.gebuchtAm);
   const historie = buchungshistorieFirma(teilnehmer.firma);
   const historieHtml = historie.length
-    ? `<ul style="margin:0; padding-left:18px;">${historie.map(h => `<li>${h.titel}: ${h.anzahl}×</li>`).join('')}</ul>`
+    ? `<ul style="margin:0; padding-left:18px;">${historie.map(h => `<li>${escHtml(h.titel)}: ${h.anzahl}×</li>`).join('')}</ul>`
     : '<p class="empty-hint" style="padding:0;">Bisher keine anderen Buchungen dieser Firma.</p>';
 
   return `
     <tr class="expand-row ${neu ? 'buchung-neu' : ''}" onclick="buchungenToggleVerlauf('${buchung.id}')">
-      <td class="cell-strong">${teilnehmer.name}</td>
-      <td>${teilnehmer.firma} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
-      <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${teilnehmer.email}</td>
+      <td class="cell-strong">${escHtml(teilnehmer.name)}</td>
+      <td>${escHtml(teilnehmer.firma)} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
+      <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${escHtml(teilnehmer.email)}</td>
       <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}${
-        buchung.statusManuell
-          ? ''
-          : '<span class="auto-marker" title="Status wurde automatisch gesetzt">⏱</span>'
+        (!buchung.statusManuell && buchung.anmeldestatus === 'bestätigt')
+          ? '<span class="auto-marker" title="Status wurde automatisch bestätigt">⏱</span>'
+          : ''
       }</td>
-      <td>${kurs.titel} <span style="color:var(--muted2);">· ${formatiereDatum(termin.datum)}</span></td>
+      <td>${escHtml(kurs.titel)} <span style="color:var(--muted2);">· ${formatiereDatum(termin.datum)}</span></td>
       <td onclick="event.stopPropagation();"><button class="btn btn-ghost-red" onclick="buchungenEntfernen('${buchung.id}')">Entfernen</button></td>
     </tr>
     <tr id="buchung-verlauf-${buchung.id}" style="display:none;">
       <td colspan="6" style="background:var(--card-2); padding:10px 14px 14px 34px;">
-        <div class="mat-group-label" style="margin:0 0 6px 0;">Buchungshistorie ${teilnehmer.firma}</div>
+        <div class="mat-group-label" style="margin:0 0 6px 0;">Buchungshistorie ${escHtml(teilnehmer.firma)}</div>
         ${historieHtml}
       </td>
     </tr>`;
@@ -2358,10 +2441,10 @@ function buchungenEntfernen(buchungId) {
 
 function oeffneNeueBuchungDialog() {
   const personenOptionen = window.STATE.teilnehmer
-    .map(t => `<option value="${t.id}">${t.name} — ${t.firma}</option>`).join('');
+    .map(t => `<option value="${escAttr(t.id)}">${escHtml(t.name)} — ${escHtml(t.firma)}</option>`).join('');
   const terminOptionen = window.STATE.kurse.map(k => `
     <optgroup label="${escAttr(k.titel)}">
-      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
+      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
     </optgroup>`).join('');
 
   oeffneDialog(`
@@ -2420,7 +2503,14 @@ function speichereNeueBuchung(ev) {
       name: felder.name, firma: felder.firma, email: felder.email, bestandskunde: false,
     });
   }
-  erstelleBuchung({ teilnehmerId, terminId: felder.terminId, anmeldestatus: felder.anmeldestatus });
+  // Ein bewusst abweichend gewaehlter Status gilt als manuell gesetzt - sonst
+  // wuerde die Automatik ihn spaeter als ihren eigenen ausweisen.
+  erstelleBuchung({
+    teilnehmerId,
+    terminId: felder.terminId,
+    anmeldestatus: felder.anmeldestatus,
+    statusManuell: felder.anmeldestatus !== 'angemeldet',
+  });
   schliesseDialog();
   return false;
 }
@@ -2455,10 +2545,10 @@ function trainerListeHtml() {
     return `
       <div class="trainer-card" onclick="showTrainerDetail('${escJsArg(t.id)}')">
         <div class="trainer-card-head">
-          <div class="trainer-avatar">${escAttr(trainerInitialen(t.name))}</div>
+          <div class="trainer-avatar">${escHtml(trainerInitialen(t.name))}</div>
           <div>
-            <div class="trainer-card-name">${escAttr(t.name)}</div>
-            <div class="trainer-card-sub">${escAttr(t.qualifikation || 'Keine Qualifikation hinterlegt')}</div>
+            <div class="trainer-card-name">${escHtml(t.name)}</div>
+            <div class="trainer-card-sub">${escHtml(t.qualifikation || 'Keine Qualifikation hinterlegt')}</div>
           </div>
         </div>
         <div class="trainer-card-body">
@@ -2487,7 +2577,7 @@ function trainerDokumentZeile(trainer, dok) {
     <div class="dok-row">
       <div class="mat-icon">📄</div>
       <div>
-        <div class="mat-name">${escAttr(dok.name)}</div>
+        <div class="mat-name">${escHtml(dok.name)}</div>
         <div class="mat-sub">${Math.max(1, Math.round(dok.groesse / 1024))} KB · ${fristHtml}</div>
       </div>
       <div class="mat-actions">
@@ -2507,8 +2597,8 @@ function trainerDetailHtml(trainer) {
     ? termine.map(({ kurs, termin, rolle }) => `
         <tr>
           <td class="cell-strong" style="cursor:pointer;" onclick="showSchulungDetail('${escJsArg(termin.id)}')">${formatiereDatum(termin.datum)}</td>
-          <td>${escAttr(kurs.titel)}</td>
-          <td>${escAttr(termin.ort)}</td>
+          <td>${escHtml(kurs.titel)}</td>
+          <td>${escHtml(termin.ort)}</td>
           <td>${rolle === 'vertretung' ? '<span class="pill">Vertretung</span>' : '<span class="pill">Trainer</span>'}</td>
         </tr>`).join('')
     : '<tr><td colspan="4" class="empty-hint">Diese Person ist keinem Termin zugeordnet.</td></tr>';
@@ -2519,10 +2609,10 @@ function trainerDetailHtml(trainer) {
     <div class="card" style="padding:20px 24px; margin-bottom:20px;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between;">
         <div style="display:flex; align-items:center; gap:14px;">
-          <div class="trainer-avatar" style="width:52px; height:52px; font-size:17px;">${escAttr(trainerInitialen(trainer.name))}</div>
+          <div class="trainer-avatar" style="width:52px; height:52px; font-size:17px;">${escHtml(trainerInitialen(trainer.name))}</div>
           <div>
-            <h2 style="font-size:20px; margin:0 0 4px 0;">${escAttr(trainer.name)}</h2>
-            <div style="font-size:12.5px; color:var(--muted);">${escAttr(trainer.qualifikation || 'Keine Qualifikation hinterlegt')}</div>
+            <h2 style="font-size:20px; margin:0 0 4px 0;">${escHtml(trainer.name)}</h2>
+            <div style="font-size:12.5px; color:var(--muted);">${escHtml(trainer.qualifikation || 'Keine Qualifikation hinterlegt')}</div>
           </div>
         </div>
         <div style="display:flex; gap:8px;">
@@ -2531,10 +2621,10 @@ function trainerDetailHtml(trainer) {
         </div>
       </div>
       <div style="display:flex; gap:32px; font-size:13px; margin-top:14px;">
-        <div><div class="mat-group-label" style="margin:0 0 3px 0;">E-Mail</div><div style="color:var(--ink);">${escAttr(trainer.email || '—')}</div></div>
-        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Telefon</div><div style="color:var(--ink);">${escAttr(trainer.telefon || '—')}</div></div>
+        <div><div class="mat-group-label" style="margin:0 0 3px 0;">E-Mail</div><div style="color:var(--ink);">${escHtml(trainer.email || '—')}</div></div>
+        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Telefon</div><div style="color:var(--ink);">${escHtml(trainer.telefon || '—')}</div></div>
       </div>
-      ${trainer.notizen ? `<div style="margin-top:14px; font-size:13px; color:var(--text);">${escAttr(trainer.notizen)}</div>` : ''}
+      ${trainer.notizen ? `<div style="margin-top:14px; font-size:13px; color:var(--text);">${escHtml(trainer.notizen)}</div>` : ''}
     </div>
 
     <div class="card">
@@ -2600,7 +2690,7 @@ function trainerFormularFelder(trainer) {
       <div class="field"><label>Telefon</label><input name="telefon" value="${escAttr(t.telefon)}" /></div>
     </div>
     <div class="field"><label>Qualifikation / Schwerpunkte</label><input name="qualifikation" value="${escAttr(t.qualifikation)}" /></div>
-    <div class="field"><label>Notizen</label><textarea name="notizen" rows="3">${escAttr(t.notizen)}</textarea></div>`;
+    <div class="field"><label>Notizen</label><textarea name="notizen" rows="3">${escHtml(t.notizen)}</textarea></div>`;
 }
 
 function oeffneNeuerTrainerDialog() {

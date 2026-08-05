@@ -23,7 +23,7 @@ function schulungenTrainerOptionen(ausgewaehlt, mitLeer) {
     ? `<option value="" ${!ausgewaehlt ? 'selected' : ''}>— keine —</option>`
     : '';
   const rest = alleTrainer().map(t =>
-    `<option value="${escAttr(t.id)}" ${t.id === ausgewaehlt ? 'selected' : ''}>${escAttr(t.name)}</option>`
+    `<option value="${escAttr(t.id)}" ${t.id === ausgewaehlt ? 'selected' : ''}>${escHtml(t.name)}</option>`
   ).join('');
   return leer + rest;
 }
@@ -40,17 +40,17 @@ function schulungenTerminZeile(kurs, termin) {
   }
 
   const trainer = termin.trainerId
-    ? escAttr(trainerName(termin.trainerId))
+    ? escHtml(trainerName(termin.trainerId))
     : '<span style="color:var(--status-red-fg);">Kein Trainer zugeordnet</span>';
   const vertretung = termin.vertretungTrainerId
-    ? `<div style="font-size:11.5px; color:var(--muted);">Vertretung: ${escAttr(trainerName(termin.vertretungTrainerId))}</div>`
+    ? `<div style="font-size:11.5px; color:var(--muted);">Vertretung: ${escHtml(trainerName(termin.vertretungTrainerId))}</div>`
     : '';
 
   return `
     <tr>
       <td class="cell-strong" style="cursor:pointer;" onclick="showSchulungDetail('${termin.id}')">${formatiereDatum(termin.datum)}</td>
       <td>${trainer}${vertretung}</td>
-      <td>${escAttr(kurs.format)} · ${escAttr(termin.ort)}</td>
+      <td>${escHtml(kurs.format)} · ${escHtml(termin.ort)}</td>
       <td>${statusBadgeHtml(termin.status)}</td>
       <td>${auslastungText}</td>
       <td style="text-align:right; white-space:nowrap;">
@@ -66,7 +66,7 @@ function schulungenAktualisiereKategorieFilter() {
   if (!select) return;
   const aktuell = select.value;
   select.innerHTML = '<option value="">Kategorie: Alle</option>'
-    + kategorienListe().map(k => `<option value="${escAttr(k)}">${escAttr(k)}</option>`).join('');
+    + kategorienListe().map(k => `<option value="${escAttr(k)}">${escHtml(k)}</option>`).join('');
   if ([...select.options].some(o => o.value === aktuell)) select.value = aktuell;
 }
 
@@ -88,8 +88,8 @@ function renderSchulungen() {
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <div class="expand-row" style="flex:1;" onclick="schulungenToggle('${kurs.id}')">
           <span class="expand-toggle" id="s-toggle-${kurs.id}">▸</span>
-          <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${escAttr(kurs.titel)}</strong>
-          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${escAttr(kurs.kategorie)} · ${escAttr(kurs.format)} · ${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer · ${kurs.termine.length} Termin(e)</span>
+          <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${escHtml(kurs.titel)}</strong>
+          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${escHtml(kurs.kategorie)} · ${escHtml(kurs.format)} · ${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer · ${kurs.termine.length} Termin(e)</span>
         </div>
         <div style="display:flex; gap:6px;">
           <button class="btn" onclick="oeffneNeuerTerminDialog('${kurs.id}')">+ Termin</button>
@@ -145,10 +145,19 @@ function schulungenKursFormularFelder(kurs) {
       <div class="field"><label>Mindestteilnehmer</label><input type="number" name="minTeilnehmer" min="1" value="${k.minTeilnehmer}" required /></div>
       <div class="field"><label>Maximalteilnehmer</label><input type="number" name="maxTeilnehmer" min="1" value="${k.maxTeilnehmer}" required /></div>
     </div>
-    <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${escAttr(k.beschreibung)}</textarea></div>
+    <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${escHtml(k.beschreibung)}</textarea></div>
     <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${escAttr(k.voraussetzungen)}" /></div>
     <div class="field"><label>Kürzel für Zertifikatsnummer</label><input name="kuerzel" value="${escAttr(z.kuerzel || '')}" placeholder="z. B. DSB" /></div>
-    <div class="field"><label>Gültigkeit der Bescheinigung</label><input name="gueltigkeit" value="${escAttr(z.gueltigkeit || 'unbefristet')}" /></div>`;
+    <div class="field"><label>Gültigkeit der Bescheinigung</label><input name="gueltigkeit" value="${escAttr(z.gueltigkeit || 'unbefristet')}" /></div>
+    <div class="field">
+      <label>Überschrift auf der Bescheinigung</label>
+      <input name="ueberschrift" value="${escAttr(z.ueberschrift || '')}" placeholder="z. B. Zertifizierungslehrgang Datenschutzbeauftragte:r" />
+    </div>
+    <div class="field">
+      <label>Bestätigungstext auf der Bescheinigung</label>
+      <textarea name="bestaetigungstext" rows="3">${escHtml(z.bestaetigungstext || '')}</textarea>
+      <div class="field-hint">Platzhalter: {teilnehmer}, {kurs}, {umfang}, {datum}, {ort}, {trainer}</div>
+    </div>`;
 }
 
 // Liest die Zahlenfelder als Zahlen und prueft min <= max.
@@ -218,6 +227,10 @@ function speichereKursBearbeiten(ev, kursId) {
       kuerzel: felder.kuerzel,
       umfangUE: felder.umfangUE,
       gueltigkeit: felder.gueltigkeit,
+      // Leer gelassen heisst "wie der Kurs heisst" bzw. "Standardwortlaut" -
+      // eine Bescheinigung ohne Ueberschrift oder Text waere nicht brauchbar.
+      ueberschrift: felder.ueberschrift.trim() || felder.titel,
+      bestaetigungstext: felder.bestaetigungstext.trim() || STANDARD_BESTAETIGUNGSTEXT,
     },
   });
   schliesseDialog();

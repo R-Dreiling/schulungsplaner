@@ -90,6 +90,8 @@ Min-/Maxteilnehmerzahl werden beim Kurs gepflegt. Die Auslastung eines Termins r
 
 Neu in der **Übersicht**: Ein Termin, dessen aktive Buchungen unter `kurs.minTeilnehmer` liegen, wird mit **„Unterbesetzt (3 von mind. 5)"** in Amber gekennzeichnet – an derselben Stelle, an der sonst „X Plätze frei" bzw. „Ausgebucht" steht. Damit ist der Handlungsbedarf (Teilnehmer ansprechen, ggf. auf den Folgetermin verschieben) direkt neben dem bereits sichtbaren Folgetermin erkennbar.
 
+Die Kennzeichnung gilt bewusst **nur für Termine, die noch in der Zukunft liegen und nicht abgeschlossen sind**. Bei einem vergangenen oder bereits abgeschlossenen Termin gibt es keinen Handlungsbedarf mehr – dort wäre „Unterbesetzt" nur ein Dauer-Fehlalarm auf der Startseite. Dieselbe Regel gilt für die Kennzeichnung in der Terminliste der Schulungen-Seite, da beide dieselbe Berechnung (`terminAuslastung`) verwenden.
+
 ### 3. Trainer-Bereich
 
 Neuer, vierter Punkt in der Seitenleiste.
@@ -164,9 +166,9 @@ Eine Buchung startet als „angemeldet". Liegt der zugehörige Termin höchstens
 
 Die Automatik läuft als eigener, klar abgegrenzter Schritt **einmal beim Laden der Anwendung** und **nach jedem Anlegen einer Buchung**, nicht während des Renderns (Rendern bleibt frei von Seiteneffekten). Sie überspringt Buchungen zu bereits abgeschlossenen Terminen.
 
-Jede manuelle Statusänderung setzt `statusManuell` auf `true`; solche Buchungen werden von der Automatik nie wieder angefasst. Manuell hat immer Vorrang.
+Jede manuelle Statusänderung setzt `statusManuell` auf `true`; solche Buchungen werden von der Automatik nie wieder angefasst. Manuell hat immer Vorrang. Das gilt auch schon beim Anlegen: Wählt man im Buchungsdialog einen anderen Status als die Vorgabe „angemeldet", zählt die Buchung von Anfang an als manuell gesetzt.
 
-In der Buchungsliste kennzeichnet ein kleines Uhr-Symbol automatisch gesetzte Status, damit erkennbar bleibt, wo manuell eingegriffen wurde.
+In der Buchungsliste kennzeichnet ein kleines Uhr-Symbol genau die Buchungen, die von der Automatik auf „bestätigt" gesetzt wurden (`statusManuell` ist `false` **und** der Status ist „bestätigt"), damit erkennbar bleibt, wo manuell eingegriffen wurde. Auf noch offenen oder manuell gesetzten Buchungen erscheint es nicht.
 
 ### 9. Hilfebereich
 
