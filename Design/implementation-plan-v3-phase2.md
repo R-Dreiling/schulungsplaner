@@ -432,17 +432,19 @@ function druckeInhalt(html, dokumentTitel) {
 
 - [ ] **Step 3b: Vorschaurahmen auf den Bildschirm beschränken**
 
-Im `<style>`-Block von `Design/shell-template.html` stehen zwei Regeln, die nur den Vorschaurahmen der App betreffen (grauer Hintergrund, zentrierte Fensterdarstellung). Sie stehen **nach** `{{BASE_CSS}}` und würden deshalb den späteren `@media print`-Block überstimmen — die gedruckte Seite käme zentriert auf grauem Grund heraus. Kapsle sie daher in `@media screen`:
+Im `<style>`-Block von `Design/shell-template.html` stehen zwei Regeln, die nur den Vorschaurahmen der App betreffen (grauer Hintergrund, zentrierte Fensterdarstellung). Sie stehen **nach** dem Basis-CSS-Platzhalter und würden deshalb den späteren `@media print`-Block überstimmen — die gedruckte Seite käme zentriert auf grauem Grund heraus. Kapsle sie daher in `@media screen`:
 
 ```html
 /* ---- Aussenrahmen fuer die Vorschau (die App selbst ist app-window) ----
-   Bewusst nur fuer den Bildschirm: diese Regeln stehen nach {{BASE_CSS}} und
-   wuerden den @media-print-Block in styles.css sonst ueberstimmen. */
+   Bewusst nur fuer den Bildschirm: diese Regeln stehen nach dem eingefuegten
+   Basis-CSS und wuerden den @media-print-Block in styles.css sonst ueberstimmen. */
 @media screen {
   body { display: flex; align-items: center; justify-content: center; padding: 18px; background: #e4e8f0; min-height: 100vh; }
   .app-window { width: 1360px; max-width: 100%; height: 860px; }
 }
 ```
+
+**Achtung:** Der Kommentar darf die Zeichenfolge der Platzhalter (doppelte geschweifte Klammern) **nicht wörtlich** enthalten. `assemble.py` ersetzt Platzhalter mit einem einfachen `str.replace` über das ganze Dokument — ein Platzhalter im Kommentar würde dort ebenfalls ersetzt, das komplette Stylesheet in den Kommentar duplizieren und alles Nachfolgende unbrauchbar machen.
 
 - [ ] **Step 4: Druck- und Nachweis-CSS anhängen**
 
