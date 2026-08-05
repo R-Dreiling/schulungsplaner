@@ -225,6 +225,7 @@ function erstelleTermin(kursId, felder) {
 function aktualisiereTermin(terminId, felder) {
   const gefunden = findeTerminMitKurs(terminId);
   if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  pruefeTerminOffen(terminId, 'Termindaten bearbeiten');
   Object.assign(gefunden.termin, felder);
   speichereState();
 }
@@ -232,6 +233,7 @@ function aktualisiereTermin(terminId, felder) {
 function loescheTermin(terminId) {
   const gefunden = findeTerminMitKurs(terminId);
   if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  pruefeTerminOffen(terminId, 'Termin löschen');
   gefunden.kurs.termine = gefunden.kurs.termine.filter(t => t.id !== terminId);
   window.STATE.buchungen = window.STATE.buchungen.filter(b => b.terminId !== terminId);
   speichereState();
@@ -242,6 +244,7 @@ function loescheTermin(terminId) {
 function checklistePunktToggeln(terminId, index) {
   const gefunden = findeTerminMitKurs(terminId);
   if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  pruefeTerminOffen(terminId, 'Checkliste ändern');
   const punkt = gefunden.termin.checkliste[index];
   if (!punkt) throw new Error(`Checklistenpunkt ${index} nicht gefunden`);
   punkt.erledigt = !punkt.erledigt;
@@ -251,6 +254,7 @@ function checklistePunktToggeln(terminId, index) {
 function checklistePunktHinzufuegen(terminId, label) {
   const gefunden = findeTerminMitKurs(terminId);
   if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  pruefeTerminOffen(terminId, 'Checkliste ändern');
   gefunden.termin.checkliste.push({ label, erledigt: false });
   speichereState();
 }
@@ -258,6 +262,7 @@ function checklistePunktHinzufuegen(terminId, label) {
 function checklistePunktEntfernen(terminId, index) {
   const gefunden = findeTerminMitKurs(terminId);
   if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  pruefeTerminOffen(terminId, 'Checkliste ändern');
   gefunden.termin.checkliste.splice(index, 1);
   speichereState();
 }
@@ -297,6 +302,7 @@ function erstelleTeilnehmer(felder) {
 // Anlegen bewusst abweichend vom Standard gesetzt wurde - dann laesst die
 // Automatik die Buchung in Ruhe und es erscheint kein Automatik-Kennzeichen.
 function erstelleBuchung(felder) {
+  pruefeTerminOffen(felder.terminId, 'Teilnehmer hinzufügen');
   const id = naechsteId('b', window.STATE.buchungen);
   window.STATE.buchungen.push({
     id,
@@ -320,6 +326,7 @@ function erstelleBuchung(felder) {
 function aktualisiereBuchungStatus(buchungId, neuerStatus) {
   const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
   if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  pruefeTerminOffen(buchung.terminId, 'Anmeldestatus ändern');
   buchung.anmeldestatus = neuerStatus;
   // Manuell hat immer Vorrang: ab jetzt fasst die Automatik diese Buchung
   // nicht mehr an.
@@ -333,11 +340,15 @@ function aktualisiereBuchungStatus(buchungId, neuerStatus) {
 function verschiebeBuchung(buchungId, neuerTerminId) {
   const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
   if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  pruefeTerminOffen(buchung.terminId, 'Teilnehmer verschieben');
+  pruefeTerminOffen(neuerTerminId, 'Teilnehmer auf diesen Termin verschieben');
   buchung.terminId = neuerTerminId;
   speichereState();
 }
 
 function loescheBuchung(buchungId) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (buchung) pruefeTerminOffen(buchung.terminId, 'Buchung entfernen');
   window.STATE.buchungen = window.STATE.buchungen.filter(b => b.id !== buchungId);
   speichereState();
 }
@@ -700,4 +711,66 @@ function zertifikatNummerFuer(buchungId) {
   buchung.zertifikatNr = `${jahr}-${kuerzel}-${naechsteZertifikatNummer()}`;
   speichereState();
   return buchung.zertifikatNr;
+}
+
+// ---- Phase 2: Schulungsabschluss ----
+// Abschluss bedeutet Festschreibung: eine nachtraeglich beliebig aenderbare
+// Anwesenheitsliste waere als Nachweis wertlos. Wiedereroeffnen bleibt
+// moeglich (Korrekturen passieren), wird aber protokolliert.
+
+function istTerminAbgeschlossen(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  // Beide Bedingungen zusammen, nicht nur abschluss: manche Beispieltermine
+  // tragen status 'abgeschlossen' als reinen Anzeigewert aus der Vorbelegung,
+  // ohne je ein foermliches abschluss-Objekt erhalten zu haben (siehe
+  // design-spec-v3.md) - die sollen nicht gesperrt sein. Und status allein
+  // reicht nicht, weil terminWiedereroeffnen() das abschluss-Objekt bewusst
+  // als Historie behaelt, dabei aber status auf 'geplant' zuruecksetzt - erst
+  // dieses Zusammenspiel gibt den Schreibschutz nach dem Wiederoeffnen frei.
+  return !!(gefunden && gefunden.termin.abschluss && gefunden.termin.status === 'abgeschlossen');
+}
+
+function pruefeTerminOffen(terminId, aktion) {
+  if (istTerminAbgeschlossen(terminId)) {
+    throw new Error(
+      `Dieser Termin ist abgeschlossen und schreibgeschützt – „${aktion}" ist nicht möglich. `
+      + 'Über „Wieder öffnen" auf der Detailseite lässt sich der Schutz aufheben; '
+      + 'das wird im Abschlussbericht vermerkt.'
+    );
+  }
+}
+
+function abschlussVollstaendigkeit(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  const statistik = anwesenheitStatistik(terminId);
+  return {
+    anwesenheitFehlt: statistik.gesamt - statistik.erfasst,
+    checklisteOffen: gefunden.termin.checkliste.filter(p => !p.erledigt).length,
+    keinTrainer: !gefunden.termin.trainerId,
+  };
+}
+
+function terminAbschliessen(terminId, vorkommnisse) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  if (gefunden.termin.abschluss && gefunden.termin.status === 'abgeschlossen') throw new Error('Dieser Termin ist bereits abgeschlossen.');
+  gefunden.termin.abschluss = {
+    abgeschlossenAm: new Date().toISOString().slice(0, 10),
+    vorkommnisse: vorkommnisse || '',
+    wiedereroeffnungen: [],
+  };
+  gefunden.termin.status = 'abgeschlossen';
+  speichereState();
+}
+
+function terminWiedereroeffnen(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  if (!gefunden.termin.abschluss) throw new Error('Dieser Termin ist nicht abgeschlossen.');
+  // abschluss bleibt erhalten: die Wiedereroeffnung soll sichtbar bleiben,
+  // nicht die Spur des Abschlusses loeschen.
+  gefunden.termin.abschluss.wiedereroeffnungen.push(new Date().toISOString().slice(0, 10));
+  gefunden.termin.status = 'geplant';
+  speichereState();
 }
