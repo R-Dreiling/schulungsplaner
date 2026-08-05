@@ -1,11 +1,177 @@
 <div class="page-header">
   <div class="page-header-text">
     <h1>Hilfe</h1>
-    <p class="subtitle">Wie der Schulungsplaner rechnet und was die Funktionen bewirken.</p>
+    <p class="subtitle">Bedienungsanleitung und Nachschlagewerk zu allen Funktionen.</p>
   </div>
 </div>
 
 <div class="card" style="padding:22px 26px; max-width:820px;">
+
+  <div class="hilfe-bereich">Bedienungsanleitung</div>
+  <p class="hilfe-bereich-hinweis">
+    Diese Anleitung führt einmal durch den kompletten Ablauf — vom leeren Programm bis zum
+    abgelegten Nachweis. Wer nur eine einzelne Regel nachschlagen will, springt in den
+    zweiten Teil weiter unten.
+  </p>
+
+  <div class="hilfe-sprungliste">
+    <button onclick="document.getElementById('hilfe-ueberblick').scrollIntoView({behavior:'smooth', block:'start'})">Überblick</button>
+    <button onclick="document.getElementById('hilfe-fenster').scrollIntoView({behavior:'smooth', block:'start'})">Aufbau des Fensters</button>
+    <button onclick="document.getElementById('hilfe-schritt-1').scrollIntoView({behavior:'smooth', block:'start'})">1. Trainer</button>
+    <button onclick="document.getElementById('hilfe-schritt-2').scrollIntoView({behavior:'smooth', block:'start'})">2. Kurs</button>
+    <button onclick="document.getElementById('hilfe-schritt-3').scrollIntoView({behavior:'smooth', block:'start'})">3. Termin</button>
+    <button onclick="document.getElementById('hilfe-schritt-4').scrollIntoView({behavior:'smooth', block:'start'})">4. Inhalte</button>
+    <button onclick="document.getElementById('hilfe-schritt-5').scrollIntoView({behavior:'smooth', block:'start'})">5. Teilnehmer</button>
+    <button onclick="document.getElementById('hilfe-schritt-6').scrollIntoView({behavior:'smooth', block:'start'})">6. Vorbereitung</button>
+    <button onclick="document.getElementById('hilfe-schritt-7').scrollIntoView({behavior:'smooth', block:'start'})">7. Anwesenheit</button>
+    <button onclick="document.getElementById('hilfe-schritt-8').scrollIntoView({behavior:'smooth', block:'start'})">8. Abschluss</button>
+    <button onclick="document.getElementById('hilfe-wiederfinden').scrollIntoView({behavior:'smooth', block:'start'})">Wiederfinden</button>
+    <button onclick="document.getElementById('hilfe-sicherung').scrollIntoView({behavior:'smooth', block:'start'})">Sicherung</button>
+    <button onclick="document.getElementById('hilfe-echtstart').scrollIntoView({behavior:'smooth', block:'start'})">Mit echten Daten starten</button>
+  </div>
+
+  <div class="hilfe-block" id="hilfe-ueberblick">
+    <h3>Wofür dieses Programm da ist</h3>
+    <p>Der Schulungsplaner plant Schulungen <em>und</em> belegt hinterher, dass sie stattgefunden haben. Der zweite Teil ist der wichtigere: Bei Datenschutz- und Arbeitssicherheitsschulungen muss auch Jahre später nachweisbar sein, dass Schulung X am Datum Y mit den Personen Z durchgeführt wurde. Genau dafür gibt es die Anwesenheitserfassung, die Teilnahmebescheinigungen und den Abschlussbericht.</p>
+    <p>Das Programm ist eine einzige Datei, die im Browser läuft. Es braucht <strong>keinen Server, keine Installation und keine Internetverbindung</strong>. Ein Doppelklick auf die Datei genügt.</p>
+    <p><strong>Alle Daten bleiben auf diesem Rechner</strong>, im Speicher dieses Browsers. Nichts wird übertragen, es gibt kein Benutzerkonto und keine Anmeldung. Wer die Datei auf einem anderen Rechner öffnet, sieht dort zunächst nichts — die Daten wandern nur über <strong>Exportieren</strong> und <strong>Importieren</strong> mit (siehe Sicherung).</p>
+  </div>
+
+  <div class="hilfe-block" id="hilfe-fenster">
+    <h3>Aufbau des Fensters</h3>
+    <p>Links steht die Navigation mit fünf Bereichen, rechts der Inhalt dazu:</p>
+    <ul>
+      <li><strong>Übersicht</strong> — der Startbildschirm: Auslastung je Kurs und die nächsten anstehenden Termine. Zum Reinschauen, nicht zum Bearbeiten.</li>
+      <li><strong>Schulungen</strong> — hier entsteht alles: Kurse anlegen, Termine anlegen, Termin öffnen und durchführen. Der meistgenutzte Bereich.</li>
+      <li><strong>Buchungen</strong> — alle Anmeldungen quer über alle Kurse, neueste zuerst. Gut für die Frage „wer ist wo angemeldet".</li>
+      <li><strong>Trainer</strong> — Personen, die Schulungen halten, samt ihren Qualifikationsnachweisen.</li>
+      <li><strong>Hilfe</strong> — diese Seite.</li>
+    </ul>
+    <p>Ganz unten links stehen die Werkzeuge für den gesamten Datenbestand: <strong>Exportieren</strong>, <strong>Importieren</strong>, <strong>Zurücksetzen</strong> und <strong>Alle Daten leeren</strong>.</p>
+    <p>Ein Hinweis zum Verständnis der ganzen Anwendung: Ein <strong>Kurs</strong> ist das Thema (z.&nbsp;B. „Erste-Hilfe-Kurs"), ein <strong>Termin</strong> ist eine konkrete Durchführung davon an einem Datum. Gebucht wird immer auf einen Termin, nie auf den Kurs.</p>
+  </div>
+
+  <div class="hilfe-block hilfe-schritt" id="hilfe-schritt-1">
+    <h3><span class="schritt-nr">Schritt 1</span> Trainer anlegen</h3>
+    <p>Am Anfang steht mindestens eine Person, die schult — ohne Trainer lässt sich kein Termin anlegen.</p>
+    <ol>
+      <li>Links auf <strong>Trainer</strong>, dann oben rechts auf <strong>„+ Neuer Trainer"</strong>.</li>
+      <li>Name, E-Mail, Telefon, Qualifikation und Notizen ausfüllen und speichern.</li>
+      <li>Auf den angelegten Trainer klicken: Auf seiner Seite lassen sich <strong>Nachweise hochladen</strong> (Zeugnisse, Zertifikate), jeweils mit einem optionalen <strong>„gültig bis"</strong>-Datum.</li>
+    </ol>
+    <p>Läuft ein solcher Nachweis ab oder läuft er innerhalb der nächsten 60 Tage ab, weist die Trainerliste darauf hin. So fällt rechtzeitig auf, wenn eine Qualifikation aufgefrischt werden muss.</p>
+  </div>
+
+  <div class="hilfe-block hilfe-schritt" id="hilfe-schritt-2">
+    <h3><span class="schritt-nr">Schritt 2</span> Kurs anlegen</h3>
+    <p>Links auf <strong>Schulungen</strong>, dann oben rechts auf <strong>„+ Neuer Kurs"</strong>. Was hier eingetragen wird, gilt für <em>alle</em> Termine dieses Kurses:</p>
+    <ul>
+      <li><strong>Titel</strong> und <strong>Kategorie</strong> — die Kategorie ist frei wählbar: eine bestehende aus der Vorschlagsliste nehmen oder einfach eine neue eintippen.</li>
+      <li><strong>Format</strong> (Vor Ort, Online, Hybrid) und <strong>Umfang in Unterrichtseinheiten</strong>.</li>
+      <li><strong>Mindest-</strong> und <strong>Maximalteilnehmerzahl</strong> — daraus errechnet das Programm später „Unterbesetzt" und „Ausgebucht".</li>
+      <li><strong>Beschreibung</strong> und <strong>Voraussetzungen</strong>.</li>
+      <li>Die Angaben für die spätere Bescheinigung: <strong>Kürzel</strong> (erscheint in der Zertifikatsnummer), <strong>Gültigkeit</strong>, <strong>Überschrift</strong> und <strong>Bestätigungstext</strong>. Im Bestätigungstext dürfen Platzhalter stehen — {teilnehmer}, {kurs}, {umfang}, {datum}, {ort}, {trainer} — die beim Druck automatisch gefüllt werden. Bleiben Überschrift und Text leer, verwendet das Programm den Kurstitel und einen Standardwortlaut.</li>
+    </ul>
+    <p>Diese Felder lassen sich jederzeit über <strong>„Bearbeiten"</strong> am Kurs nachträglich ändern — auch dann noch, wenn bereits Termine abgeschlossen sind.</p>
+  </div>
+
+  <div class="hilfe-block hilfe-schritt" id="hilfe-schritt-3">
+    <h3><span class="schritt-nr">Schritt 3</span> Termin anlegen</h3>
+    <p>In der Kursliste auf <strong>„+ Termin"</strong> in der Zeile des Kurses. Ein Termin bekommt:</p>
+    <ul>
+      <li><strong>Datum</strong>, <strong>Ort</strong> und <strong>Status</strong> (geplant, laufend, abgeschlossen),</li>
+      <li>einen <strong>Trainer</strong> und optional eine <strong>Vertretung</strong> für den Krankheitsfall. Beide dürfen nicht dieselbe Person sein.</li>
+    </ul>
+    <p>Ein Klick auf den Kurstitel klappt seine Termine auf. Jede Terminzeile zeigt Datum, Trainer, Format und Ort, Status und Auslastung.</p>
+  </div>
+
+  <div class="hilfe-block hilfe-schritt" id="hilfe-schritt-4">
+    <h3><span class="schritt-nr">Schritt 4</span> Inhalte zum Kurs pflegen</h3>
+    <p>Ein Klick auf das Datum oder auf <strong>„Öffnen"</strong> führt zur Detailseite des Termins. Dort steht alles beisammen, was zu dieser Durchführung gehört. Über die Leiste am Kopf springt man zwischen den Abschnitten:</p>
+    <ul>
+      <li><strong>Beschreibung &amp; Lernziele</strong> — worum es geht und was die Teilnehmer danach können.</li>
+      <li><strong>Agenda</strong> — der Ablaufplan aus Uhrzeit und Programmpunkt, über „+ Programmpunkt" erweiterbar. Die Agenda erscheint später im Abschlussbericht als Beleg dafür, was tatsächlich vermittelt wurde.</li>
+      <li><strong>Materialien</strong> — Seminarunterlagen und Vorlagen zum Hochladen. Die Dateien liegen ebenfalls nur lokal in diesem Browser.</li>
+      <li><strong>Checkliste</strong> — die Vorbereitungsschritte (Raum gebucht, Technik geprüft …), abhakbar.</li>
+    </ul>
+    <p>Wichtig zu wissen: Beschreibung, Lernziele, Agenda und Materialien gehören zum <strong>Kurs</strong> und gelten damit für alle seine Termine. Checkliste, Teilnehmer und Anwesenheit gehören zum <strong>einzelnen Termin</strong>.</p>
+  </div>
+
+  <div class="hilfe-block hilfe-schritt" id="hilfe-schritt-5">
+    <h3><span class="schritt-nr">Schritt 5</span> Teilnehmer buchen</h3>
+    <p>Dafür gibt es zwei Wege, die dasselbe bewirken:</p>
+    <ul>
+      <li>Auf der <strong>Detailseite des Termins</strong> über <strong>„+ Teilnehmer"</strong> — praktisch, wenn man ohnehin gerade an diesem Termin arbeitet.</li>
+      <li>Im Bereich <strong>Buchungen</strong> über <strong>„+ Neue Buchung"</strong> — dort wählt man zuerst die Person, dann den Termin.</li>
+    </ul>
+    <p>In beiden Fällen lässt sich eine <strong>bereits bekannte Person</strong> auswählen oder über „— Neue Person —" eine neue mit Name, Firma und E-Mail anlegen. Ist der Termin voll, fragt das Programm nach, bucht auf Wunsch aber trotzdem.</p>
+    <p>Jede Buchung hat einen <strong>Anmeldestatus</strong>: <em>angemeldet</em>, <em>bestätigt</em> oder <em>abgesagt</em>. Eine neue Buchung startet als „angemeldet" und wird automatisch auf „bestätigt" gesetzt, sobald der Termin höchstens sieben Tage entfernt ist. Sobald man den Status einmal von Hand ändert, lässt die Automatik diese Buchung für immer in Ruhe — erkennbar am fehlenden Uhr-Symbol ⏱ hinter dem Status.</p>
+    <p><strong>Absagen statt löschen:</strong> Wer absagt, sollte auf „abgesagt" gesetzt und nicht entfernt werden. Abgesagte Buchungen geben ihren Platz wieder frei, bleiben aber als Spur erhalten und zählen später nirgends mit.</p>
+  </div>
+
+  <div class="hilfe-block hilfe-schritt" id="hilfe-schritt-6">
+    <h3><span class="schritt-nr">Schritt 6</span> Vor der Schulung</h3>
+    <ul>
+      <li>Die <strong>Übersicht</strong> zeigt, wo es klemmt: <em>Unterbesetzt</em> (amber) heißt weniger Anmeldungen als die Mindestteilnehmerzahl, <em>Ausgebucht</em> (indigo) heißt Maximum erreicht.</li>
+      <li>Ist ein Termin unterbesetzt, nennt die Übersicht gleich daneben den nächsten Termin desselben Kurses. Über <strong>„Verschieben"</strong> auf der Detailseite lässt sich ein Teilnehmer dorthin umbuchen; Buchungsdatum und Anmeldestatus bleiben erhalten.</li>
+      <li>Die <strong>Checkliste</strong> auf der Detailseite abarbeiten.</li>
+    </ul>
+  </div>
+
+  <div class="hilfe-block hilfe-schritt" id="hilfe-schritt-7">
+    <h3><span class="schritt-nr">Schritt 7</span> Nach der Schulung: Anwesenheit und Bescheinigungen</h3>
+    <ol>
+      <li>Detailseite des Termins öffnen, zum Abschnitt <strong>Anwesenheit</strong> gehen.</li>
+      <li>Auf <strong>„Alle auf 100 %"</strong> klicken und danach nur die Ausnahmen korrigieren — das ist schneller, als jede Zeile einzeln zu füllen.</li>
+      <li>Bei wem etwas fehlt, den Prozentwert eintragen und einen <strong>Grund</strong> wählen (krank, entschuldigt, unentschuldigt). Bei 100 % verschwindet ein zuvor gesetzter Grund von selbst.</li>
+      <li>Ab <strong>80 % Anwesenheit</strong> wird der Knopf <strong>„Bescheinigung"</strong> in der Zeile aktiv. Darunter bleibt er gesperrt, und unter dem Namen steht der Grund: „unter 80 % — keine Bescheinigung".</li>
+      <li>Ein Klick auf „Bescheinigung" öffnet den Druckdialog des Browsers. Dort <strong>„Als PDF speichern"</strong> wählen, wenn kein Ausdruck gebraucht wird.</li>
+    </ol>
+    <p>Bescheinigungen werden <strong>bewusst immer nur für eine Person</strong> erzeugt. Ein Sammeldokument würde beim Versand an einen Teilnehmer die Daten aller anderen mitliefern.</p>
+    <p>Jede Bescheinigung trägt eine fortlaufende <strong>Zertifikatsnummer</strong> nach dem Muster Jahr-Kürzel-Nummer, etwa 2026-DSB-0147. Die Nummer wird erst beim tatsächlichen Druck vergeben und ändert sich danach nicht mehr — ein zweiter Ausdruck derselben Bescheinigung trägt dieselbe Nummer.</p>
+  </div>
+
+  <div class="hilfe-block hilfe-schritt" id="hilfe-schritt-8">
+    <h3><span class="schritt-nr">Schritt 8</span> Abschließen und archivieren</h3>
+    <p>Ist die Anwesenheit erfasst, wird die Schulung über <strong>„Schulung abschließen"</strong> festgeschrieben. Das Programm zeigt vorher, was noch offen ist (fehlende Anwesenheit, offene Checklistenpunkte, kein Trainer) — abschließen lässt sich trotzdem, die Hinweise sind nur nachrichtlich. Besondere Vorkommnisse können dabei vermerkt werden.</p>
+    <p><strong>Nach dem Abschluss sind Anwesenheit, Teilnehmerliste und Checkliste dieses Termins schreibgeschützt.</strong> Das ist der Kern der Nachweisfähigkeit: Eine Anwesenheitsliste, die sich jederzeit ändern lässt, taugt nicht als Beleg. Wer es doch versucht, bekommt eine Meldung mit dem Grund.</p>
+    <p>Korrekturen bleiben möglich: <strong>„Wieder öffnen"</strong> hebt den Schutz auf. Das wird mit Datum protokolliert und im Abschlussbericht ausgewiesen — die Wiederöffnung wird also nicht verhindert, aber sichtbar gemacht.</p>
+    <p>Der <strong>Abschlussbericht</strong> ist das Archivdokument für die eigenen Unterlagen. Er enthält Kurs- und Termindaten, die durchgeführte Agenda, alle Teilnehmer mit Anwesenheit und ausgestellter Bescheinigung, Kennzahlen, die Vorkommnisse und eine Unterschriftszeile. Zu erreichen ist er über das Banner auf der Detailseite oder über den Knopf <strong>„Bericht"</strong> in der Terminliste. Anders als die Bescheinigung enthält er bewusst alle Teilnehmer — er ist ein <strong>internes</strong> Dokument und nicht für den Versand an einzelne Teilnehmer gedacht.</p>
+  </div>
+
+  <div class="hilfe-block" id="hilfe-wiederfinden">
+    <h3>Etwas wiederfinden</h3>
+    <ul>
+      <li><strong>Schulungen</strong>: Suchfeld für den Kurstitel, Filter für die Kategorie und Filter für den Zustand der Termine (Alle, Nur offene, Nur abgeschlossene). Die Filter lassen sich kombinieren.</li>
+      <li><strong>Buchungen</strong>: Filter nach Anmeldestatus und nach Kurs. Ein Klick auf eine Zeile klappt die <strong>Buchungshistorie der Firma</strong> auf — welche Kurse dieses Unternehmen bisher wie oft gebucht hat. Das zeigt auf einen Blick, welche Themen dort schon abgedeckt sind. Kürzlich angelegte Buchungen (bis 14 Tage) sind in der Liste hervorgehoben.</li>
+      <li>Für die Nachweisführung am nützlichsten: „Nur abgeschlossene" auf der Schulungen-Seite — dort steht in jeder Zeile direkt der Knopf „Bericht".</li>
+    </ul>
+  </div>
+
+  <div class="hilfe-block" id="hilfe-sicherung">
+    <h3>Sicherung und Datenübertragung</h3>
+    <p>Weil alles nur in diesem Browser liegt, ist eine regelmäßige Sicherung wichtig — spätestens nach jeder abgeschlossenen Schulung.</p>
+    <ul>
+      <li><strong>Exportieren</strong> lädt den kompletten Datenstand als JSON-Datei herunter. Das ist die Sicherung und zugleich der Weg auf einen anderen Rechner. Hochgeladene Dateien sind darin <em>nicht</em> enthalten.</li>
+      <li><strong>Importieren</strong> liest eine solche Datei wieder ein und ersetzt den aktuellen Stand. Ist die Datei fehlerhaft, bleibt der bisherige Stand unangetastet.</li>
+      <li><strong>Zurücksetzen</strong> stellt die mitgelieferten Beispieldaten wieder her. Alle eigenen Eingaben gehen verloren.</li>
+      <li><strong>Alle Daten leeren</strong> löscht alles inklusive der hochgeladenen Dateien. Nicht umkehrbar.</li>
+    </ul>
+    <p>Wer den Browser-Speicher löscht (etwa über „Browserdaten löschen"), löscht damit auch die Daten dieses Programms. Ein Export vorher schützt davor.</p>
+  </div>
+
+  <div class="hilfe-block" id="hilfe-echtstart">
+    <h3>Mit echten Daten starten</h3>
+    <p>Beim ersten Öffnen ist das Programm mit Beispieldaten gefüllt, damit sichtbar ist, wie alles zusammenwirkt. Für den echten Betrieb:</p>
+    <ol>
+      <li>In Ruhe mit den Beispieldaten ausprobieren — kaputtmachen kann man dabei nichts.</li>
+      <li>Unten links auf <strong>„Alle Daten leeren"</strong>.</li>
+      <li>Mit Schritt 1 dieser Anleitung beginnen: erst Trainer, dann Kurse, dann Termine.</li>
+      <li>Nach dem Anlegen der Grunddaten einmal <strong>Exportieren</strong> — damit existiert eine erste Sicherung.</li>
+    </ol>
+  </div>
+
+  <div class="hilfe-bereich">Nachschlagen: wie das Programm rechnet</div>
 
   <div class="hilfe-block">
     <h3>Kurse und Termine</h3>
