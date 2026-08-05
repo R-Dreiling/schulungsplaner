@@ -1038,6 +1038,66 @@ In `Design/fragments/page-schulungdetail.js`, in der Funktion `renderSchulungdet
           ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn" onclick="detailOeffneAbschlussDialog('${escJsArg(termin.id)}')">Schulung abschließen</button>`}
 ```
 
+- [ ] **Step 2b: Schreibschutz-Meldungen für die Nutzerin sichtbar machen**
+
+Seit Task 2 werfen die Mutatoren bei einem abgeschlossenen Termin. Die Anwesenheits-Handler fangen das ab und zeigen die Meldung; sechs ältere Handler tun das nicht — dort passiert für die Nutzerin scheinbar einfach nichts, der Grund landet nur in der Konsole. Das wird hier nachgezogen.
+
+Ergänze in `Design/fragments/page-schulungdetail.js` einen kleinen gemeinsamen Helfer:
+
+```javascript
+// Fuehrt eine Aenderung aus und zeigt eine Fehlermeldung an, statt sie nur in
+// der Konsole zu hinterlassen. Seit dem Schreibschutz werfen die Mutatoren bei
+// einem abgeschlossenen Termin - die Nutzerin soll erfahren, warum nichts
+// passiert ist, statt vor einer scheinbar toten Schaltflaeche zu sitzen.
+function detailVersuche(aktion) {
+  try {
+    aktion();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+```
+
+Und wickle die sechs betroffenen Aufrufe damit ein:
+
+**(a)** Die Checklisten-Schaltfläche in `detailAbschnittCheckliste` — ersetze das `onclick` durch:
+
+```javascript
+onclick="detailVersuche(() => checklistePunktToggeln('${escJsArg(termin.id)}', ${i}))"
+```
+
+**(b)** In `detailChecklisteHinzufuegen` den Aufruf `checklistePunktHinzufuegen(terminId, label.trim());` ersetzen durch:
+
+```javascript
+    detailVersuche(() => checklistePunktHinzufuegen(terminId, label.trim()));
+```
+
+**(c)** In `detailChecklisteEntfernen` den Aufruf `checklistePunktEntfernen(terminId, index);` ersetzen durch:
+
+```javascript
+    detailVersuche(() => checklistePunktEntfernen(terminId, index));
+```
+
+**(d)** In `detailBuchungEntfernen` den Aufruf `loescheBuchung(buchungId);` ersetzen durch:
+
+```javascript
+    detailVersuche(() => loescheBuchung(buchungId));
+```
+
+**(e)** In `detailSpeichereVerschieben` den Aufruf `verschiebeBuchung(buchungId, felder.neuerTerminId);` (bzw. den dort stehenden Verschiebe-Aufruf) einwickeln:
+
+```javascript
+  detailVersuche(() => verschiebeBuchung(buchungId, felder.neuerTerminId));
+```
+
+**(f)** In `detailSpeichereTeilnehmerHinzufuegen` den `erstelleBuchung(...)`-Aufruf einwickeln:
+
+```javascript
+  detailVersuche(() => erstelleBuchung({ teilnehmerId, terminId, anmeldestatus: felder.anmeldestatus }));
+```
+
+Bei (e) und (f) bleibt das anschließende `schliesseDialog()` unverändert stehen — der Dialog schließt sich also auch dann, wenn die Aktion abgelehnt wurde; die Meldung erklärt den Grund.
+
 - [ ] **Step 3: Build und Browser-Verifikation**
 
 Run: `python Design/assemble.py`
