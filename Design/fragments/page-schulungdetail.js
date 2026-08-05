@@ -500,8 +500,10 @@ function detailAbschlussBanner(termin) {
         </div>
         ${a.vorkommnisse ? `<div class="abschluss-hinweis">Vorkommnisse: ${escHtml(a.vorkommnisse)}</div>` : ''}
       </div>
-      <button class="btn" onclick="detailWiedereroeffnen('${escJsArg(termin.id)}')">Wieder öffnen</button>
-    </div>`;
+      <div style="display:flex; gap:8px; flex:none;">
+        <button class="btn btn-primary" onclick="druckeAbschlussbericht('${escJsArg(termin.id)}')">Abschlussbericht</button>
+        <button class="btn" onclick="detailWiedereroeffnen('${escJsArg(termin.id)}')">Wieder öffnen</button>
+      </div>`;
 }
 
 function detailOeffneAbschlussDialog(terminId) {
