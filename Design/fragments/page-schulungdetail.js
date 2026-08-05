@@ -59,7 +59,7 @@ function renderSchulungdetail(terminId) {
         <div style="display:flex; gap:8px;">
           <button class="btn" onclick="oeffneTerminBearbeitenDialog('${termin.id}')">Bearbeiten</button>
           ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn" onclick="detailOeffneAbschlussDialog('${escJsArg(termin.id)}')">Schulung abschließen</button>`}
-          <button class="btn btn-primary" onclick="detailOeffneTeilnehmerHinzufuegenDialog('${termin.id}')">+ Teilnehmer</button>
+          ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn btn-primary" onclick="detailOeffneTeilnehmerHinzufuegenDialog('${escJsArg(termin.id)}')">+ Teilnehmer</button>`}
         </div>
       </div>
       <div style="display:flex; gap:32px; font-size:13px; margin:14px 0;">
@@ -614,6 +614,12 @@ function detailToggleNeuePersonFelder(wert) {
 
 function detailSpeichereTeilnehmerHinzufuegen(ev, terminId) {
   ev.preventDefault();
+  if (istTerminAbgeschlossen(terminId)) {
+    alert('Dieser Termin ist abgeschlossen und schreibgeschützt – es können keine Teilnehmer hinzugefügt werden. '
+      + 'Über „Wieder öffnen" lässt sich der Schutz aufheben.');
+    schliesseDialog();
+    return false;
+  }
   const felder = formularWerte(ev.target);
   const a = terminAuslastung(terminId);
   if (a.frei <= 0 && !confirm(`Dieser Termin hat keine freien Plätze mehr (${a.belegt} von ${a.kapazitaet} belegt). Trotzdem buchen?`)) {
