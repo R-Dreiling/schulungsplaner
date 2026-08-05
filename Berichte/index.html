@@ -2319,6 +2319,8 @@ function renderSchulungdetail(terminId) {
   container.innerHTML = `
     <button class="crumb" onclick="showPage('schulungen')">← Zurück zu Schulungen</button>
 
+    ${detailAbschlussBanner(termin)}
+
     <div class="card" style="padding:20px 24px; margin-bottom:20px;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between;">
         <div>
@@ -2330,6 +2332,7 @@ function renderSchulungdetail(terminId) {
         </div>
         <div style="display:flex; gap:8px;">
           <button class="btn" onclick="oeffneTerminBearbeitenDialog('${termin.id}')">Bearbeiten</button>
+          ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn" onclick="detailOeffneAbschlussDialog('${escJsArg(termin.id)}')">Schulung abschließen</button>`}
           <button class="btn btn-primary" onclick="detailOeffneTeilnehmerHinzufuegenDialog('${termin.id}')">+ Teilnehmer</button>
         </div>
       </div>
@@ -2745,6 +2748,96 @@ function detailSpeichereVerschieben(ev, buchungId) {
 function detailBuchungEntfernen(buchungId) {
   if (confirm('Diese Buchung wirklich entfernen?')) {
     loescheBuchung(buchungId);
+  }
+}
+
+// ---- Phase 2: Schulungsabschluss ----
+
+// Das Banner erscheint, sobald der Termin jemals foermlich abgeschlossen
+// wurde - auch nach dem Wiederoeffnen, denn die Abschlusshistorie soll
+// sichtbar bleiben. Ob aktuell schreibgeschuetzt wird, ist eine andere
+// Frage und haengt an istTerminAbgeschlossen().
+function detailAbschlussBanner(termin) {
+  if (!termin.abschluss) return '';
+  const a = termin.abschluss;
+  const wieder = (a.wiedereroeffnungen || []).length;
+  const gesperrt = istTerminAbgeschlossen(termin.id);
+  return `
+    <div class="abschluss-banner">
+      <div>
+        <strong>${gesperrt ? 'Abgeschlossen' : 'Wieder geöffnet · abgeschlossen war'} am ${formatiereDatum(a.abgeschlossenAm)}</strong>
+        <div class="abschluss-hinweis">
+          ${gesperrt
+            ? 'Anwesenheit, Teilnehmerliste und Checkliste sind schreibgeschützt. Bescheinigungen und Abschlussbericht bleiben druckbar.'
+            : 'Der Schreibschutz ist derzeit aufgehoben. Nach den Korrekturen bitte erneut abschließen.'}
+          ${wieder > 0 ? `<br/>Nachträglich geöffnet: ${wieder}× (zuletzt ${formatiereDatum(a.wiedereroeffnungen[wieder - 1])})` : ''}
+        </div>
+        ${a.vorkommnisse ? `<div class="abschluss-hinweis">Vorkommnisse: ${escHtml(a.vorkommnisse)}</div>` : ''}
+      </div>
+      <button class="btn" onclick="detailWiedereroeffnen('${escJsArg(termin.id)}')">Wieder öffnen</button>
+    </div>`;
+}
+
+function detailOeffneAbschlussDialog(terminId) {
+  const v = abschlussVollstaendigkeit(terminId);
+  const hinweise = [];
+  if (v.anwesenheitFehlt > 0) hinweise.push(`Bei ${v.anwesenheitFehlt} Teilnehmer(n) ist die Anwesenheit noch nicht erfasst.`);
+  if (v.checklisteOffen > 0) hinweise.push(`${v.checklisteOffen} Checklistenpunkt(e) sind noch offen.`);
+  if (v.keinTrainer) hinweise.push('Diesem Termin ist kein Trainer zugeordnet.');
+
+  const hinweisHtml = hinweise.length
+    ? `<div class="field-hint" style="color:var(--status-amber-fg); font-size:12px;">
+         <strong>Noch offen:</strong><ul style="margin:6px 0 0 0; padding-left:18px;">
+           ${hinweise.map(h => `<li>${escHtml(h)}</li>`).join('')}
+         </ul>
+         <div style="margin-top:6px;">Du kannst trotzdem abschließen — die Punkte werden nur nachrichtlich angezeigt.</div>
+       </div>`
+    : '<div class="field-hint" style="color:var(--status-green-fg); font-size:12px;">Alles vollständig erfasst.</div>';
+
+  oeffneDialog(`
+    <div class="dialog-head"><h3>Schulung abschließen</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
+    <form onsubmit="return detailSpeichereAbschluss(event, '${escJsArg(terminId)}')">
+      <div class="dialog-body">
+        ${hinweisHtml}
+        <div class="field">
+          <label>Besondere Vorkommnisse (optional)</label>
+          <textarea name="vorkommnisse" rows="3" placeholder="z. B. Teilnehmer Müller musste wegen Notfall früher gehen"></textarea>
+        </div>
+        <div class="field-hint">
+          Nach dem Abschluss sind Anwesenheit, Teilnehmerliste und Checkliste dieses Termins
+          schreibgeschützt. Ein späteres Wiederöffnen ist möglich, wird aber protokolliert
+          und im Abschlussbericht ausgewiesen.
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <button type="button" class="btn" onclick="schliesseDialog()">Abbrechen</button>
+        <button type="submit" class="btn btn-primary">Jetzt abschließen</button>
+      </div>
+    </form>`);
+}
+
+function detailSpeichereAbschluss(ev, terminId) {
+  ev.preventDefault();
+  const felder = formularWerte(ev.target);
+  try {
+    terminAbschliessen(terminId, felder.vorkommnisse);
+    schliesseDialog();
+  } catch (e) {
+    alert(e.message);
+  }
+  return false;
+}
+
+function detailWiedereroeffnen(terminId) {
+  if (!confirm(
+    'Diesen abgeschlossenen Termin wieder öffnen?\n\n'
+    + 'Der Schreibschutz wird aufgehoben. Die Wiederöffnung wird mit Datum '
+    + 'festgehalten und im Abschlussbericht ausgewiesen.'
+  )) return;
+  try {
+    terminWiedereroeffnen(terminId);
+  } catch (e) {
+    alert(e.message);
   }
 }
 
