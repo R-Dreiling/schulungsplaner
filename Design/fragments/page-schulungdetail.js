@@ -302,9 +302,16 @@ function detailAnwesenheitZeile(termin, buchung, gesperrt) {
         </select>
       </div>
       <div class="anw-aktion">
-        ${unter ? '<span class="anw-hinweis">unter ' + MINDEST_ANWESENHEIT + ' %</span>' : ''}
-      </div>
-    </div>`;
+        ${(() => {
+          if (!erfasst) {
+            return '<button class="btn" disabled title="Anwesenheit noch nicht erfasst">Bescheinigung</button>';
+          }
+          if (unter) {
+            return `<button class="btn" disabled title="unter Mindestteilnahme von ${MINDEST_ANWESENHEIT} %">Bescheinigung</button>`;
+          }
+          return `<button class="btn" onclick="druckeZertifikat('${escJsArg(buchung.id)}')">Bescheinigung</button>`;
+        })()}
+      </div>`;
 }
 
 function detailAbschnittAnwesenheit(termin) {
@@ -335,6 +342,7 @@ function detailAbschnittAnwesenheit(termin) {
       </div>
       <p class="field-hint" style="margin:-4px 0 10px 0;">
         Ab ${MINDEST_ANWESENHEIT} % Anwesenheit wird eine Teilnahmebescheinigung ausgestellt.
+        Sie wird bewusst einzeln erzeugt, damit beim Versand keine Daten anderer Teilnehmer mitgehen.
       </p>
       ${buchungen.map(b => detailAnwesenheitZeile(termin, b, gesperrt)).join('')}
     </div>`;
