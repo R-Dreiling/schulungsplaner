@@ -754,11 +754,16 @@ function abschlussVollstaendigkeit(terminId) {
 function terminAbschliessen(terminId, vorkommnisse) {
   const gefunden = findeTerminMitKurs(terminId);
   if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
-  if (gefunden.termin.abschluss && gefunden.termin.status === 'abgeschlossen') throw new Error('Dieser Termin ist bereits abgeschlossen.');
+  if (istTerminAbgeschlossen(terminId)) throw new Error('Dieser Termin ist bereits abgeschlossen.');
+  // Wurde der Termin schon einmal abgeschlossen und wieder geoeffnet, muss
+  // die bisherige Wiedereroeffnungs-Historie erhalten bleiben - sie ist der
+  // Kern des Nachweises und darf durch ein erneutes Abschliessen nicht
+  // verschwinden.
+  const bisherige = (gefunden.termin.abschluss && gefunden.termin.abschluss.wiedereroeffnungen) || [];
   gefunden.termin.abschluss = {
     abgeschlossenAm: new Date().toISOString().slice(0, 10),
     vorkommnisse: vorkommnisse || '',
-    wiedereroeffnungen: [],
+    wiedereroeffnungen: bisherige,
   };
   gefunden.termin.status = 'abgeschlossen';
   speichereState();
@@ -767,7 +772,7 @@ function terminAbschliessen(terminId, vorkommnisse) {
 function terminWiedereroeffnen(terminId) {
   const gefunden = findeTerminMitKurs(terminId);
   if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
-  if (!gefunden.termin.abschluss) throw new Error('Dieser Termin ist nicht abgeschlossen.');
+  if (!istTerminAbgeschlossen(terminId)) throw new Error('Dieser Termin ist nicht abgeschlossen.');
   // abschluss bleibt erhalten: die Wiedereroeffnung soll sichtbar bleiben,
   // nicht die Spur des Abschlusses loeschen.
   gefunden.termin.abschluss.wiedereroeffnungen.push(new Date().toISOString().slice(0, 10));
