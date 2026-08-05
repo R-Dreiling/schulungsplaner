@@ -3,7 +3,10 @@
 // Reset, Export/Import. Wird von shell-template.html vor den Seiten-Skripten
 // eingebunden. window.SEED_DATA muss vorher gesetzt sein.
 
-const STORAGE_KEY = 'schulungsplaner_state_v2';
+// v3: Das Schema hat sich inkompatibel geaendert (Trainer, Format/Kapazitaet
+// am Kurs). Ein alter v2-Stand im Browser wuerde die App zerlegen, daher ein
+// neuer Schluessel - alte Staende werden ignoriert, die Beispieldaten greifen.
+const STORAGE_KEY = 'schulungsplaner_state_v3';
 
 function ladeState() {
   const roh = localStorage.getItem(STORAGE_KEY);
@@ -128,8 +131,18 @@ function erstelleKurs(felder) {
     kategorie: felder.kategorie,
     beschreibung: felder.beschreibung || '',
     lernziele: felder.lernziele || [],
-    zielgruppe: felder.zielgruppe || '',
-    voraussetzungen: felder.voraussetzungen || '',
+    voraussetzungen: felder.voraussetzungen || 'Keine',
+    format: felder.format || 'Vor Ort',
+    minTeilnehmer: felder.minTeilnehmer || 5,
+    maxTeilnehmer: felder.maxTeilnehmer || 30,
+    zertifikat: {
+      kuerzel: felder.kuerzel || '',
+      umfangUE: felder.umfangUE || 8,
+      ueberschrift: felder.ueberschrift || felder.titel,
+      bestaetigungstext: felder.bestaetigungstext
+        || 'an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.',
+      gueltigkeit: felder.gueltigkeit || 'unbefristet',
+    },
     agenda: [],
     materialien: { seminarunterlagen: [], vorlagen: [] },
     termine: [],
@@ -172,12 +185,12 @@ function erstelleTermin(kursId, felder) {
   kurs.termine.push({
     id,
     datum: felder.datum,
-    trainer: felder.trainer,
-    format: felder.format,
-    ort: felder.ort,
-    kapazitaet: felder.kapazitaet,
+    trainerId: felder.trainerId || null,
+    vertretungTrainerId: felder.vertretungTrainerId || null,
+    ort: felder.ort || '—',
     status: felder.status || 'geplant',
     checkliste: STANDARD_CHECKLISTE.map(label => ({ label, erledigt: false })),
+    abschluss: null,
   });
   speichereState();
   return id;
@@ -297,12 +310,15 @@ function terminAuslastung(terminId) {
   const belegt = window.STATE.buchungen.filter(
     b => b.terminId === terminId && b.anmeldestatus !== 'abgesagt'
   ).length;
-  const kapazitaet = gefunden.termin.kapazitaet;
+  const kapazitaet = gefunden.kurs.maxTeilnehmer;
+  const minTeilnehmer = gefunden.kurs.minTeilnehmer;
   return {
     belegt,
     kapazitaet,
+    minTeilnehmer,
     frei: Math.max(0, kapazitaet - belegt),
     prozent: kapazitaet > 0 ? Math.round((belegt / kapazitaet) * 100) : 0,
+    unterbesetzt: belegt < minTeilnehmer,
   };
 }
 
@@ -353,4 +369,114 @@ function materialEntfernen(kursId, bereich, dateiId) {
   if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
   kurs.materialien[bereich] = kurs.materialien[bereich].filter(d => d.id !== dateiId);
   speichereState();
+}
+
+// -- Einstellungen --
+
+const EINSTELLUNGEN_VORGABE = {
+  zertifikatStartNummer: 147,
+  bestaetigungsfristTage: 7,
+};
+
+function einstellungen() {
+  if (!window.STATE.einstellungen) {
+    window.STATE.einstellungen = { ...EINSTELLUNGEN_VORGABE };
+  }
+  for (const [schluessel, wert] of Object.entries(EINSTELLUNGEN_VORGABE)) {
+    if (window.STATE.einstellungen[schluessel] === undefined) {
+      window.STATE.einstellungen[schluessel] = wert;
+    }
+  }
+  return window.STATE.einstellungen;
+}
+
+function aktualisiereEinstellungen(felder) {
+  Object.assign(einstellungen(), felder);
+  speichereState();
+}
+
+// -- Kategorien (abgeleitet, keine eigene Verwaltung) --
+
+function kategorienListe() {
+  const gesehen = new Set();
+  for (const kurs of window.STATE.kurse) {
+    const wert = (kurs.kategorie || '').trim();
+    if (wert) gesehen.add(wert);
+  }
+  return [...gesehen].sort((a, b) => a.localeCompare(b, 'de'));
+}
+
+// -- Trainer --
+
+function alleTrainer() {
+  if (!Array.isArray(window.STATE.trainer)) window.STATE.trainer = [];
+  return window.STATE.trainer;
+}
+
+function findeTrainer(trainerId) {
+  return alleTrainer().find(t => t.id === trainerId);
+}
+
+function trainerName(trainerId) {
+  const t = findeTrainer(trainerId);
+  return t ? t.name : '';
+}
+
+function erstelleTrainer(felder) {
+  const id = naechsteId('tr', alleTrainer());
+  alleTrainer().push({
+    id,
+    name: felder.name,
+    email: felder.email || '',
+    telefon: felder.telefon || '',
+    qualifikation: felder.qualifikation || '',
+    notizen: felder.notizen || '',
+    dokumente: [],
+  });
+  speichereState();
+  return id;
+}
+
+function aktualisiereTrainer(trainerId, felder) {
+  const trainer = findeTrainer(trainerId);
+  if (!trainer) throw new Error(`Trainer ${trainerId} nicht gefunden`);
+  Object.assign(trainer, felder);
+  speichereState();
+}
+
+function loescheTrainer(trainerId) {
+  if (!findeTrainer(trainerId)) throw new Error(`Trainer ${trainerId} nicht gefunden`);
+  for (const kurs of window.STATE.kurse) {
+    for (const termin of kurs.termine) {
+      if (termin.trainerId === trainerId) termin.trainerId = null;
+      if (termin.vertretungTrainerId === trainerId) termin.vertretungTrainerId = null;
+    }
+  }
+  window.STATE.trainer = alleTrainer().filter(t => t.id !== trainerId);
+  speichereState();
+}
+
+function termineFuerTrainer(trainerId) {
+  const treffer = [];
+  for (const kurs of window.STATE.kurse) {
+    for (const termin of kurs.termine) {
+      if (termin.trainerId === trainerId) treffer.push({ kurs, termin, rolle: 'trainer' });
+      else if (termin.vertretungTrainerId === trainerId) treffer.push({ kurs, termin, rolle: 'vertretung' });
+    }
+  }
+  return treffer.sort((a, b) => a.termin.datum.localeCompare(b.termin.datum));
+}
+
+// Nachweise, die abgelaufen sind oder in den naechsten 60 Tagen ablaufen.
+function trainerDokumentStatus(trainer) {
+  const heute = new Date().toISOString().slice(0, 10);
+  const grenze = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+  let abgelaufen = 0;
+  let laeuftBaldAb = 0;
+  for (const dok of trainer.dokumente || []) {
+    if (!dok.gueltigBis) continue;
+    if (dok.gueltigBis < heute) abgelaufen++;
+    else if (dok.gueltigBis <= grenze) laeuftBaldAb++;
+  }
+  return { abgelaufen, laeuftBaldAb };
 }
