@@ -15,6 +15,7 @@ def read(path, default=""):
 template = read(BASE / "shell-template.html")
 base_css = read(BASE / "styles.css")
 logo_b64 = read(BASE / "logo-invers.b64.txt").strip()
+logo_normal_b64 = read(BASE / "logo.b64.txt").strip()
 
 page_css_parts = []
 for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-buchungen", "page-trainer", "page-hilfe"]:
@@ -55,6 +56,7 @@ html = template
 html = html.replace("{{BASE_CSS}}", base_css)
 html = html.replace("{{PAGE_CSS}}", page_css)
 html = html.replace("{{LOGO_B64}}", logo_b64)
+html = html.replace("{{LOGO_NORMAL_B64}}", logo_normal_b64)
 html = html.replace("{{CORE_JS}}", core_js)
 html = html.replace("{{PAGE_JS}}", page_js)
 html = html.replace("{{DATA_JSON}}", data_json_str)

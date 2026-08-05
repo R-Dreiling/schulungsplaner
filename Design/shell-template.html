@@ -92,6 +92,11 @@ body { display: flex; align-items: center; justify-content: center; padding: 18p
   <div id="dialog-container" class="dialog"></div>
 </div>
 
+<!-- Wird nur beim Drucken sichtbar (siehe @media print in styles.css) und
+     vorher per druckeInhalt() befuellt. So entstehen Bescheinigung und
+     Abschlussbericht ohne zweites Fenster und ohne Zusatzbibliothek. -->
+<div id="druck-bereich"></div>
+
 <script>
 window.SEED_DATA = {{DATA_JSON}};
 </script>
@@ -129,6 +134,20 @@ function showTrainerDetail(trainerId) {
   if (typeof renderTrainer === 'function') {
     renderTrainer(trainerId);
   }
+}
+
+window.LOGO_NORMAL = 'data:image/svg+xml;base64,{{LOGO_NORMAL_B64}}';
+
+// Fuellt den Druckbereich und loest den Browser-Druckdialog aus. Der
+// Dokumenttitel bestimmt den vom Browser vorgeschlagenen Dateinamen beim
+// "Als PDF speichern" und wird danach wieder zurueckgesetzt.
+function druckeInhalt(html, dokumentTitel) {
+  const bereich = document.getElementById('druck-bereich');
+  bereich.innerHTML = html;
+  const vorherigerTitel = document.title;
+  document.title = dokumentTitel;
+  window.print();
+  document.title = vorherigerTitel;
 }
 
 document.getElementById('import-input').addEventListener('change', (ev) => {

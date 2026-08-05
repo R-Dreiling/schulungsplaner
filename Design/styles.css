@@ -414,3 +414,98 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
   border-radius: var(--radius-lg); padding: 28px; text-align: center;
   color: var(--muted); font-size: 13px;
 }
+
+/* ========================================================================
+   v3 Phase 2: Anwesenheit, Abschluss, Bescheinigung, Abschlussbericht
+   ======================================================================== */
+
+/* --- Anwesenheitsabschnitt --- */
+.anw-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.anw-row:last-child { border-bottom: none; }
+.anw-name { flex: 1; min-width: 0; }
+.anw-name strong { color: var(--ink); font-weight: 600; }
+.anw-firma { font-size: 11.5px; color: var(--muted2); }
+.anw-prozent { width: 74px; flex: none; }
+.anw-prozent input {
+  width: 100%; font-family: var(--font-body); font-size: 13px; padding: 5px 8px;
+  border: 1px solid var(--line-strong); border-radius: 6px; text-align: right; color: var(--ink);
+}
+.anw-grund { width: 150px; flex: none; }
+.anw-grund select {
+  width: 100%; font-family: var(--font-body); font-size: 12.5px; padding: 5px 8px;
+  border: 1px solid var(--line-strong); border-radius: 6px; background: #fff; color: var(--ink);
+}
+.anw-row.unter-mindest .anw-prozent input { border-color: #E9B4AE; color: var(--status-red-fg); font-weight: 600; }
+.anw-hinweis { font-size: 11.5px; color: var(--status-red-fg); font-weight: 600; }
+.anw-aktion { width: 132px; flex: none; text-align: right; }
+
+/* --- Abschluss-Kennzeichnung --- */
+.abschluss-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  background: var(--status-gray-bg); border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 18px;
+  font-size: 13px; color: var(--status-gray-fg);
+}
+.abschluss-banner strong { color: var(--ink); font-family: var(--font-display); }
+.abschluss-hinweis { font-size: 11.5px; color: var(--muted2); margin-top: 3px; }
+
+/* --- Gemeinsame Druckseite --- */
+#druck-bereich { display: none; }
+.druck-seite {
+  width: 100%; background: #fff; color: var(--ink);
+  font-family: var(--font-body); box-sizing: border-box;
+}
+.druck-logo { height: 34px; }
+
+/* --- Bescheinigung (Nachbau der tribeta-Vorlage) --- */
+.zert-rahmen {
+  border: 3px solid var(--teal); padding: 42px 52px; text-align: center;
+  display: flex; flex-direction: column; min-height: 176mm;
+}
+.zert-ueberschrift {
+  font-family: var(--font-display); font-size: 11pt; font-weight: 700;
+  color: var(--teal-deep); letter-spacing: .4px; text-transform: uppercase;
+  margin: 18px 0 6px 0;
+}
+.zert-titel { font-family: var(--font-display); font-size: 30pt; font-weight: 800; color: var(--ink); margin: 0 0 22px 0; }
+.zert-einleitung { font-size: 11pt; color: var(--text); margin-bottom: 10px; }
+.zert-name { font-family: var(--font-display); font-size: 20pt; font-weight: 800; color: var(--ink); margin: 0 0 20px 0; }
+.zert-text { font-size: 11pt; line-height: 1.7; color: var(--text); max-width: 150mm; margin: 0 auto; }
+.zert-unterschriften { display: flex; justify-content: space-between; gap: 24px; margin-top: auto; padding-top: 34px; }
+.zert-unterschrift { flex: 1; text-align: center; }
+.zert-linie { border-top: 1px solid var(--ink); margin-bottom: 5px; }
+.zert-unterschrift span { font-size: 9pt; color: var(--muted); }
+.zert-fuss { font-size: 8.5pt; color: var(--muted); margin-top: 16px; }
+
+/* --- Abschlussbericht --- */
+.bericht-kopf { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 2px solid var(--teal); padding-bottom: 12px; margin-bottom: 18px; }
+.bericht-titel { font-family: var(--font-display); font-size: 17pt; font-weight: 700; color: var(--ink); margin: 0; }
+.bericht-untertitel { font-size: 10pt; color: var(--muted); margin-top: 3px; }
+.bericht-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 20px; margin-bottom: 18px; }
+.bericht-meta div { font-size: 10pt; }
+.bericht-meta .l { font-family: var(--font-display); font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--muted); }
+.bericht-abschnitt { font-family: var(--font-display); font-size: 11pt; font-weight: 700; color: var(--ink); margin: 18px 0 8px 0; }
+table.bericht-tabelle { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+table.bericht-tabelle th {
+  text-align: left; font-family: var(--font-display); font-size: 8pt; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .3px; color: var(--muted);
+  border-bottom: 1px solid var(--ink); padding: 5px 7px;
+}
+table.bericht-tabelle td { padding: 5px 7px; border-bottom: 1px solid var(--line); color: var(--text); }
+table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600; }
+.bericht-kennzahlen { display: flex; gap: 26px; font-size: 10pt; margin-top: 8px; }
+.bericht-vorkommnisse { font-size: 10pt; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+.bericht-warnung { font-size: 9.5pt; color: var(--status-red-fg); font-weight: 600; margin-top: 8px; }
+.bericht-unterschrift { margin-top: 34px; width: 62mm; }
+
+/* --- Druckausgabe: nur der Druckbereich, nichts von der App --- */
+@media print {
+  @page { size: A4; margin: 14mm; }
+  body { display: block; padding: 0; background: #fff; min-height: 0; }
+  .app-window, #dialog-overlay { display: none !important; }
+  #druck-bereich { display: block; }
+  .druck-seite { page-break-after: always; }
+  .druck-seite:last-child { page-break-after: auto; }
+  table.bericht-tabelle { page-break-inside: auto; }
+  table.bericht-tabelle tr { page-break-inside: avoid; }
+}
