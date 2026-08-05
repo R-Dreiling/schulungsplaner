@@ -70,6 +70,7 @@ function renderSchulungdetail(terminId) {
         <a id="nav-agenda" onclick="detailScrollZu('agenda')">Agenda</a>
         <a id="nav-materialien" onclick="detailScrollZu('materialien')">Materialien</a>
         <a id="nav-checkliste" onclick="detailScrollZu('checkliste')">Checkliste</a>
+        <a id="nav-anwesenheit" onclick="detailScrollZu('anwesenheit')">Anwesenheit</a>
         <a id="nav-teilnehmer" onclick="detailScrollZu('teilnehmer')">Teilnehmer</a>
       </div>
       <div class="detail-main">
@@ -77,6 +78,7 @@ function renderSchulungdetail(terminId) {
         ${detailAbschnittAgenda(kurs)}
         ${detailAbschnittMaterialien(kurs)}
         ${detailAbschnittCheckliste(termin)}
+        ${detailAbschnittAnwesenheit(termin)}
         ${detailAbschnittTeilnehmer(kurs, termin)}
       </div>
     </div>`;
@@ -266,6 +268,106 @@ function detailChecklisteHinzufuegen(terminId) {
 function detailChecklisteEntfernen(terminId, index) {
   if (confirm('Diesen Checklistenpunkt entfernen?')) {
     checklistePunktEntfernen(terminId, index);
+  }
+}
+
+// ---- Phase 2: Anwesenheit ----
+
+function detailAnwesenheitZeile(termin, buchung, gesperrt) {
+  const teilnehmer = window.STATE.teilnehmer.find(t => t.id === buchung.teilnehmerId);
+  const erfasst = buchung.anwesenheitProzent !== null && buchung.anwesenheitProzent !== undefined;
+  const unter = erfasst && !erfuelltMindestteilnahme(buchung);
+  const gruende = ['krank', 'entschuldigt', 'unentschuldigt'];
+  const grundOptionen = ['<option value="">— kein Grund —</option>']
+    .concat(gruende.map(g =>
+      `<option value="${g}" ${buchung.fehlgrund === g ? 'selected' : ''}>${g}</option>`))
+    .join('');
+
+  return `
+    <div class="anw-row ${unter ? 'unter-mindest' : ''}">
+      <div class="anw-name">
+        <strong>${escHtml(teilnehmer ? teilnehmer.name : '(unbekannt)')}</strong>
+        <div class="anw-firma">${escHtml(teilnehmer ? teilnehmer.firma : '')}</div>
+      </div>
+      <div class="anw-prozent">
+        <input type="number" min="0" max="100" step="1"
+               value="${erfasst ? buchung.anwesenheitProzent : ''}"
+               placeholder="%" ${gesperrt ? 'disabled' : ''}
+               onchange="detailAnwesenheitProzent('${escJsArg(buchung.id)}', this.value)" />
+      </div>
+      <div class="anw-grund">
+        <select ${gesperrt || !erfasst || buchung.anwesenheitProzent === 100 ? 'disabled' : ''}
+                onchange="detailAnwesenheitGrund('${escJsArg(buchung.id)}', this.value)">
+          ${grundOptionen}
+        </select>
+      </div>
+      <div class="anw-aktion">
+        ${unter ? '<span class="anw-hinweis">unter ' + MINDEST_ANWESENHEIT + ' %</span>' : ''}
+      </div>
+    </div>`;
+}
+
+function detailAbschnittAnwesenheit(termin) {
+  // Nicht !!termin.abschluss verwenden: nach dem Wiederoeffnen bleibt das
+  // abschluss-Objekt als Historie erhalten, der Termin ist aber wieder offen.
+  const gesperrt = istTerminAbgeschlossen(termin.id);
+  const buchungen = anwesenheitsBuchungen(termin.id);
+  const s = anwesenheitStatistik(termin.id);
+
+  if (buchungen.length === 0) {
+    return `
+      <div class="card" id="abschnitt-anwesenheit">
+        <div class="section-title">Anwesenheit</div>
+        <p class="empty-hint">Noch keine Teilnehmer gebucht — es gibt nichts zu erfassen.</p>
+      </div>`;
+  }
+
+  const zusammenfassung = s.erfasst === 0
+    ? 'noch nichts erfasst'
+    : `${s.erfuellt} von ${s.gesamt} erfüllen die Mindestteilnahme`
+      + (s.erfasst < s.gesamt ? ` · ${s.gesamt - s.erfasst} offen` : '')
+      + (s.durchschnitt !== null ? ` · Ø ${s.durchschnitt} %` : '');
+
+  return `
+    <div class="card" id="abschnitt-anwesenheit">
+      <div class="section-title">Anwesenheit <small>${escHtml(zusammenfassung)}</small>
+        ${gesperrt ? '' : `<button class="btn" onclick="detailAlleAnwesend('${escJsArg(termin.id)}')">Alle auf 100 %</button>`}
+      </div>
+      <p class="field-hint" style="margin:-4px 0 10px 0;">
+        Ab ${MINDEST_ANWESENHEIT} % Anwesenheit wird eine Teilnahmebescheinigung ausgestellt.
+      </p>
+      ${buchungen.map(b => detailAnwesenheitZeile(termin, b, gesperrt)).join('')}
+    </div>`;
+}
+
+function detailAnwesenheitProzent(buchungId, wert) {
+  if (wert === '') return;
+  try {
+    const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+    anwesenheitSetzen(buchungId, wert, buchung ? buchung.fehlgrund : null);
+  } catch (e) {
+    alert(e.message);
+    renderAll();
+  }
+}
+
+function detailAnwesenheitGrund(buchungId, wert) {
+  try {
+    const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+    if (!buchung) return;
+    anwesenheitSetzen(buchungId, buchung.anwesenheitProzent, wert || null);
+  } catch (e) {
+    alert(e.message);
+    renderAll();
+  }
+}
+
+function detailAlleAnwesend(terminId) {
+  try {
+    const anzahl = alleAnwesenheitAufVoll(terminId);
+    if (anzahl === 0) alert('Keine Teilnehmer vorhanden.');
+  } catch (e) {
+    alert(e.message);
   }
 }
 
