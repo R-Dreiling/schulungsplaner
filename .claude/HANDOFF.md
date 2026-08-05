@@ -1,7 +1,14 @@
 # HANDOFF — Schulungsplaner v3 Phase 2
 
-Stand: Ende der Session, Branch `feature/kurs-termin-buchung`, HEAD `dcaff7a`.
+Stand: Ende der Session, Branch `feature/kurs-termin-buchung`, HEAD `0aa2f54`.
 Arbeitsbaum sauber, **keine Datei in einem halbfertigen Zustand**.
+
+Nach Abschluss von Phase 2 kam auf Wunsch der Nutzerin noch eine **Bedienungsanleitung**
+auf die Hilfeseite (Commit `0aa2f54`): Überblick, Aufbau des Fensters, acht nummerierte
+Schritte vom Trainer bis zum Abschlussbericht, Wiederfinden, Sicherung, Start mit echten
+Daten — gedacht für Leser ohne Vorwissen, etwa Geschäftspartner. Alle Aussagen sind gegen
+den Code geprüft. Die Seite trägt jetzt zwei Bereiche: „Bedienungsanleitung" und
+„Nachschlagen: wie das Programm rechnet".
 
 **Phase 2 ist inhaltlich fertig (Tasks 1–10) und intern reviewt. Offen ist nur die
 Abnahme durch die Nutzerin. Nicht vor der Abnahme nach `master` mergen.**
@@ -186,7 +193,7 @@ Bereits geklärt, **nicht erneut fragen**:
 ## Umgebung
 
 **Branch:** `feature/kurs-termin-buchung` (Basis: `master`, Merge-Base `14b93d4`)
-**HEAD:** `dcaff7a` — `fix: Schreibschutz auch auf Schulungen- und Buchungsseite sichtbar machen`
+**HEAD:** `0aa2f54` — `docs: Bedienungsanleitung auf der Hilfeseite`
 **git status:** sauber · **Remote:** keiner (rein lokales Repository)
 
 **Build:** `python Design/assemble.py` — aktuell reproduzierbar (byte-identisch).
