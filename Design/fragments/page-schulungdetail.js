@@ -19,6 +19,18 @@ function detailScrollZu(anker) {
   document.getElementById(`nav-${anker}`)?.classList.add('active');
 }
 
+// Fuehrt eine Aenderung aus und zeigt eine Fehlermeldung an, statt sie nur in
+// der Konsole zu hinterlassen. Seit dem Schreibschutz werfen die Mutatoren bei
+// einem abgeschlossenen Termin - die Nutzerin soll erfahren, warum nichts
+// passiert ist, statt vor einer scheinbar toten Schaltflaeche zu sitzen.
+function detailVersuche(aktion) {
+  try {
+    aktion();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
 function renderSchulungdetail(terminId) {
   const container = document.getElementById('schulungdetail-inhalt');
   if (!container) return;
@@ -247,7 +259,7 @@ function detailMaterialEntfernen(kursId, bereich, dateiId) {
 function detailAbschnittCheckliste(termin) {
   const zeilen = termin.checkliste.map((p, i) => `
     <div class="check-row ${p.erledigt ? 'done' : ''}">
-      <button class="check-box ${p.erledigt ? 'done' : ''}" onclick="checklistePunktToggeln('${termin.id}', ${i})">${p.erledigt ? '✓' : ''}</button>
+      <button class="check-box ${p.erledigt ? 'done' : ''}" onclick="detailVersuche(() => checklistePunktToggeln('${escJsArg(termin.id)}', ${i}))">${p.erledigt ? '✓' : ''}</button>
       <span class="lbl" style="flex:1;">${escHtml(p.label)}</span>
       <button class="btn-link" style="color:var(--status-red-fg);" onclick="detailChecklisteEntfernen('${termin.id}', ${i})">Entfernen</button>
     </div>`).join('');
@@ -264,13 +276,13 @@ function detailAbschnittCheckliste(termin) {
 function detailChecklisteHinzufuegen(terminId) {
   const label = prompt('Neuer Checklistenpunkt:');
   if (label && label.trim()) {
-    checklistePunktHinzufuegen(terminId, label.trim());
+    detailVersuche(() => checklistePunktHinzufuegen(terminId, label.trim()));
   }
 }
 
 function detailChecklisteEntfernen(terminId, index) {
   if (confirm('Diesen Checklistenpunkt entfernen?')) {
-    checklistePunktEntfernen(terminId, index);
+    detailVersuche(() => checklistePunktEntfernen(terminId, index));
   }
 }
 
@@ -454,14 +466,14 @@ function detailOeffneVerschiebenDialog(buchungId) {
 function detailSpeichereVerschieben(ev, buchungId) {
   ev.preventDefault();
   const felder = formularWerte(ev.target);
-  verschiebeBuchung(buchungId, felder.neuerTerminId);
+  detailVersuche(() => verschiebeBuchung(buchungId, felder.neuerTerminId));
   schliesseDialog();
   return false;
 }
 
 function detailBuchungEntfernen(buchungId) {
   if (confirm('Diese Buchung wirklich entfernen?')) {
-    loescheBuchung(buchungId);
+    detailVersuche(() => loescheBuchung(buchungId));
   }
 }
 
@@ -615,12 +627,12 @@ function detailSpeichereTeilnehmerHinzufuegen(ev, terminId) {
   }
   // Ein bewusst abweichend gewaehlter Status gilt als manuell gesetzt - sonst
   // wuerde die Automatik ihn spaeter als ihren eigenen ausweisen.
-  erstelleBuchung({
+  detailVersuche(() => erstelleBuchung({
     teilnehmerId,
     terminId,
     anmeldestatus: felder.anmeldestatus,
     statusManuell: felder.anmeldestatus !== 'angemeldet',
-  });
+  }));
   schliesseDialog();
   return false;
 }
