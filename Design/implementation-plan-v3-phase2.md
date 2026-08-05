@@ -1337,29 +1337,64 @@ function schulungenGefilterteKurse() {
   return window.STATE.kurse.filter(k => {
     if (suche && !k.titel.toLowerCase().includes(suche)) return false;
     if (kategorie && k.kategorie !== kategorie) return false;
-    if (abschluss === 'abgeschlossen') return k.termine.some(t => t.abschluss);
-    if (abschluss === 'offen') return k.termine.some(t => !t.abschluss);
+    if (abschluss === 'abgeschlossen') return k.termine.some(t => istTerminAbgeschlossen(t.id));
+    if (abschluss === 'offen') return k.termine.some(t => !istTerminAbgeschlossen(t.id));
     return true;
   });
 }
 
 // Welche Termine eines Kurses in der aufgeklappten Tabelle erscheinen -
-// derselbe Filter wie oben, damit die Liste zur Auswahl passt.
+// derselbe Filter wie oben, damit die Liste zur Auswahl passt. Massstab ist
+// der foermliche Abschluss (istTerminAbgeschlossen), nicht das blosse
+// Vorhandensein eines abschluss-Objekts: ein wiedereroeffneter Termin behaelt
+// dieses Objekt als Nachweisspur, ist aber wieder offene Arbeit und gehoert
+// deshalb unter "Nur offene".
 function schulungenGefilterteTermine(kurs) {
   const abschluss = document.getElementById('schulungen-abschluss-filter')?.value || '';
-  if (abschluss === 'abgeschlossen') return kurs.termine.filter(t => t.abschluss);
-  if (abschluss === 'offen') return kurs.termine.filter(t => !t.abschluss);
+  if (abschluss === 'abgeschlossen') return kurs.termine.filter(t => istTerminAbgeschlossen(t.id));
+  if (abschluss === 'offen') return kurs.termine.filter(t => !istTerminAbgeschlossen(t.id));
   return kurs.termine;
 }
 ```
 
-Ersetze in `renderSchulungen` den Ausdruck `kurs.termine.map(t => schulungenTerminZeile(kurs, t)).join('')` durch:
+**Korrektur gegenüber der ersten Planfassung:** dort filterten beide Funktionen über
+`t.abschluss`. Das hätte einen wiedereröffneten Termin aus „Nur offene" ausgeblendet,
+obwohl er wieder offene Arbeit ist — dieselbe Fehlerklasse wie in Task 2. Der
+Berichts-Knopf bleibt bewusst an `termin.abschluss` gebunden (Nachweisspur, wie das
+Abschluss-Banner).
+
+Stelle `renderSchulungen` auf die gefilterte Terminliste um. Damit die Kopfzeile nicht
+mehr Termine ankündigt, als darunter stehen, wird einmal gefiltert und wiederverwendet —
+der Kursblock wird dafür von einem Ausdruck zu einem Block mit `return`:
 
 ```javascript
-${schulungenGefilterteTermine(kurs).map(t => schulungenTerminZeile(kurs, t)).join('')}
+  container.innerHTML = kurse.map(kurs => {
+    // Einmal filtern und wiederverwenden - die Zaehlung in der Kopfzeile muss
+    // zu den Zeilen passen, die darunter tatsaechlich stehen.
+    const sichtbareTermine = schulungenGefilterteTermine(kurs);
+    const terminAnzahl = sichtbareTermine.length === kurs.termine.length
+      ? `${kurs.termine.length} Termin(e)`
+      : `${sichtbareTermine.length} von ${kurs.termine.length} Terminen`;
+    return `
+    …
+          <span …>… · ${terminAnzahl}</span>
+    …
+      <div class="expand-content" id="s-expand-${kurs.id}">
+        ${sichtbareTermine.length === 0
+          ? (kurs.termine.length === 0
+            ? '<p class="empty-hint">Noch keine Termine. Über „+ Termin" anlegen.</p>'
+            : '<p class="empty-hint">Kein Termin passt zum gewählten Filter.</p>')
+          : `<table class="data-table fixed-rows">
+          …
+          <tbody>${sichtbareTermine.map(t => schulungenTerminZeile(kurs, t)).join('')}</tbody>
+        </table>`}
+      </div>
+    </div>`;
+  }).join('');
 ```
 
-und die vorangehende Bedingung `kurs.termine.length === 0` durch `schulungenGefilterteTermine(kurs).length === 0`.
+Der zweite Leer-Hinweis ist nötig, weil „Noch keine Termine. Über ‚+ Termin' anlegen."
+bei aktivem Filter falsch wäre — der Kurs hat Termine, sie passen nur nicht.
 
 Ergänze in `schulungenTerminZeile` in der Aktionsspalte, direkt **vor** dem „Öffnen"-Knopf, den Berichts-Knopf für abgeschlossene Termine:
 

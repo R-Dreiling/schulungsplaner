@@ -1,12 +1,32 @@
 // Design/fragments/page-schulungen.js
 
+// Liefert die anzuzeigenden Kurse. Der Abschluss-Filter wirkt auf Termin-
+// ebene: ein Kurs erscheint nur, wenn mindestens ein Termin zum Filter passt.
 function schulungenGefilterteKurse() {
   const suche = (document.getElementById('schulungen-suche')?.value || '').toLowerCase();
   const kategorie = document.getElementById('schulungen-kategorie-filter')?.value || '';
-  return window.STATE.kurse.filter(k =>
-    (!suche || k.titel.toLowerCase().includes(suche)) &&
-    (!kategorie || k.kategorie === kategorie)
-  );
+  const abschluss = document.getElementById('schulungen-abschluss-filter')?.value || '';
+
+  return window.STATE.kurse.filter(k => {
+    if (suche && !k.titel.toLowerCase().includes(suche)) return false;
+    if (kategorie && k.kategorie !== kategorie) return false;
+    if (abschluss === 'abgeschlossen') return k.termine.some(t => istTerminAbgeschlossen(t.id));
+    if (abschluss === 'offen') return k.termine.some(t => !istTerminAbgeschlossen(t.id));
+    return true;
+  });
+}
+
+// Welche Termine eines Kurses in der aufgeklappten Tabelle erscheinen -
+// derselbe Filter wie oben, damit die Liste zur Auswahl passt. Massstab ist
+// der foermliche Abschluss (istTerminAbgeschlossen), nicht das blosse
+// Vorhandensein eines abschluss-Objekts: ein wiedereroeffneter Termin behaelt
+// dieses Objekt als Nachweisspur, ist aber wieder offene Arbeit und gehoert
+// deshalb unter "Nur offene".
+function schulungenGefilterteTermine(kurs) {
+  const abschluss = document.getElementById('schulungen-abschluss-filter')?.value || '';
+  if (abschluss === 'abgeschlossen') return kurs.termine.filter(t => istTerminAbgeschlossen(t.id));
+  if (abschluss === 'offen') return kurs.termine.filter(t => !istTerminAbgeschlossen(t.id));
+  return kurs.termine;
 }
 
 // Vorschlagsliste fuer das Kategorie-Freitextfeld, gespeist aus dem Bestand.
@@ -54,6 +74,7 @@ function schulungenTerminZeile(kurs, termin) {
       <td>${statusBadgeHtml(termin.status)}</td>
       <td>${auslastungText}</td>
       <td style="text-align:right; white-space:nowrap;">
+        ${termin.abschluss ? `<button class="btn" onclick="druckeAbschlussbericht('${escJsArg(termin.id)}')">Bericht</button>` : ''}
         <button class="btn" onclick="showSchulungDetail('${termin.id}')">Öffnen</button>
         <button class="btn" onclick="oeffneTerminBearbeitenDialog('${termin.id}')">Bearbeiten</button>
         <button class="btn btn-ghost-red" onclick="terminLoeschenBestaetigen('${termin.id}')">Löschen</button>
@@ -83,13 +104,20 @@ function renderSchulungen() {
     return;
   }
 
-  container.innerHTML = kurse.map(kurs => `
+  container.innerHTML = kurse.map(kurs => {
+    // Einmal filtern und wiederverwenden - die Zaehlung in der Kopfzeile muss
+    // zu den Zeilen passen, die darunter tatsaechlich stehen.
+    const sichtbareTermine = schulungenGefilterteTermine(kurs);
+    const terminAnzahl = sichtbareTermine.length === kurs.termine.length
+      ? `${kurs.termine.length} Termin(e)`
+      : `${sichtbareTermine.length} von ${kurs.termine.length} Terminen`;
+    return `
     <div style="border-bottom:1px solid var(--line); padding:14px 0;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <div class="expand-row" style="flex:1;" onclick="schulungenToggle('${kurs.id}')">
           <span class="expand-toggle" id="s-toggle-${kurs.id}">▸</span>
           <strong style="font-family:var(--font-display); font-size:14px; color:var(--ink);">${escHtml(kurs.titel)}</strong>
-          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${escHtml(kurs.kategorie)} · ${escHtml(kurs.format)} · ${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer · ${kurs.termine.length} Termin(e)</span>
+          <span style="color:var(--muted); font-size:12px; margin-left:8px;">${escHtml(kurs.kategorie)} · ${escHtml(kurs.format)} · ${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer · ${terminAnzahl}</span>
         </div>
         <div style="display:flex; gap:6px;">
           <button class="btn" onclick="oeffneNeuerTerminDialog('${kurs.id}')">+ Termin</button>
@@ -98,14 +126,17 @@ function renderSchulungen() {
         </div>
       </div>
       <div class="expand-content" id="s-expand-${kurs.id}">
-        ${kurs.termine.length === 0
-          ? '<p class="empty-hint">Noch keine Termine. Über „+ Termin" anlegen.</p>'
+        ${sichtbareTermine.length === 0
+          ? (kurs.termine.length === 0
+            ? '<p class="empty-hint">Noch keine Termine. Über „+ Termin" anlegen.</p>'
+            : '<p class="empty-hint">Kein Termin passt zum gewählten Filter.</p>')
           : `<table class="data-table fixed-rows">
           <thead><tr><th>Datum</th><th>Trainer</th><th>Format / Ort</th><th>Status</th><th>Teilnehmer</th><th></th></tr></thead>
-          <tbody>${kurs.termine.map(t => schulungenTerminZeile(kurs, t)).join('')}</tbody>
+          <tbody>${sichtbareTermine.map(t => schulungenTerminZeile(kurs, t)).join('')}</tbody>
         </table>`}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function schulungenToggle(kursId) {
