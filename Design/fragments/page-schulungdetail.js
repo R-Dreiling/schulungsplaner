@@ -49,8 +49,16 @@ function renderSchulungdetail(terminId) {
       </div>
       <div style="display:flex; gap:32px; font-size:13px; margin:14px 0;">
         <div><div class="mat-group-label" style="margin:0 0 3px 0;">Datum</div><div style="color:var(--ink); font-weight:600;">${formatiereDatum(termin.datum)}</div></div>
-        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Trainer</div><div style="color:var(--ink); font-weight:600;">${termin.trainer}</div></div>
-        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Format</div><div style="color:var(--ink); font-weight:600;">${termin.format} · ${termin.ort}</div></div>
+        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Trainer</div><div style="color:var(--ink); font-weight:600;">${
+          termin.trainerId
+            ? escAttr(trainerName(termin.trainerId))
+            : '<span style="color:var(--status-red-fg);">Kein Trainer zugeordnet</span>'
+        }${
+          termin.vertretungTrainerId
+            ? `<div style="font-size:11.5px; font-weight:400; color:var(--muted);">Vertretung: ${escAttr(trainerName(termin.vertretungTrainerId))}</div>`
+            : ''
+        }</div></div>
+        <div><div class="mat-group-label" style="margin:0 0 3px 0;">Format</div><div style="color:var(--ink); font-weight:600;">${escAttr(kurs.format)} · ${escAttr(termin.ort)}</div></div>
         <div><div class="mat-group-label" style="margin:0 0 3px 0;">Kapazität</div><div style="color:var(--ink); font-weight:600;">${a.belegt} von ${a.kapazitaet} belegt</div></div>
       </div>
       <div class="progress-track"><div class="progress-fill ${a.belegt >= a.kapazitaet ? 'full' : ''}" style="width:${a.prozent}%"></div></div>
@@ -95,8 +103,10 @@ function detailAbschnittBeschreibung(kurs) {
       <p class="desc-text" style="font-size:13px; line-height:1.55;">${kurs.beschreibung || '<em>Noch keine Beschreibung.</em>'}</p>
       <ul class="goal-list">${(kurs.lernziele || []).map(z => `<li>${z}</li>`).join('') || '<li style="color:var(--muted2);">Noch keine Lernziele.</li>'}</ul>
       <div class="pill-row">
-        <span class="pill">Zielgruppe: ${kurs.zielgruppe || '—'}</span>
-        <span class="pill">Voraussetzung: ${kurs.voraussetzungen || '—'}</span>
+        <span class="pill">Format: ${escAttr(kurs.format)}</span>
+        <span class="pill">${kurs.minTeilnehmer}–${kurs.maxTeilnehmer} Teilnehmer</span>
+        <span class="pill">Umfang: ${kurs.zertifikat && kurs.zertifikat.umfangUE ? kurs.zertifikat.umfangUE : '—'} UE</span>
+        <span class="pill">Voraussetzung: ${escAttr(kurs.voraussetzungen || '—')}</span>
       </div>
     </div>`;
 }
@@ -109,10 +119,7 @@ function detailOeffneBeschreibungBearbeitenDialog(kursId) {
       <div class="dialog-body">
         <div class="field"><label>Beschreibung</label><textarea name="beschreibung" rows="3">${kurs.beschreibung}</textarea></div>
         <div class="field"><label>Lernziele (ein Punkt pro Zeile)</label><textarea name="lernzieleText" rows="4">${(kurs.lernziele || []).join('\n')}</textarea></div>
-        <div class="field-row2">
-          <div class="field"><label>Zielgruppe</label><input name="zielgruppe" value="${escAttr(kurs.zielgruppe)}" /></div>
-          <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${escAttr(kurs.voraussetzungen)}" /></div>
-        </div>
+        <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${escAttr(kurs.voraussetzungen)}" /></div>
       </div>
       <div class="dialog-foot">
         <button type="button" class="btn" onclick="schliesseDialog()">Abbrechen</button>
@@ -126,8 +133,9 @@ function detailSpeichereBeschreibung(ev, kursId) {
   const felder = formularWerte(ev.target);
   const lernziele = felder.lernzieleText.split('\n').map(z => z.trim()).filter(Boolean);
   aktualisiereKurs(kursId, {
-    beschreibung: felder.beschreibung, zielgruppe: felder.zielgruppe,
-    voraussetzungen: felder.voraussetzungen, lernziele,
+    beschreibung: felder.beschreibung,
+    voraussetzungen: felder.voraussetzungen,
+    lernziele,
   });
   schliesseDialog();
   return false;
