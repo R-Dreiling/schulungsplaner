@@ -1,1 +1,60 @@
-<div class="page-header"><div class="page-header-text"><h1>Hilfe</h1><p class="subtitle">Wird in Task 9 gebaut.</p></div></div>
+<div class="page-header">
+  <div class="page-header-text">
+    <h1>Hilfe</h1>
+    <p class="subtitle">Wie der Schulungsplaner rechnet und was die Funktionen bewirken.</p>
+  </div>
+</div>
+
+<div class="card" style="padding:22px 26px; max-width:820px;">
+
+  <div class="hilfe-block">
+    <h3>Kurse und Termine</h3>
+    <p>Ein <strong>Kurs</strong> ist das inhaltliche Thema (z.&nbsp;B. „Erste-Hilfe-Kurs"). Ein <strong>Termin</strong> ist eine konkrete Durchführung dieses Kurses an einem Datum. Ein Kurs kann beliebig viele Termine im Jahr haben.</p>
+    <p>Am <strong>Kurs</strong> hängen: Beschreibung, Lernziele, Agenda, Materialien, Format, Mindest- und Maximalteilnehmerzahl sowie die Angaben für die Bescheinigung. Diese gelten für <em>alle</em> Termine des Kurses.</p>
+    <p>Am <strong>Termin</strong> hängen: Datum, Trainer, Vertretung, Ort, Status, Checkliste und die gebuchten Teilnehmer. Diese unterscheiden sich je Durchführung.</p>
+  </div>
+
+  <div class="hilfe-block">
+    <h3>Auslastung</h3>
+    <p>Die Auslastung eines Termins zählt alle Buchungen <strong>außer den abgesagten</strong>. Wer absagt, gibt seinen Platz also wieder frei.</p>
+    <ul>
+      <li><strong>Ausgebucht</strong> (indigo): Die Maximalteilnehmerzahl des Kurses ist erreicht. Buchen ist weiterhin möglich, aber nur nach Rückfrage.</li>
+      <li><strong>Unterbesetzt</strong> (amber): Es sind weniger Teilnehmer gebucht als die Mindestteilnehmerzahl des Kurses vorgibt. Hier lohnt sich ein Blick, ob Teilnehmer auf den Folgetermin verschoben werden sollten.</li>
+      <li><strong>X Plätze frei</strong> (grün): Alles im grünen Bereich.</li>
+    </ul>
+  </div>
+
+  <div class="hilfe-block">
+    <h3>Teilnehmer verschieben</h3>
+    <p>Ist ein Termin unterbesetzt, zeigt die Übersicht direkt daneben den nächsten Termin desselben Kurses mit seiner Auslastung. Über die Schulungsdetailseite lässt sich ein Teilnehmer per <strong>„Verschieben"</strong> auf einen anderen Termin desselben Kurses umbuchen. Buchungsdatum und Anmeldestatus bleiben dabei erhalten.</p>
+  </div>
+
+  <div class="hilfe-block">
+    <h3>Anmeldestatus und Automatik</h3>
+    <p>Eine neue Buchung startet als <strong>angemeldet</strong>. Liegt der Termin höchstens sieben Tage in der Zukunft, setzt das System den Status automatisch auf <strong>bestätigt</strong>.</p>
+    <p>Sobald du einen Status <strong>von Hand</strong> änderst, hat das Vorrang: Diese Buchung wird von der Automatik nie wieder angefasst. In der Buchungsliste erkennst du an dem Uhr-Symbol ⏱ hinter dem Status, dass er automatisch gesetzt wurde — fehlt das Symbol, wurde manuell eingegriffen.</p>
+  </div>
+
+  <div class="hilfe-block">
+    <h3>Trainer und Nachweise</h3>
+    <p>Trainer werden im Bereich <strong>Trainer</strong> gepflegt und beim Termin ausgewählt. Zusätzlich lässt sich je Termin eine <strong>Vertretung</strong> hinterlegen, die im Krankheitsfall einspringt.</p>
+    <p>Zu jedem Trainer können Nachweise (Zeugnisse, Zertifikate) hochgeladen werden, optional mit einem <strong>„gültig bis"</strong>-Datum. Läuft ein Nachweis ab oder läuft er innerhalb der nächsten 60 Tage ab, wird das in der Trainerliste angezeigt.</p>
+  </div>
+
+  <div class="hilfe-block">
+    <h3>Kategorien</h3>
+    <p>Kategorien sind nicht fest vorgegeben. Beim Anlegen oder Bearbeiten eines Kurses kannst du eine bestehende Kategorie aus der Vorschlagsliste wählen oder einfach eine neue eintippen — sie steht danach überall zur Verfügung.</p>
+  </div>
+
+  <div class="hilfe-block">
+    <h3>Wo die Daten liegen</h3>
+    <p>Alle Daten liegen <strong>ausschließlich lokal in diesem Browser</strong> auf diesem Rechner. Es gibt keinen Server, nichts wird übertragen. Ein anderer Browser oder ein anderer Rechner sieht diese Daten nicht.</p>
+    <ul>
+      <li><strong>Exportieren</strong> — lädt den kompletten Datenstand als JSON-Datei herunter. Das ist deine Sicherung und der Weg, Daten auf einen anderen Rechner zu bringen. Hochgeladene Dateien sind darin nicht enthalten.</li>
+      <li><strong>Importieren</strong> — liest eine solche Datei wieder ein und ersetzt den aktuellen Stand. Ist die Datei fehlerhaft, bleibt der bisherige Stand erhalten.</li>
+      <li><strong>Zurücksetzen</strong> — stellt die mitgelieferten Beispieldaten wieder her. Alle eigenen Eingaben gehen verloren.</li>
+      <li><strong>Alle Daten leeren</strong> — löscht Kurse, Termine, Buchungen, Teilnehmer, Trainer und alle hochgeladenen Dateien. Für den sauberen Start mit echten Daten. Nicht umkehrbar.</li>
+    </ul>
+  </div>
+
+</div>
