@@ -11,7 +11,6 @@
         "Ein Verfahrensverzeichnis eigenständig aufbauen können",
         "Meldepflichten bei Datenschutzverstößen sicher anwenden"
       ],
-      "zielgruppe": "Neue und angehende Datenschutzbeauftragte",
       "voraussetzungen": "Keine",
       "agenda": [
         {
@@ -43,10 +42,7 @@
         {
           "id": "s1",
           "datum": "2026-08-12",
-          "trainer": "Dr. Julia Berg",
-          "format": "Vor Ort",
           "ort": "Hamburg",
-          "kapazitaet": 10,
           "status": "geplant",
           "checkliste": [
             {
@@ -69,15 +65,15 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": false
             }
-          ]
+          ],
+          "trainerId": "tr1",
+          "vertretungTrainerId": null,
+          "abschluss": null
         },
         {
           "id": "s1b",
           "datum": "2026-11-18",
-          "trainer": "Dr. Julia Berg",
-          "format": "Vor Ort",
           "ort": "Hamburg",
-          "kapazitaet": 10,
           "status": "geplant",
           "checkliste": [
             {
@@ -100,9 +96,22 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": false
             }
-          ]
+          ],
+          "trainerId": "tr1",
+          "vertretungTrainerId": null,
+          "abschluss": null
         }
-      ]
+      ],
+      "format": "Vor Ort",
+      "maxTeilnehmer": 10,
+      "minTeilnehmer": 5,
+      "zertifikat": {
+        "kuerzel": "DSB",
+        "umfangUE": 40,
+        "ueberschrift": "Zertifizierungslehrgang Datenschutzbeauftragte:r",
+        "bestaetigungstext": "den Zertifizierungslehrgang „{kurs}“ – Fachkunde nach Art. 37 DSGVO – im Umfang von {umfang} Unterrichtseinheiten erfolgreich absolviert und die Abschlussprüfung bestanden hat. Damit wurde die für die Rolle erforderliche Fachkunde nachgewiesen.",
+        "gueltigkeit": "unbefristet"
+      }
     },
     {
       "id": "k2",
@@ -114,7 +123,6 @@
         "Verantwortung als Führungskraft einschätzen können",
         "Datenschutzrisiken im eigenen Bereich erkennen"
       ],
-      "zielgruppe": "Führungskräfte",
       "voraussetzungen": "Grundkenntnisse Datenschutz empfohlen",
       "agenda": [
         {
@@ -136,10 +144,7 @@
         {
           "id": "s5",
           "datum": "2026-06-18",
-          "trainer": "Dr. Julia Berg",
-          "format": "Online",
           "ort": "—",
-          "kapazitaet": 12,
           "status": "abgeschlossen",
           "checkliste": [
             {
@@ -162,9 +167,22 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": true
             }
-          ]
+          ],
+          "trainerId": "tr1",
+          "vertretungTrainerId": null,
+          "abschluss": null
         }
-      ]
+      ],
+      "format": "Online",
+      "maxTeilnehmer": 12,
+      "minTeilnehmer": 5,
+      "zertifikat": {
+        "kuerzel": "DSGVO-FK",
+        "umfangUE": 8,
+        "ueberschrift": "DSGVO Update für Führungskräfte",
+        "bestaetigungstext": "an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.",
+        "gueltigkeit": "unbefristet"
+      }
     },
     {
       "id": "k3",
@@ -176,7 +194,6 @@
         "Interne Meldestelle korrekt aufsetzen",
         "Meldungen rechtssicher bearbeiten"
       ],
-      "zielgruppe": "Compliance-Verantwortliche, Personalabteilung",
       "voraussetzungen": "Keine",
       "agenda": [
         {
@@ -203,10 +220,7 @@
         {
           "id": "s2",
           "datum": "2026-08-19",
-          "trainer": "Markus Feldmann",
-          "format": "Online",
           "ort": "—",
-          "kapazitaet": 18,
           "status": "geplant",
           "checkliste": [
             {
@@ -229,9 +243,22 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": false
             }
-          ]
+          ],
+          "trainerId": "tr2",
+          "vertretungTrainerId": null,
+          "abschluss": null
         }
-      ]
+      ],
+      "format": "Online",
+      "maxTeilnehmer": 18,
+      "minTeilnehmer": 5,
+      "zertifikat": {
+        "kuerzel": "HINSCHG",
+        "umfangUE": 8,
+        "ueberschrift": "Hinweisgeberschutz kompakt",
+        "bestaetigungstext": "an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.",
+        "gueltigkeit": "unbefristet"
+      }
     },
     {
       "id": "k4",
@@ -243,7 +270,6 @@
         "Gefahren am Arbeitsplatz erkennen",
         "Präventionsmaßnahmen richtig anwenden"
       ],
-      "zielgruppe": "Alle Mitarbeitenden",
       "voraussetzungen": "Keine",
       "agenda": [
         {
@@ -270,10 +296,7 @@
         {
           "id": "s3",
           "datum": "2026-07-30",
-          "trainer": "Sabine Kroll",
-          "format": "Vor Ort",
           "ort": "München",
-          "kapazitaet": 7,
           "status": "laufend",
           "checkliste": [
             {
@@ -296,15 +319,15 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": true
             }
-          ]
+          ],
+          "trainerId": "tr4",
+          "vertretungTrainerId": null,
+          "abschluss": null
         },
         {
           "id": "s3b",
           "datum": "2026-10-15",
-          "trainer": "Sabine Kroll",
-          "format": "Vor Ort",
           "ort": "München",
-          "kapazitaet": 7,
           "status": "geplant",
           "checkliste": [
             {
@@ -327,9 +350,22 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": false
             }
-          ]
+          ],
+          "trainerId": "tr4",
+          "vertretungTrainerId": null,
+          "abschluss": null
         }
-      ]
+      ],
+      "format": "Vor Ort",
+      "maxTeilnehmer": 7,
+      "minTeilnehmer": 5,
+      "zertifikat": {
+        "kuerzel": "ASIB",
+        "umfangUE": 8,
+        "ueberschrift": "Arbeitssicherheit Basisschulung",
+        "bestaetigungstext": "an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.",
+        "gueltigkeit": "unbefristet"
+      }
     },
     {
       "id": "k5",
@@ -341,7 +377,6 @@
         "Gefährdungen strukturiert erfassen",
         "Maßnahmen ableiten und dokumentieren"
       ],
-      "zielgruppe": "Führungskräfte, Sicherheitsbeauftragte",
       "voraussetzungen": "Keine",
       "agenda": [
         {
@@ -363,10 +398,7 @@
         {
           "id": "s7",
           "datum": "2026-05-14",
-          "trainer": "Sabine Kroll",
-          "format": "Vor Ort",
           "ort": "Stuttgart",
-          "kapazitaet": 8,
           "status": "abgeschlossen",
           "checkliste": [
             {
@@ -389,9 +421,22 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": true
             }
-          ]
+          ],
+          "trainerId": "tr4",
+          "vertretungTrainerId": null,
+          "abschluss": null
         }
-      ]
+      ],
+      "format": "Vor Ort",
+      "maxTeilnehmer": 8,
+      "minTeilnehmer": 5,
+      "zertifikat": {
+        "kuerzel": "GBU",
+        "umfangUE": 8,
+        "ueberschrift": "Gefährdungsbeurteilung Workshop",
+        "bestaetigungstext": "an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.",
+        "gueltigkeit": "unbefristet"
+      }
     },
     {
       "id": "k6",
@@ -403,7 +448,6 @@
         "Brandklassen und Löschmittel unterscheiden",
         "Löschgerät im Ernstfall sicher bedienen"
       ],
-      "zielgruppe": "Benannte Brandschutzhelfer",
       "voraussetzungen": "Keine",
       "agenda": [
         {
@@ -430,10 +474,7 @@
         {
           "id": "s4",
           "datum": "2026-09-02",
-          "trainer": "Thomas Weidner",
-          "format": "Vor Ort",
           "ort": "Köln",
-          "kapazitaet": 5,
           "status": "geplant",
           "checkliste": [
             {
@@ -456,9 +497,22 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": false
             }
-          ]
+          ],
+          "trainerId": "tr5",
+          "vertretungTrainerId": null,
+          "abschluss": null
         }
-      ]
+      ],
+      "format": "Vor Ort",
+      "maxTeilnehmer": 5,
+      "minTeilnehmer": 5,
+      "zertifikat": {
+        "kuerzel": "BSH",
+        "umfangUE": 8,
+        "ueberschrift": "Brandschutzhelfer Ausbildung",
+        "bestaetigungstext": "an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.",
+        "gueltigkeit": "unbefristet"
+      }
     },
     {
       "id": "k7",
@@ -470,7 +524,6 @@
         "Lebensrettende Sofortmaßnahmen sicher durchführen",
         "Verhalten im Notfall koordinieren"
       ],
-      "zielgruppe": "Benannte Ersthelfer",
       "voraussetzungen": "Keine",
       "agenda": [
         {
@@ -497,10 +550,7 @@
         {
           "id": "s6",
           "datum": "2026-09-10",
-          "trainer": "Nina Vogel",
-          "format": "Vor Ort",
           "ort": "Berlin",
-          "kapazitaet": 8,
           "status": "geplant",
           "checkliste": [
             {
@@ -523,9 +573,22 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": false
             }
-          ]
+          ],
+          "trainerId": "tr3",
+          "vertretungTrainerId": null,
+          "abschluss": null
         }
-      ]
+      ],
+      "format": "Vor Ort",
+      "maxTeilnehmer": 8,
+      "minTeilnehmer": 5,
+      "zertifikat": {
+        "kuerzel": "EH",
+        "umfangUE": 9,
+        "ueberschrift": "Erste-Hilfe-Kurs",
+        "bestaetigungstext": "an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.",
+        "gueltigkeit": "unbefristet"
+      }
     },
     {
       "id": "k8",
@@ -537,7 +600,6 @@
         "Typische Fehlerquellen vermeiden",
         "Aktuelle Änderungen kennen"
       ],
-      "zielgruppe": "Alle Mitarbeitenden",
       "voraussetzungen": "Vorherige Datenschutzschulung",
       "agenda": [
         {
@@ -559,10 +621,7 @@
         {
           "id": "s8",
           "datum": "2026-08-27",
-          "trainer": "Markus Feldmann",
-          "format": "Online",
           "ort": "—",
-          "kapazitaet": 25,
           "status": "geplant",
           "checkliste": [
             {
@@ -585,9 +644,22 @@
               "label": "Zertifikate vorbereitet",
               "erledigt": false
             }
-          ]
+          ],
+          "trainerId": "tr2",
+          "vertretungTrainerId": null,
+          "abschluss": null
         }
-      ]
+      ],
+      "format": "Online",
+      "maxTeilnehmer": 25,
+      "minTeilnehmer": 5,
+      "zertifikat": {
+        "kuerzel": "DS-AUF",
+        "umfangUE": 4,
+        "ueberschrift": "Datenschutz-Auffrischung",
+        "bestaetigungstext": "an der Schulung „{kurs}“ im Umfang von {umfang} Unterrichtseinheiten am {datum} in {ort} teilgenommen hat.",
+        "gueltigkeit": "unbefristet"
+      }
     }
   ],
   "teilnehmer": [
@@ -829,252 +901,447 @@
       "teilnehmerId": "t1",
       "terminId": "s1",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-23"
+      "gebuchtAm": "2026-07-23",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b2",
       "teilnehmerId": "t2",
       "terminId": "s1",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-07"
+      "gebuchtAm": "2026-07-07",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b3",
       "teilnehmerId": "t3",
       "terminId": "s1",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-23"
+      "gebuchtAm": "2026-07-23",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b4",
       "teilnehmerId": "t4",
       "terminId": "s5",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-06-04"
+      "gebuchtAm": "2026-06-04",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b5",
       "teilnehmerId": "t5",
       "terminId": "s5",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-04-27"
+      "gebuchtAm": "2026-04-27",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b6",
       "teilnehmerId": "t6",
       "terminId": "s8",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-07-06"
+      "gebuchtAm": "2026-07-06",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b7",
       "teilnehmerId": "t7",
       "terminId": "s3",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-07-14"
+      "gebuchtAm": "2026-07-14",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b8",
       "teilnehmerId": "t7",
       "terminId": "s7",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-04-10"
+      "gebuchtAm": "2026-04-10",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b9",
       "teilnehmerId": "t8",
       "terminId": "s3",
       "anmeldestatus": "abgesagt",
-      "gebuchtAm": "2026-06-05"
+      "gebuchtAm": "2026-06-05",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b10",
       "teilnehmerId": "t9",
       "terminId": "s3",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-05"
+      "gebuchtAm": "2026-07-05",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b11",
       "teilnehmerId": "t9",
       "terminId": "s7",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-04-30"
+      "gebuchtAm": "2026-04-30",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b12",
       "teilnehmerId": "t10",
       "terminId": "s6",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-16"
+      "gebuchtAm": "2026-07-16",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b13",
       "teilnehmerId": "t10",
       "terminId": "s4",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-16"
+      "gebuchtAm": "2026-07-16",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b14",
       "teilnehmerId": "t11",
       "terminId": "s6",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-08-01"
+      "gebuchtAm": "2026-08-01",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b15",
       "teilnehmerId": "t12",
       "terminId": "s4",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-07-20"
+      "gebuchtAm": "2026-07-20",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b16",
       "teilnehmerId": "t13",
       "terminId": "s7",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-04-05"
+      "gebuchtAm": "2026-04-05",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b17",
       "teilnehmerId": "t14",
       "terminId": "s2",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-06-28"
+      "gebuchtAm": "2026-06-28",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b18",
       "teilnehmerId": "t15",
       "terminId": "s2",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-06-28"
+      "gebuchtAm": "2026-06-28",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b19",
       "teilnehmerId": "t16",
       "terminId": "s5",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-05-27"
+      "gebuchtAm": "2026-05-27",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b20",
       "teilnehmerId": "t17",
       "terminId": "s5",
       "anmeldestatus": "abgesagt",
-      "gebuchtAm": "2026-06-03"
+      "gebuchtAm": "2026-06-03",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b21",
       "teilnehmerId": "t18",
       "terminId": "s4",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-07-10"
+      "gebuchtAm": "2026-07-10",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b22",
       "teilnehmerId": "t19",
       "terminId": "s4",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-24"
+      "gebuchtAm": "2026-07-24",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b23",
       "teilnehmerId": "t20",
       "terminId": "s6",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-24"
+      "gebuchtAm": "2026-07-24",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b24",
       "teilnehmerId": "t21",
       "terminId": "s3",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-06-19"
+      "gebuchtAm": "2026-06-19",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b25",
       "teilnehmerId": "t22",
       "terminId": "s3",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-07-07"
+      "gebuchtAm": "2026-07-07",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b26",
       "teilnehmerId": "t23",
       "terminId": "s3",
       "anmeldestatus": "abgesagt",
-      "gebuchtAm": "2026-06-19"
+      "gebuchtAm": "2026-06-19",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b27",
       "teilnehmerId": "t24",
       "terminId": "s7",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-03-28"
+      "gebuchtAm": "2026-03-28",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b28",
       "teilnehmerId": "t25",
       "terminId": "s7",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-04-13"
+      "gebuchtAm": "2026-04-13",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b29",
       "teilnehmerId": "t26",
       "terminId": "s6",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-07-26"
+      "gebuchtAm": "2026-07-26",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b30",
       "teilnehmerId": "t27",
       "terminId": "s4",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-08-04"
+      "gebuchtAm": "2026-08-04",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b31",
       "teilnehmerId": "t28",
       "terminId": "s1",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-25"
+      "gebuchtAm": "2026-07-25",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b32",
       "teilnehmerId": "t29",
       "terminId": "s1",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-07-13"
+      "gebuchtAm": "2026-07-13",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b33",
       "teilnehmerId": "t30",
       "terminId": "s2",
       "anmeldestatus": "bestätigt",
-      "gebuchtAm": "2026-07-02"
+      "gebuchtAm": "2026-07-02",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b34",
       "teilnehmerId": "t31",
       "terminId": "s3",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-06-23"
+      "gebuchtAm": "2026-06-23",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b35",
       "teilnehmerId": "t32",
       "terminId": "s8",
       "anmeldestatus": "angemeldet",
-      "gebuchtAm": "2026-07-06"
+      "gebuchtAm": "2026-07-06",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     },
     {
       "id": "b36",
       "teilnehmerId": "t33",
       "terminId": "s8",
       "anmeldestatus": "abgesagt",
-      "gebuchtAm": "2026-07-16"
+      "gebuchtAm": "2026-07-16",
+      "anwesenheitProzent": null,
+      "fehlgrund": null,
+      "zertifikatNr": null,
+      "statusManuell": false
     }
-  ]
+  ],
+  "trainer": [
+    {
+      "id": "tr1",
+      "name": "Dr. Julia Berg",
+      "email": "",
+      "telefon": "",
+      "qualifikation": "",
+      "notizen": "",
+      "dokumente": []
+    },
+    {
+      "id": "tr2",
+      "name": "Markus Feldmann",
+      "email": "",
+      "telefon": "",
+      "qualifikation": "",
+      "notizen": "",
+      "dokumente": []
+    },
+    {
+      "id": "tr3",
+      "name": "Nina Vogel",
+      "email": "",
+      "telefon": "",
+      "qualifikation": "",
+      "notizen": "",
+      "dokumente": []
+    },
+    {
+      "id": "tr4",
+      "name": "Sabine Kroll",
+      "email": "",
+      "telefon": "",
+      "qualifikation": "",
+      "notizen": "",
+      "dokumente": []
+    },
+    {
+      "id": "tr5",
+      "name": "Thomas Weidner",
+      "email": "",
+      "telefon": "",
+      "qualifikation": "",
+      "notizen": "",
+      "dokumente": []
+    }
+  ],
+  "einstellungen": {
+    "zertifikatStartNummer": 147,
+    "bestaetigungsfristTage": 7
+  }
 }
