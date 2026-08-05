@@ -2,14 +2,20 @@
 
 function uebersichtTerminSpalte(termin) {
   const a = terminAuslastung(termin.id);
-  const badge = a.belegt >= a.kapazitaet
-    ? '<span class="badge badge-indigo">Ausgebucht</span>'
-    : `<span class="badge badge-green">${a.frei} Plätze frei</span>`;
+  const istVoll = a.belegt >= a.kapazitaet;
+  let badge;
+  if (istVoll) {
+    badge = '<span class="badge badge-indigo">Ausgebucht</span>';
+  } else if (a.unterbesetzt) {
+    badge = `<span class="badge badge-unterbesetzt">Unterbesetzt (${a.belegt} von mind. ${a.minTeilnehmer})</span>`;
+  } else {
+    badge = `<span class="badge badge-green">${a.frei} Plätze frei</span>`;
+  }
   return `
     <div class="termin-col">
       <div class="termin-col-label">${formatiereDatum(termin.datum)}</div>
-      <div class="progress-track"><div class="progress-fill ${a.belegt >= a.kapazitaet ? 'full' : ''}" style="width:${a.prozent}%"></div></div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+      <div class="progress-track"><div class="progress-fill ${istVoll ? 'full' : ''}" style="width:${a.prozent}%"></div></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; gap:8px;">
         <span style="font-size:12px; color:var(--muted);">${a.belegt} von ${a.kapazitaet} belegt</span>
         ${badge}
       </div>
@@ -78,7 +84,7 @@ function renderUebersicht() {
       <div class="list-row">
         <div>
           <div style="font-weight:600; color:var(--ink); font-size:13px;">${kurs.titel}</div>
-          <div style="font-size:12px; color:var(--muted);">${termin.trainer} · ${formatiereDatum(termin.datum)}</div>
+          <div style="font-size:12px; color:var(--muted);">${escAttr(trainerName(termin.trainerId) || 'Kein Trainer')} · ${formatiereDatum(termin.datum)}</div>
         </div>
         ${chip}
       </div>`;

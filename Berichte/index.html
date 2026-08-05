@@ -1369,14 +1369,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function uebersichtTerminSpalte(termin) {
   const a = terminAuslastung(termin.id);
-  const badge = a.belegt >= a.kapazitaet
-    ? '<span class="badge badge-indigo">Ausgebucht</span>'
-    : `<span class="badge badge-green">${a.frei} Plätze frei</span>`;
+  const istVoll = a.belegt >= a.kapazitaet;
+  let badge;
+  if (istVoll) {
+    badge = '<span class="badge badge-indigo">Ausgebucht</span>';
+  } else if (a.unterbesetzt) {
+    badge = `<span class="badge badge-unterbesetzt">Unterbesetzt (${a.belegt} von mind. ${a.minTeilnehmer})</span>`;
+  } else {
+    badge = `<span class="badge badge-green">${a.frei} Plätze frei</span>`;
+  }
   return `
     <div class="termin-col">
       <div class="termin-col-label">${formatiereDatum(termin.datum)}</div>
-      <div class="progress-track"><div class="progress-fill ${a.belegt >= a.kapazitaet ? 'full' : ''}" style="width:${a.prozent}%"></div></div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+      <div class="progress-track"><div class="progress-fill ${istVoll ? 'full' : ''}" style="width:${a.prozent}%"></div></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; gap:8px;">
         <span style="font-size:12px; color:var(--muted);">${a.belegt} von ${a.kapazitaet} belegt</span>
         ${badge}
       </div>
@@ -1445,7 +1451,7 @@ function renderUebersicht() {
       <div class="list-row">
         <div>
           <div style="font-weight:600; color:var(--ink); font-size:13px;">${kurs.titel}</div>
-          <div style="font-size:12px; color:var(--muted);">${termin.trainer} · ${formatiereDatum(termin.datum)}</div>
+          <div style="font-size:12px; color:var(--muted);">${escAttr(trainerName(termin.trainerId) || 'Kein Trainer')} · ${formatiereDatum(termin.datum)}</div>
         </div>
         ${chip}
       </div>`;
@@ -2102,7 +2108,7 @@ function detailOeffneVerschiebenDialog(buchungId) {
   const andere = kurs.termine.filter(t => t.id !== termin.id);
   const optionen = andere.map(t => {
     const a = terminAuslastung(t.id);
-    return `<option value="${t.id}">${formatiereDatum(t.datum)} · ${escAttr(t.trainer)} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
+    return `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
   }).join('');
   const koerper = andere.length === 0
     ? '<p class="empty-hint">Dieser Kurs hat keine weiteren Termine.</p>'
@@ -2242,7 +2248,11 @@ function buchungenZeile(buchung) {
       <td class="cell-strong">${teilnehmer.name}</td>
       <td>${teilnehmer.firma} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
       <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${teilnehmer.email}</td>
-      <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}</td>
+      <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}${
+        buchung.statusManuell
+          ? ''
+          : '<span class="auto-marker" title="Status wurde automatisch gesetzt">⏱</span>'
+      }</td>
       <td>${kurs.titel} <span style="color:var(--muted2);">· ${formatiereDatum(termin.datum)}</span></td>
       <td onclick="event.stopPropagation();"><button class="btn btn-ghost-red" onclick="buchungenEntfernen('${buchung.id}')">Entfernen</button></td>
     </tr>
@@ -2291,7 +2301,7 @@ function oeffneNeueBuchungDialog() {
     .map(t => `<option value="${t.id}">${t.name} — ${t.firma}</option>`).join('');
   const terminOptionen = window.STATE.kurse.map(k => `
     <optgroup label="${escAttr(k.titel)}">
-      ${k.termine.map(t => `<option value="${t.id}">${formatiereDatum(t.datum)} · ${t.trainer}</option>`).join('')}
+      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
     </optgroup>`).join('');
 
   oeffneDialog(`

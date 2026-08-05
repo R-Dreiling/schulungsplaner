@@ -36,7 +36,11 @@ function buchungenZeile(buchung) {
       <td class="cell-strong">${teilnehmer.name}</td>
       <td>${teilnehmer.firma} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
       <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${teilnehmer.email}</td>
-      <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}</td>
+      <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}${
+        buchung.statusManuell
+          ? ''
+          : '<span class="auto-marker" title="Status wurde automatisch gesetzt">⏱</span>'
+      }</td>
       <td>${kurs.titel} <span style="color:var(--muted2);">· ${formatiereDatum(termin.datum)}</span></td>
       <td onclick="event.stopPropagation();"><button class="btn btn-ghost-red" onclick="buchungenEntfernen('${buchung.id}')">Entfernen</button></td>
     </tr>
@@ -85,7 +89,7 @@ function oeffneNeueBuchungDialog() {
     .map(t => `<option value="${t.id}">${t.name} — ${t.firma}</option>`).join('');
   const terminOptionen = window.STATE.kurse.map(k => `
     <optgroup label="${escAttr(k.titel)}">
-      ${k.termine.map(t => `<option value="${t.id}">${formatiereDatum(t.datum)} · ${t.trainer}</option>`).join('')}
+      ${k.termine.map(t => `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')}</option>`).join('')}
     </optgroup>`).join('');
 
   oeffneDialog(`

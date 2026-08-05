@@ -315,7 +315,7 @@ function detailOeffneVerschiebenDialog(buchungId) {
   const andere = kurs.termine.filter(t => t.id !== termin.id);
   const optionen = andere.map(t => {
     const a = terminAuslastung(t.id);
-    return `<option value="${t.id}">${formatiereDatum(t.datum)} · ${escAttr(t.trainer)} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
+    return `<option value="${escAttr(t.id)}">${formatiereDatum(t.datum)} · ${escAttr(trainerName(t.trainerId) || 'Kein Trainer')} — ${a.belegt}/${a.kapazitaet} belegt</option>`;
   }).join('');
   const koerper = andere.length === 0
     ? '<p class="empty-hint">Dieser Kurs hat keine weiteren Termine.</p>'
