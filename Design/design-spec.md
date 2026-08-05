@@ -53,7 +53,7 @@ Kopfkarte (Kurstitel, Kategorie- und Status-Badge, Datum/Trainer/Format-Ort/Kapa
 - **Agenda** (kursweit, Programmpunkte hinzufügen/bearbeiten/entfernen/umsortieren)
 - **Materialien** (kursweit): Block „Seminarunterlagen" (feste Kursunterlagen, Datei-Upload/Ersetzen/Löschen) und Block „Vorlagen-Bibliothek" (frei beliebig viele zusätzliche Dateien mit Titel/Beschreibung, z. B. Vorlagen die bei der Umsetzung des Kursinhalts helfen)
 - **Checkliste** (pro Termin): abhakbar, Punkte hinzufügen/entfernen; beim Anlegen eines neuen Termins wird eine Standard-Vorlage kopiert (Raum gebucht, Technik geprüft, Unterlagen gedruckt, Einladungen versendet, Zertifikate vorbereitet) und ist danach frei anpassbar
-- **Teilnehmer dieses Termins**: „+ Teilnehmer hinzufügen" (bestehende Person wählen oder neu anlegen → erzeugt Buchung), Anmeldestatus je Zeile per Dropdown ändern, Teilnehmer entfernen (Buchung löschen)
+- **Teilnehmer dieses Termins**: „+ Teilnehmer hinzufügen" (bestehende Person wählen oder neu anlegen → erzeugt Buchung, mit Warnung bei Buchung in einen vollen Termin), Anmeldestatus je Zeile per Dropdown ändern, „Verschieben" auf einen anderen Termin desselben Kurses (behält `gebuchtAm`/Anmeldestatus bei — das ist die konkrete Umsetzung des eingangs genannten Kernzwecks „Verschieben zwischen Terminen bei zu geringer Auslastung"), Teilnehmer entfernen (Buchung löschen)
 
 ### 4. Buchungen – ersetzt die bisherigen Seiten „Teilnehmer" und „Kunden"
 
