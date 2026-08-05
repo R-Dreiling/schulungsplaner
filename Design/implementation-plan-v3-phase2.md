@@ -430,6 +430,20 @@ function druckeInhalt(html, dokumentTitel) {
 }
 ```
 
+- [ ] **Step 3b: Vorschaurahmen auf den Bildschirm beschränken**
+
+Im `<style>`-Block von `Design/shell-template.html` stehen zwei Regeln, die nur den Vorschaurahmen der App betreffen (grauer Hintergrund, zentrierte Fensterdarstellung). Sie stehen **nach** `{{BASE_CSS}}` und würden deshalb den späteren `@media print`-Block überstimmen — die gedruckte Seite käme zentriert auf grauem Grund heraus. Kapsle sie daher in `@media screen`:
+
+```html
+/* ---- Aussenrahmen fuer die Vorschau (die App selbst ist app-window) ----
+   Bewusst nur fuer den Bildschirm: diese Regeln stehen nach {{BASE_CSS}} und
+   wuerden den @media-print-Block in styles.css sonst ueberstimmen. */
+@media screen {
+  body { display: flex; align-items: center; justify-content: center; padding: 18px; background: #e4e8f0; min-height: 100vh; }
+  .app-window { width: 1360px; max-width: 100%; height: 860px; }
+}
+```
+
 - [ ] **Step 4: Druck- und Nachweis-CSS anhängen**
 
 Hänge an `Design/styles.css` an:
@@ -456,7 +470,7 @@ Hänge an `Design/styles.css` an:
   width: 100%; font-family: var(--font-body); font-size: 12.5px; padding: 5px 8px;
   border: 1px solid var(--line-strong); border-radius: 6px; background: #fff; color: var(--ink);
 }
-.anw-row.unter-mindest .anw-prozent input { border-color: #E9B4AE; color: var(--status-red-fg); font-weight: 600; }
+.anw-row.unter-mindest .anw-prozent input { border-color: var(--status-red-fg); color: var(--status-red-fg); font-weight: 600; }
 .anw-hinweis { font-size: 11.5px; color: var(--status-red-fg); font-weight: 600; }
 .anw-aktion { width: 132px; flex: none; text-align: right; }
 
