@@ -1098,6 +1098,25 @@ onclick="detailVersuche(() => checklistePunktToggeln('${escJsArg(termin.id)}', $
 
 Bei (e) und (f) bleibt das anschließende `schliesseDialog()` unverändert stehen — der Dialog schließt sich also auch dann, wenn die Aktion abgelehnt wurde; die Meldung erklärt den Grund.
 
+**(g) Verwaiste Teilnehmer verhindern.** In `detailSpeichereTeilnehmerHinzufuegen` wird bei „— Neue Person —" zuerst `erstelleTeilnehmer(...)` aufgerufen (das sofort speichert) und erst danach `erstelleBuchung(...)`. Auf einem abgeschlossenen Termin scheitert nur der zweite Aufruf — die Person bliebe ohne Buchung im Bestand zurück. Ein Wrap um `erstelleBuchung` allein reicht deshalb nicht. Setze zusätzlich einen frühen Riegel als **erste Anweisung nach `ev.preventDefault()`**:
+
+```javascript
+  if (istTerminAbgeschlossen(terminId)) {
+    alert('Dieser Termin ist abgeschlossen und schreibgeschützt – es können keine Teilnehmer hinzugefügt werden. '
+      + 'Über „Wieder öffnen" lässt sich der Schutz aufheben.');
+    schliesseDialog();
+    return false;
+  }
+```
+
+**(h) Den Knopf gar nicht erst anbieten.** Damit diese Situation im Normalfall nicht entsteht, wird der Knopf „+ Teilnehmer" im Kopfbereich bei abgeschlossenem Termin ausgeblendet — analog zu „Schulung abschließen". Ersetze in `renderSchulungdetail` die Zeile mit dem `+ Teilnehmer`-Knopf durch:
+
+```javascript
+          ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn btn-primary" onclick="detailOeffneTeilnehmerHinzufuegenDialog('${escJsArg(termin.id)}')">+ Teilnehmer</button>`}
+```
+
+(g) bleibt trotzdem nötig: Der Dialog kann bereits offen sein, während der Termin in einem anderen Tab abgeschlossen wird.
+
 - [ ] **Step 3: Build und Browser-Verifikation**
 
 Run: `python Design/assemble.py`
