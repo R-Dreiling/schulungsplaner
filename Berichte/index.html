@@ -1265,6 +1265,103 @@ async function alleDatenLeeren() {
   speichereState();
 }
 
+// ---- Phase 2: Anwesenheit ----
+
+// Mindestanteil der Anwesenheit, ab dem eine Teilnahmebescheinigung
+// ausgestellt wird (siehe design-spec-v3.md, Abschnitt 4).
+const MINDEST_ANWESENHEIT = 80;
+
+// Fuer Anwesenheit und Bescheinigung zaehlen nur Buchungen, die nicht
+// abgesagt wurden - wer abgesagt hat, war nicht da und bekommt nichts.
+function anwesenheitsBuchungen(terminId) {
+  return window.STATE.buchungen.filter(
+    b => b.terminId === terminId && b.anmeldestatus !== 'abgesagt'
+  );
+}
+
+function erfuelltMindestteilnahme(buchung) {
+  return buchung.anwesenheitProzent !== null
+    && buchung.anwesenheitProzent !== undefined
+    && buchung.anwesenheitProzent >= MINDEST_ANWESENHEIT;
+}
+
+function anwesenheitSetzen(buchungId, prozent, fehlgrund) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  pruefeTerminOffen(buchung.terminId, 'Anwesenheit ändern');
+
+  const zahl = Number(prozent);
+  if (!Number.isFinite(zahl) || zahl < 0 || zahl > 100) {
+    throw new Error('Anwesenheit muss eine Zahl zwischen 0 und 100 sein.');
+  }
+  buchung.anwesenheitProzent = Math.round(zahl);
+  // Bei voller Anwesenheit ist ein Fehlgrund sinnlos - sonst bliebe ein
+  // alter Grund stehen, nachdem korrigiert wurde.
+  buchung.fehlgrund = buchung.anwesenheitProzent === 100 ? null : (fehlgrund || null);
+  speichereState();
+}
+
+function alleAnwesenheitAufVoll(terminId) {
+  pruefeTerminOffen(terminId, 'Anwesenheit ändern');
+  const betroffen = anwesenheitsBuchungen(terminId);
+  for (const buchung of betroffen) {
+    buchung.anwesenheitProzent = 100;
+    buchung.fehlgrund = null;
+  }
+  speichereState();
+  return betroffen.length;
+}
+
+function anwesenheitStatistik(terminId) {
+  const buchungen = anwesenheitsBuchungen(terminId);
+  const erfasste = buchungen.filter(
+    b => b.anwesenheitProzent !== null && b.anwesenheitProzent !== undefined
+  );
+  const summe = erfasste.reduce((s, b) => s + b.anwesenheitProzent, 0);
+  return {
+    gesamt: buchungen.length,
+    erfasst: erfasste.length,
+    erfuellt: buchungen.filter(erfuelltMindestteilnahme).length,
+    unterMindest: erfasste.filter(b => !erfuelltMindestteilnahme(b)).length,
+    durchschnitt: erfasste.length ? Math.round(summe / erfasste.length) : null,
+  };
+}
+
+// ---- Phase 2: Zertifikatsnummern ----
+// Schema JAHR-KUERZEL-LAUFNUMMER, z. B. 2026-DSB-0147. Die Laufnummer ist
+// global fortlaufend ueber alle Kurse und startet bei einem einstellbaren
+// Wert, damit der ersten Bescheinigung nicht anzusehen ist, dass sie die
+// erste ist.
+
+function naechsteZertifikatNummer() {
+  let hoechste = 0;
+  for (const buchung of window.STATE.buchungen) {
+    if (!buchung.zertifikatNr) continue;
+    const teile = String(buchung.zertifikatNr).split('-');
+    const laufnummer = parseInt(teile[teile.length - 1], 10);
+    if (Number.isFinite(laufnummer)) hoechste = Math.max(hoechste, laufnummer);
+  }
+  const naechste = hoechste > 0 ? hoechste + 1 : einstellungen().zertifikatStartNummer;
+  return String(naechste).padStart(4, '0');
+}
+
+function zertifikatNummerFuer(buchungId) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  // Einmal vergeben, bleibt die Nummer stabil - ein zweiter Ausdruck darf
+  // keine neue Nummer erzeugen.
+  if (buchung.zertifikatNr) return buchung.zertifikatNr;
+
+  const gefunden = findeTerminMitKurs(buchung.terminId);
+  if (!gefunden) throw new Error(`Termin ${buchung.terminId} nicht gefunden`);
+  const jahr = gefunden.termin.datum.slice(0, 4);
+  const kuerzel = (gefunden.kurs.zertifikat && gefunden.kurs.zertifikat.kuerzel)
+    || gefunden.kurs.id.toUpperCase();
+  buchung.zertifikatNr = `${jahr}-${kuerzel}-${naechsteZertifikatNummer()}`;
+  speichereState();
+  return buchung.zertifikatNr;
+}
+
 
 // ---- file-store.js ----
 // Design/file-store.js
