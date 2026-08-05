@@ -780,9 +780,12 @@ function zertifikatHtml(buchungId) {
   // gedruckt wird - nicht schon beim Anzeigen der Liste.
   const nummer = zertifikatNummerFuer(buchungId);
 
-  // Die Platzhalter werden mit bereits escapetem Text gefuellt, damit ein
-  // Kurstitel mit Sonderzeichen die Seite nicht zerlegt.
-  const text = zertifikatPlatzhalterFuellen(z.bestaetigungstext || '', {
+  // Reihenfolge ist wichtig: erst die frei eingegebene Vorlage escapen, dann
+  // die ebenfalls escapten Werte einsetzen. Sonst wuerde ein "&" oder "<" im
+  // Bestaetigungstext still als Markup interpretiert statt angezeigt. Die
+  // geschweiften Klammern der Platzhalter ueberstehen escHtml unveraendert,
+  // die Ersetzung greift also weiterhin.
+  const text = zertifikatPlatzhalterFuellen(escHtml(z.bestaetigungstext || ''), {
     teilnehmer: escHtml(teilnehmer.name),
     kurs: escHtml(kurs.titel),
     umfang: escHtml(String(z.umfangUE || '')),
