@@ -213,7 +213,14 @@ git commit -m "feat: Anwesenheitserfassung und Zertifikatsnummern in der State-E
 
 function istTerminAbgeschlossen(terminId) {
   const gefunden = findeTerminMitKurs(terminId);
-  return !!(gefunden && gefunden.termin.abschluss);
+  // Beide Bedingungen zusammen, nicht nur abschluss: manche Beispieltermine
+  // tragen status 'abgeschlossen' als reinen Anzeigewert aus der Vorbelegung,
+  // ohne je ein foermliches abschluss-Objekt erhalten zu haben - die sollen
+  // nicht gesperrt sein. Und status allein reicht nicht, weil
+  // terminWiedereroeffnen() das abschluss-Objekt bewusst als Historie behaelt,
+  // dabei aber status auf 'geplant' zuruecksetzt - erst dieses Zusammenspiel
+  // gibt den Schreibschutz nach dem Wiederoeffnen wieder frei.
+  return !!(gefunden && gefunden.termin.abschluss && gefunden.termin.status === 'abgeschlossen');
 }
 
 function pruefeTerminOffen(terminId, aktion) {
@@ -600,7 +607,9 @@ function detailAnwesenheitZeile(termin, buchung, gesperrt) {
 }
 
 function detailAbschnittAnwesenheit(termin) {
-  const gesperrt = !!termin.abschluss;
+  // Nicht !!termin.abschluss verwenden: nach dem Wiederoeffnen bleibt das
+  // abschluss-Objekt als Historie erhalten, der Termin ist aber wieder offen.
+  const gesperrt = istTerminAbgeschlossen(termin.id);
   const buchungen = anwesenheitsBuchungen(termin.id);
   const s = anwesenheitStatistik(termin.id);
 
@@ -898,17 +907,23 @@ git commit -m "feat: Teilnahmebescheinigung nach tribeta-Vorlage, einzeln druckb
 ```javascript
 // ---- Phase 2: Schulungsabschluss ----
 
+// Das Banner erscheint, sobald der Termin jemals foermlich abgeschlossen
+// wurde - auch nach dem Wiederoeffnen, denn die Abschlusshistorie soll
+// sichtbar bleiben. Ob aktuell schreibgeschuetzt wird, ist eine andere
+// Frage und haengt an istTerminAbgeschlossen().
 function detailAbschlussBanner(termin) {
   if (!termin.abschluss) return '';
   const a = termin.abschluss;
   const wieder = (a.wiedereroeffnungen || []).length;
+  const gesperrt = istTerminAbgeschlossen(termin.id);
   return `
     <div class="abschluss-banner">
       <div>
-        <strong>Abgeschlossen am ${formatiereDatum(a.abgeschlossenAm)}</strong>
+        <strong>${gesperrt ? 'Abgeschlossen' : 'Wieder geöffnet · abgeschlossen war'} am ${formatiereDatum(a.abgeschlossenAm)}</strong>
         <div class="abschluss-hinweis">
-          Anwesenheit, Teilnehmerliste und Checkliste sind schreibgeschützt.
-          Bescheinigungen und Abschlussbericht bleiben druckbar.
+          ${gesperrt
+            ? 'Anwesenheit, Teilnehmerliste und Checkliste sind schreibgeschützt. Bescheinigungen und Abschlussbericht bleiben druckbar.'
+            : 'Der Schreibschutz ist derzeit aufgehoben. Nach den Korrekturen bitte erneut abschließen.'}
           ${wieder > 0 ? `<br/>Nachträglich geöffnet: ${wieder}× (zuletzt ${formatiereDatum(a.wiedereroeffnungen[wieder - 1])})` : ''}
         </div>
         ${a.vorkommnisse ? `<div class="abschluss-hinweis">Vorkommnisse: ${escHtml(a.vorkommnisse)}</div>` : ''}
@@ -994,7 +1009,7 @@ In `Design/fragments/page-schulungdetail.js`, in der Funktion `renderSchulungdet
 **(b)** Ergänze in der Knopfleiste der Kopfkarte, direkt **vor** dem Knopf „+ Teilnehmer", den Abschluss-Knopf — er erscheint nur, solange der Termin offen ist:
 
 ```javascript
-          ${termin.abschluss ? '' : `<button class="btn" onclick="detailOeffneAbschlussDialog('${escJsArg(termin.id)}')">Schulung abschließen</button>`}
+          ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn" onclick="detailOeffneAbschlussDialog('${escJsArg(termin.id)}')">Schulung abschließen</button>`}
 ```
 
 - [ ] **Step 3: Build und Browser-Verifikation**
