@@ -195,6 +195,11 @@ button { font-family: var(--font-body); cursor: pointer; }
 .progress-fill.full { background: var(--indigo-deep); }
 
 /* Tables */
+/* Breite Tabellen scrollen in ihrem eigenen Rahmen, statt aus der Karte
+   herauszuragen. min-width haelt die Spalten lesbar, statt sie zu quetschen. */
+.tabelle-scroll { overflow-x: auto; }
+.tabelle-scroll table.data-table { min-width: 620px; }
+
 table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 table.data-table thead th {
   text-align: left;
@@ -213,8 +218,36 @@ table.data-table tbody td {
   color: var(--text);
 }
 table.data-table tbody tr:hover { background: var(--card-2); }
+/* In Tabellenzeilen kompakter, damit die Spalte nicht unnoetig breit wird. */
+table.data-table select { font-size: 12.5px; padding: 6px 26px 6px 9px; background-position: right 8px center; }
 table.data-table tbody tr:last-child td { border-bottom: none; }
 table.data-table .cell-strong { color: var(--ink); font-weight: 600; }
+
+/* Auswahlfelder app-weit einheitlich. Das native Bedienelement sieht auf
+   jedem System anders aus und passte nirgends zum Rest; deshalb eigener
+   Rahmen und eigenes Pfeilsymbol (als Data-URI, damit offline nichts fehlt). */
+select {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23697187' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: 8px 30px 8px 11px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+select:hover:not(:disabled) { border-color: var(--teal-deep); }
+select:focus-visible { outline: 2px solid var(--teal); outline-offset: -1px; }
+select:disabled {
+  background-color: var(--card-2); color: var(--muted2); cursor: default; opacity: 1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%239AA2B5' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
 
 /* Filter bar */
 .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -224,9 +257,10 @@ table.data-table .cell-strong { color: var(--ink); font-weight: 600; }
   padding: 8px 12px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--text);
 }
+.filter-select { padding-right: 30px; }
 .filter-input { flex: 1; min-width: 180px; }
 .filter-input:focus, .filter-select:focus { outline: 2px solid var(--teal); outline-offset: -1px; }
 
@@ -294,8 +328,9 @@ table.data-table .cell-strong { color: var(--ink); font-weight: 600; }
 .field label { font-family: var(--font-display); font-size: 11.5px; font-weight: 600; color: var(--muted); }
 .field input, .field select, .field textarea {
   font-family: var(--font-body); font-size: 13px; padding: 9px 11px;
-  border: 1px solid var(--line-strong); border-radius: 8px; color: var(--ink); background: #fff;
+  border: 1px solid var(--line-strong); border-radius: 8px; color: var(--ink); background-color: #fff;
 }
+.field select { padding-right: 30px; }
 .dialog-foot { padding: 16px 22px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
 
 /* Schulungsdetail: Sprungmarken-Navigation (Layout-Option B) */
@@ -507,8 +542,8 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
 }
 .anw-grund { width: 150px; flex: none; }
 .anw-grund select {
-  width: 100%; font-family: var(--font-body); font-size: 12.5px; padding: 5px 8px;
-  border: 1px solid var(--line-strong); border-radius: 6px; background: #fff; color: var(--ink);
+  width: 100%; font-size: 12.5px; padding: 6px 26px 6px 9px;
+  background-position: right 8px center;
 }
 .anw-row.unter-mindest .anw-prozent input { border-color: var(--status-red-fg); color: var(--status-red-fg); font-weight: 600; }
 .anw-hinweis { font-size: 11.5px; color: var(--status-red-fg); font-weight: 600; }

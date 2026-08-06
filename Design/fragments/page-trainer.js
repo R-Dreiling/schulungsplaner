@@ -130,10 +130,12 @@ function trainerDetailHtml(trainer) {
 
     <div class="card">
       <div class="section-title">Eingeplante Termine <small>${termine.length}</small></div>
-      <table class="data-table fixed-rows">
-        <thead><tr><th>Datum</th><th>Kurs</th><th>Ort</th><th>Rolle</th></tr></thead>
-        <tbody>${terminZeilen}</tbody>
-      </table>
+      <div class="tabelle-scroll">
+        <table class="data-table fixed-rows">
+          <thead><tr><th>Datum</th><th>Kurs</th><th>Ort</th><th>Rolle</th></tr></thead>
+          <tbody>${terminZeilen}</tbody>
+        </table>
+      </div>
     </div>`;
 }
 

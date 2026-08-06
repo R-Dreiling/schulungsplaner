@@ -407,21 +407,29 @@ function detailAlleAnwesend(terminId) {
   }
 }
 
+// Lehnt der Mutator ab (abgeschlossener Termin), muss die Zeile neu gezeichnet
+// werden: sonst zeigt das Auswahlfeld den angeklickten Wert an, waehrend
+// gespeichert weiterhin der alte steht - die Oberflaeche wuerde luegen.
+function detailBuchungStatusSetzen(buchungId, wert) {
+  if (!detailVersuche(() => aktualisiereBuchungStatus(buchungId, wert))) renderAll();
+}
+
 function detailAbschnittTeilnehmer(kurs, termin) {
   const buchungen = buchungenFuerTermin(termin.id);
   // Abgesagte bleiben als Zeile sichtbar (sie muessen verwaltbar sein), zaehlen
   // aber nicht mit - so passt die Kopfzahl zur Kapazitaetsanzeige oben.
   const aktivAnzahl = buchungen.filter(b => b.anmeldestatus !== 'abgesagt').length;
   const mehrereTermine = kurs.termine.length > 1;
+  const gesperrt = istTerminAbgeschlossen(termin.id);
   const zeilen = buchungen.map(b => {
     const t = window.STATE.teilnehmer.find(p => p.id === b.teilnehmerId);
     return `
       <tr>
         <td class="cell-strong">${t ? escHtml(t.name) : '(unbekannt)'}</td>
         <td>${t ? escHtml(t.firma) : ''}</td>
-        <td>${t ? escHtml(t.email) : ''}</td>
+        <td class="truncate" style="max-width:190px;" title="${t ? escAttr(t.email) : ''}">${t ? escHtml(t.email) : ''}</td>
         <td>
-          <select onchange="aktualisiereBuchungStatus('${b.id}', this.value)">
+          <select ${gesperrt ? 'disabled' : ''} onchange="detailBuchungStatusSetzen('${escJsArg(b.id)}', this.value)">
             <option value="angemeldet" ${b.anmeldestatus === 'angemeldet' ? 'selected' : ''}>angemeldet</option>
             <option value="bestätigt" ${b.anmeldestatus === 'bestätigt' ? 'selected' : ''}>bestätigt</option>
             <option value="abgesagt" ${b.anmeldestatus === 'abgesagt' ? 'selected' : ''}>abgesagt</option>
@@ -436,10 +444,12 @@ function detailAbschnittTeilnehmer(kurs, termin) {
   return `
     <div class="card" id="abschnitt-teilnehmer">
       <div class="section-title">Teilnehmer dieses Termins <small>${aktivAnzahl} aktiv von ${buchungen.length}</small></div>
-      <table class="data-table fixed-rows">
-        <thead><tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th></th></tr></thead>
-        <tbody>${zeilen}</tbody>
-      </table>
+      <div class="tabelle-scroll">
+        <table class="data-table fixed-rows">
+          <thead><tr><th>Name</th><th>Firma</th><th>E-Mail</th><th>Anmeldestatus</th><th></th></tr></thead>
+          <tbody>${zeilen}</tbody>
+        </table>
+      </div>
     </div>`;
 }
 

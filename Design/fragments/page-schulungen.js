@@ -130,10 +130,10 @@ function renderSchulungen() {
           ? (kurs.termine.length === 0
             ? '<p class="empty-hint">Noch keine Termine. Über „+ Termin" anlegen.</p>'
             : '<p class="empty-hint">Kein Termin passt zum gewählten Filter.</p>')
-          : `<table class="data-table fixed-rows">
+          : `<div class="tabelle-scroll"><table class="data-table fixed-rows">
           <thead><tr><th>Datum</th><th>Trainer</th><th>Format / Ort</th><th>Status</th><th>Teilnehmer</th><th></th></tr></thead>
           <tbody>${sichtbareTermine.map(t => schulungenTerminZeile(kurs, t)).join('')}</tbody>
-        </table>`}
+        </table></div>`}
       </div>
     </div>`;
   }).join('');
