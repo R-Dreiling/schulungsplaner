@@ -87,7 +87,7 @@ function trainerDetailHtml(trainer) {
   return `
     <button class="crumb" onclick="showTrainerListe()">← Zurück zur Trainerliste</button>
 
-    <div class="card" style="padding:20px 24px; margin-bottom:20px;">
+    <div class="card">
       <div style="display:flex; align-items:flex-start; justify-content:space-between;">
         <div style="display:flex; align-items:center; gap:14px;">
           <div class="trainer-avatar" style="width:52px; height:52px; font-size:17px;">${escHtml(trainerInitialen(trainer.name))}</div>
@@ -114,7 +114,11 @@ function trainerDetailHtml(trainer) {
       <div style="margin-top:12px; display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
         <div class="field" style="flex:1; min-width:180px;">
           <label>Datei</label>
-          <input type="file" id="trainer-datei-input" />
+          <label class="datei-wahl">
+            <input type="file" id="trainer-datei-input" onchange="trainerDateiNameZeigen(this)" />
+            <span class="datei-wahl-knopf">Datei wählen</span>
+            <span class="datei-wahl-name" id="trainer-datei-name">keine gewählt</span>
+          </label>
         </div>
         <div class="field">
           <label>gültig bis (optional)</label>
@@ -223,6 +227,16 @@ function trainerLoeschenBestaetigen(trainerId) {
     loescheTrainer(trainerId);
     showTrainerListe();
   }
+}
+
+// Hier wird die Datei erst gewaehlt und dann ueber "Hochladen" uebernommen -
+// ohne Namensanzeige waere nach dem Waehlen nicht erkennbar, was ansteht.
+function trainerDateiNameZeigen(input) {
+  const anzeige = document.getElementById('trainer-datei-name');
+  if (!anzeige) return;
+  const datei = input.files && input.files[0];
+  anzeige.textContent = datei ? datei.name : 'keine gewählt';
+  anzeige.classList.toggle('gewaehlt', !!datei);
 }
 
 function trainerDokumentHochladen(trainerId) {

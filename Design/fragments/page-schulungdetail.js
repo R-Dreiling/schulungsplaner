@@ -52,7 +52,7 @@ function renderSchulungdetail(terminId) {
 
     ${detailAbschlussBanner(termin)}
 
-    <div class="card" style="padding:20px 24px; margin-bottom:20px;">
+    <div class="card">
       <div style="display:flex; align-items:flex-start; justify-content:space-between;">
         <div>
           <div style="display:flex; gap:8px; margin-bottom:10px;">
@@ -236,13 +236,19 @@ function detailAbschnittMaterialien(kurs) {
       ${detailKursweitHinweis(kurs)}
       <div class="mat-group-label">Seminarunterlagen</div>
       ${detailMaterialListe(kurs, 'seminarunterlagen')}
-      <div style="margin:10px 0 18px 0;">
-        <input type="file" onchange="detailMaterialUpload(event, '${kurs.id}', 'seminarunterlagen')" />
+      <div style="margin:10px 0 22px 0;">
+        <label class="datei-wahl">
+          <input type="file" onchange="detailMaterialUpload(event, '${escJsArg(kurs.id)}', 'seminarunterlagen')" />
+          <span class="datei-wahl-knopf">Seminarunterlage hochladen</span>
+        </label>
       </div>
       <div class="mat-group-label">Vorlagen-Bibliothek <span style="text-transform:none; font-weight:400;">— Ressourcen für die Umsetzung</span></div>
       ${detailMaterialListe(kurs, 'vorlagen')}
       <div style="margin-top:10px;">
-        <input type="file" onchange="detailMaterialUpload(event, '${kurs.id}', 'vorlagen')" />
+        <label class="datei-wahl">
+          <input type="file" onchange="detailMaterialUpload(event, '${escJsArg(kurs.id)}', 'vorlagen')" />
+          <span class="datei-wahl-knopf">Vorlage hochladen</span>
+        </label>
       </div>
     </div>`;
 }
