@@ -619,6 +619,24 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
 .bericht-warnung { font-size: 9.5pt; color: var(--status-red-fg); font-weight: 600; margin-top: 8px; }
 .bericht-unterschrift { margin-top: 34px; width: 62mm; }
 
+/* --- Anwesenheitsliste (Praesenzliste zum Abhaken) --- */
+.al-kopfzeile { font-size: 10pt; color: var(--text); margin-bottom: 4px; }
+.al-tabelle { margin-top: 16px; }
+.al-tabelle td { height: 11mm; vertical-align: middle; }
+.al-tabelle .al-nr { width: 12mm; color: var(--muted); }
+.al-tabelle .al-haken { width: 22mm; text-align: center; }
+.al-tabelle .al-unterschrift { width: 58mm; }
+/* Leeres Kaestchen zum Ankreuzen und leere Linie zum Beschriften. */
+.al-kasten {
+  display: inline-block; width: 5mm; height: 5mm;
+  border: 1px solid var(--ink); border-radius: 1mm;
+}
+.al-linie { display: block; border-bottom: 1px solid var(--line-strong); height: 5mm; }
+.al-bestaetigung { font-size: 9.5pt; color: var(--text); line-height: 1.5; margin-top: 22px; }
+.al-signatur { display: flex; gap: 18mm; margin-top: 20px; }
+.al-signatur > div { flex: 1; }
+.al-signatur-label { font-size: 8.5pt; color: var(--muted); margin-top: 4px; }
+
 /* --- Druckausgabe: nur der Druckbereich, nichts von der App --- */
 @media print {
   @page { size: A4; margin: 14mm; }
@@ -629,4 +647,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
   .druck-seite:last-child { page-break-after: auto; }
   table.bericht-tabelle { page-break-inside: auto; }
   table.bericht-tabelle tr { page-break-inside: avoid; }
+  /* Kopfzeile der Anwesenheitsliste auf Folgeseiten wiederholen. */
+  table.al-tabelle thead { display: table-header-group; }
+  .al-bestaetigung, .al-signatur { page-break-inside: avoid; }
 }

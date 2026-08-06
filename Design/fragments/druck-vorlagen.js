@@ -74,6 +74,103 @@ function druckeZertifikat(buchungId) {
   }
 }
 
+// ---- Anwesenheitsliste ----
+// Das Blatt, das der Dozent mitnimmt: abhaken, wer da ist, jede anwesende
+// Person unterschreibt. Bewusst OHNE die in der App erfassten Prozentwerte -
+// vorbelegte Zahlen wuerden die Erhebung vor Ort entwerten.
+
+const ANWESENHEITSLISTE_LEERZEILEN = 3;
+
+function anwesenheitslisteHtml(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  const { kurs, termin } = gefunden;
+  const z = kurs.zertifikat || {};
+
+  // Dieselbe massgebliche Menge wie ueberall: abgesagte Buchungen zaehlen nicht.
+  const buchungen = anwesenheitsBuchungen(terminId)
+    .map(b => window.STATE.teilnehmer.find(t => t.id === b.teilnehmerId))
+    .filter(Boolean)
+    .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+  const zeilen = buchungen.map((t, i) => `
+      <tr>
+        <td class="al-nr">${i + 1}</td>
+        <td>${escHtml(t.name)}</td>
+        <td>${escHtml(t.firma)}</td>
+        <td class="al-haken"><span class="al-kasten"></span></td>
+        <td><span class="al-linie"></span></td>
+      </tr>`).join('');
+
+  // Leerzeilen fuer Personen, die spontan dazukommen.
+  const leerzeilen = Array.from({ length: ANWESENHEITSLISTE_LEERZEILEN }, (_, i) => `
+      <tr>
+        <td class="al-nr">${buchungen.length + i + 1}</td>
+        <td><span class="al-linie"></span></td>
+        <td><span class="al-linie"></span></td>
+        <td class="al-haken"><span class="al-kasten"></span></td>
+        <td><span class="al-linie"></span></td>
+      </tr>`).join('');
+
+  const vertretung = trainerName(termin.vertretungTrainerId);
+
+  return `
+    <div class="druck-seite">
+      <div class="bericht-kopf">
+        <div>
+          <h1 class="bericht-titel">Anwesenheitsliste</h1>
+          <div class="bericht-untertitel">${escHtml(kurs.titel)}</div>
+        </div>
+        <img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" />
+      </div>
+
+      <div class="al-kopfzeile">
+        ${formatiereDatum(termin.datum)} · ${escHtml(termin.ort || 'Ort offen')} ·
+        ${escHtml(kurs.format)} · ${escHtml(String(z.umfangUE || '—'))} Unterrichtseinheiten
+      </div>
+      <div class="al-kopfzeile">
+        Trainer: ${escHtml(trainerName(termin.trainerId) || 'kein Trainer zugeordnet')}${
+          vertretung ? ` · Vertretung: ${escHtml(vertretung)}` : ''}
+      </div>
+
+      <table class="bericht-tabelle al-tabelle">
+        <thead>
+          <tr>
+            <th class="al-nr">Nr.</th><th>Name</th><th>Firma</th>
+            <th class="al-haken">Anwesend</th><th class="al-unterschrift">Unterschrift</th>
+          </tr>
+        </thead>
+        <tbody>${zeilen}${leerzeilen}</tbody>
+      </table>
+
+      <div class="al-bestaetigung">
+        Ich bestätige, dass die Schulung wie oben angegeben durchgeführt wurde
+        und die abgehakten Personen daran teilgenommen haben.
+      </div>
+      <div class="al-signatur">
+        <div>
+          <span class="al-linie"></span>
+          <div class="al-signatur-label">Ort, Datum</div>
+        </div>
+        <div>
+          <span class="al-linie"></span>
+          <div class="al-signatur-label">Unterschrift Trainer</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function druckeAnwesenheitsliste(terminId) {
+  try {
+    const gefunden = findeTerminMitKurs(terminId);
+    const html = anwesenheitslisteHtml(terminId);
+    const dateiname = `Anwesenheitsliste_${gefunden.termin.datum}_${(gefunden.kurs.titel || '').replace(/\s+/g, '-')}`;
+    druckeInhalt(html, dateiname);
+  } catch (e) {
+    alert('Anwesenheitsliste konnte nicht erzeugt werden: ' + e.message);
+  }
+}
+
 // ---- Abschlussbericht ----
 // Internes Archivdokument: enthaelt bewusst ALLE Teilnehmer mit ihren
 // Anwesenheiten, anders als die personenbezogene Bescheinigung.

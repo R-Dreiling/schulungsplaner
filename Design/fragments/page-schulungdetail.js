@@ -61,8 +61,10 @@ function renderSchulungdetail(terminId) {
           </div>
           <h2 style="font-size:20px; margin:0 0 8px 0;">${escHtml(kurs.titel)}</h2>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
           <button class="btn" onclick="oeffneTerminBearbeitenDialog('${termin.id}')">Bearbeiten</button>
+          <!-- Drucken ist lesend: bleibt auch bei abgeschlossenem Termin verfuegbar. -->
+          <button class="btn" onclick="druckeAnwesenheitsliste('${escJsArg(termin.id)}')">Anwesenheitsliste</button>
           ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn" onclick="detailOeffneAbschlussDialog('${escJsArg(termin.id)}')">Schulung abschließen</button>`}
           ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn btn-primary" onclick="detailOeffneTeilnehmerHinzufuegenDialog('${escJsArg(termin.id)}')">+ Teilnehmer</button>`}
         </div>

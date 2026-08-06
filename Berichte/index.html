@@ -625,6 +625,24 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
 .bericht-warnung { font-size: 9.5pt; color: var(--status-red-fg); font-weight: 600; margin-top: 8px; }
 .bericht-unterschrift { margin-top: 34px; width: 62mm; }
 
+/* --- Anwesenheitsliste (Praesenzliste zum Abhaken) --- */
+.al-kopfzeile { font-size: 10pt; color: var(--text); margin-bottom: 4px; }
+.al-tabelle { margin-top: 16px; }
+.al-tabelle td { height: 11mm; vertical-align: middle; }
+.al-tabelle .al-nr { width: 12mm; color: var(--muted); }
+.al-tabelle .al-haken { width: 22mm; text-align: center; }
+.al-tabelle .al-unterschrift { width: 58mm; }
+/* Leeres Kaestchen zum Ankreuzen und leere Linie zum Beschriften. */
+.al-kasten {
+  display: inline-block; width: 5mm; height: 5mm;
+  border: 1px solid var(--ink); border-radius: 1mm;
+}
+.al-linie { display: block; border-bottom: 1px solid var(--line-strong); height: 5mm; }
+.al-bestaetigung { font-size: 9.5pt; color: var(--text); line-height: 1.5; margin-top: 22px; }
+.al-signatur { display: flex; gap: 18mm; margin-top: 20px; }
+.al-signatur > div { flex: 1; }
+.al-signatur-label { font-size: 8.5pt; color: var(--muted); margin-top: 4px; }
+
 /* --- Druckausgabe: nur der Druckbereich, nichts von der App --- */
 @media print {
   @page { size: A4; margin: 14mm; }
@@ -635,6 +653,9 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
   .druck-seite:last-child { page-break-after: auto; }
   table.bericht-tabelle { page-break-inside: auto; }
   table.bericht-tabelle tr { page-break-inside: avoid; }
+  /* Kopfzeile der Anwesenheitsliste auf Folgeseiten wiederholen. */
+  table.al-tabelle thead { display: table-header-group; }
+  .al-bestaetigung, .al-signatur { page-break-inside: avoid; }
 }
 
 
@@ -927,6 +948,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
       <li>Die <strong>Übersicht</strong> zeigt, wo es klemmt: <em>Unterbesetzt</em> (amber) heißt weniger Anmeldungen als die Mindestteilnehmerzahl, <em>Ausgebucht</em> (indigo) heißt Maximum erreicht.</li>
       <li>Ist ein Termin unterbesetzt, nennt die Übersicht gleich daneben den nächsten Termin desselben Kurses. Über <strong>„Verschieben"</strong> auf der Detailseite lässt sich ein Teilnehmer dorthin umbuchen; Buchungsdatum und Anmeldestatus bleiben erhalten.</li>
       <li>Die <strong>Checkliste</strong> auf der Detailseite abarbeiten.</li>
+      <li>Über <strong>„Anwesenheitsliste"</strong> im Kopf der Detailseite druckst du das Blatt für den Dozenten: alle angemeldeten Personen alphabetisch, je Zeile ein Kästchen zum Abhaken und eine Unterschriftslinie, dazu drei Leerzeilen für spontane Teilnehmer. Unten bestätigt der Dozent die Durchführung mit Ort, Datum und Unterschrift. Die unterschriebene Liste ist der Beleg, den du zur Schulung abheftest — die Prozentwerte trägst du danach in die App ein.</li>
     </ul>
   </div>
 
@@ -2151,6 +2173,103 @@ function druckeZertifikat(buchungId) {
   }
 }
 
+// ---- Anwesenheitsliste ----
+// Das Blatt, das der Dozent mitnimmt: abhaken, wer da ist, jede anwesende
+// Person unterschreibt. Bewusst OHNE die in der App erfassten Prozentwerte -
+// vorbelegte Zahlen wuerden die Erhebung vor Ort entwerten.
+
+const ANWESENHEITSLISTE_LEERZEILEN = 3;
+
+function anwesenheitslisteHtml(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  const { kurs, termin } = gefunden;
+  const z = kurs.zertifikat || {};
+
+  // Dieselbe massgebliche Menge wie ueberall: abgesagte Buchungen zaehlen nicht.
+  const buchungen = anwesenheitsBuchungen(terminId)
+    .map(b => window.STATE.teilnehmer.find(t => t.id === b.teilnehmerId))
+    .filter(Boolean)
+    .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+  const zeilen = buchungen.map((t, i) => `
+      <tr>
+        <td class="al-nr">${i + 1}</td>
+        <td>${escHtml(t.name)}</td>
+        <td>${escHtml(t.firma)}</td>
+        <td class="al-haken"><span class="al-kasten"></span></td>
+        <td><span class="al-linie"></span></td>
+      </tr>`).join('');
+
+  // Leerzeilen fuer Personen, die spontan dazukommen.
+  const leerzeilen = Array.from({ length: ANWESENHEITSLISTE_LEERZEILEN }, (_, i) => `
+      <tr>
+        <td class="al-nr">${buchungen.length + i + 1}</td>
+        <td><span class="al-linie"></span></td>
+        <td><span class="al-linie"></span></td>
+        <td class="al-haken"><span class="al-kasten"></span></td>
+        <td><span class="al-linie"></span></td>
+      </tr>`).join('');
+
+  const vertretung = trainerName(termin.vertretungTrainerId);
+
+  return `
+    <div class="druck-seite">
+      <div class="bericht-kopf">
+        <div>
+          <h1 class="bericht-titel">Anwesenheitsliste</h1>
+          <div class="bericht-untertitel">${escHtml(kurs.titel)}</div>
+        </div>
+        <img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" />
+      </div>
+
+      <div class="al-kopfzeile">
+        ${formatiereDatum(termin.datum)} · ${escHtml(termin.ort || 'Ort offen')} ·
+        ${escHtml(kurs.format)} · ${escHtml(String(z.umfangUE || '—'))} Unterrichtseinheiten
+      </div>
+      <div class="al-kopfzeile">
+        Trainer: ${escHtml(trainerName(termin.trainerId) || 'kein Trainer zugeordnet')}${
+          vertretung ? ` · Vertretung: ${escHtml(vertretung)}` : ''}
+      </div>
+
+      <table class="bericht-tabelle al-tabelle">
+        <thead>
+          <tr>
+            <th class="al-nr">Nr.</th><th>Name</th><th>Firma</th>
+            <th class="al-haken">Anwesend</th><th class="al-unterschrift">Unterschrift</th>
+          </tr>
+        </thead>
+        <tbody>${zeilen}${leerzeilen}</tbody>
+      </table>
+
+      <div class="al-bestaetigung">
+        Ich bestätige, dass die Schulung wie oben angegeben durchgeführt wurde
+        und die abgehakten Personen daran teilgenommen haben.
+      </div>
+      <div class="al-signatur">
+        <div>
+          <span class="al-linie"></span>
+          <div class="al-signatur-label">Ort, Datum</div>
+        </div>
+        <div>
+          <span class="al-linie"></span>
+          <div class="al-signatur-label">Unterschrift Trainer</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function druckeAnwesenheitsliste(terminId) {
+  try {
+    const gefunden = findeTerminMitKurs(terminId);
+    const html = anwesenheitslisteHtml(terminId);
+    const dateiname = `Anwesenheitsliste_${gefunden.termin.datum}_${(gefunden.kurs.titel || '').replace(/\s+/g, '-')}`;
+    druckeInhalt(html, dateiname);
+  } catch (e) {
+    alert('Anwesenheitsliste konnte nicht erzeugt werden: ' + e.message);
+  }
+}
+
 // ---- Abschlussbericht ----
 // Internes Archivdokument: enthaelt bewusst ALLE Teilnehmer mit ihren
 // Anwesenheiten, anders als die personenbezogene Bescheinigung.
@@ -2788,8 +2907,10 @@ function renderSchulungdetail(terminId) {
           </div>
           <h2 style="font-size:20px; margin:0 0 8px 0;">${escHtml(kurs.titel)}</h2>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
           <button class="btn" onclick="oeffneTerminBearbeitenDialog('${termin.id}')">Bearbeiten</button>
+          <!-- Drucken ist lesend: bleibt auch bei abgeschlossenem Termin verfuegbar. -->
+          <button class="btn" onclick="druckeAnwesenheitsliste('${escJsArg(termin.id)}')">Anwesenheitsliste</button>
           ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn" onclick="detailOeffneAbschlussDialog('${escJsArg(termin.id)}')">Schulung abschließen</button>`}
           ${istTerminAbgeschlossen(termin.id) ? '' : `<button class="btn btn-primary" onclick="detailOeffneTeilnehmerHinzufuegenDialog('${escJsArg(termin.id)}')">+ Teilnehmer</button>`}
         </div>
