@@ -78,11 +78,8 @@ button { font-family: var(--font-body); cursor: pointer; }
   background: var(--ink);
   color: #fff;
 }
-.titlebar .traffic-dots { display: flex; gap: 6px; }
-.titlebar .dot { width: 10px; height: 10px; border-radius: 50%; }
-.titlebar .dot.red { background: #FF6159; }
-.titlebar .dot.yellow { background: #FFBD2E; }
-.titlebar .dot.green { background: #28C93F; }
+/* Die nachgebauten Fensterknoepfe sind entfallen: sie hatten keine Funktion
+   und wirkten im echten App-Fenster wie ein Fremdkoerper. */
 .titlebar .logo { height: 18px; margin-left: 10px; }
 .titlebar .app-name {
   font-family: var(--font-display);
@@ -570,33 +567,87 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
 .abschluss-banner strong { color: var(--ink); font-family: var(--font-display); }
 .abschluss-hinweis { font-size: 11.5px; color: var(--muted2); margin-top: 3px; }
 
-/* --- Gemeinsame Druckseite --- */
+/* --- Gemeinsame Druckseite ---
+   Der Seitenrand steckt hier im Dokument, nicht in @page. Grund: sobald @page
+   einen Rand hat, setzt der Browser dort seine eigene Kopf- und Fusszeile
+   hinein (Dateipfad, Datum, Seitenzahl). Mit @page margin 0 bleibt dafuer kein
+   Platz - der Ausdruck zeigt nur noch den eigenen Inhalt. */
 #druck-bereich { display: none; }
+/* 296 statt 297 mm: exakt Seitenhoehe wuerde durch Rundung eine leere
+   Folgeseite ausloesen. */
 .druck-seite {
-  width: 100%; background: #fff; color: var(--ink);
-  font-family: var(--font-body); box-sizing: border-box;
+  position: relative; width: 100%; min-height: 296mm;
+  padding: 16mm 18mm; background: #fff; color: var(--ink);
+  font-family: var(--font-body); box-sizing: border-box; overflow: hidden;
 }
 .druck-logo { height: 34px; }
 
-/* --- Bescheinigung (Nachbau der tribeta-Vorlage) --- */
-.zert-rahmen {
-  border: 3px solid var(--teal); padding: 42px 52px; text-align: center;
-  display: flex; flex-direction: column; min-height: 176mm;
+/* Untergrund und Wasserzeichen liegen als echte Elemente auf der Seite, nicht
+   als CSS-Hintergrund: Hintergrundgrafiken sind im Druckdialog abschaltbar,
+   Bilder im Dokument werden immer gedruckt. */
+.druck-grund { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.druck-wasserzeichen {
+  position: absolute; top: 46%; left: 50%; width: 132mm;
+  transform: translate(-50%, -50%); opacity: .05; z-index: 0;
 }
+.druck-inhalt { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 264mm; }
+/* Absenderzeile am Fuss jeder Druckseite */
+.druck-fusszeile {
+  margin-top: auto; padding-top: 10mm; display: flex; align-items: flex-end;
+  justify-content: space-between; gap: 12mm;
+  font-size: 8pt; color: var(--muted2);
+}
+.druck-fusszeile .druck-logo { height: 22px; opacity: .8; }
+
+/* --- Bescheinigung ---
+   Aufbau nach dem Vorbild einer Zertifizierungsurkunde: ruhige Mitte, klare
+   Rangfolge Programm > Dokumentart > Name > Text, Kennzahlen mit Beschriftung
+   am Fuss. Kein Rahmen mehr - der Untergrund traegt die Wertigkeit. */
+.zert-kopfmarke {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12mm; margin-bottom: 22mm;
+}
+.zert-kopfmarke .druck-logo { height: 30px; }
+.zert-dokumentart {
+  font-family: var(--font-display); font-size: 8.5pt; font-weight: 700;
+  letter-spacing: 1.6px; text-transform: uppercase; color: var(--teal-deep);
+}
+.zert-mitte { text-align: center; }
 .zert-ueberschrift {
-  font-family: var(--font-display); font-size: 11pt; font-weight: 700;
-  color: var(--teal-deep); letter-spacing: .4px; text-transform: uppercase;
-  margin: 18px 0 6px 0;
+  font-family: var(--font-display); font-size: 10.5pt; font-weight: 600;
+  color: var(--teal-deep); letter-spacing: .6px; margin: 0 0 4mm 0;
 }
-.zert-titel { font-family: var(--font-display); font-size: 30pt; font-weight: 800; color: var(--ink); margin: 0 0 22px 0; }
-.zert-einleitung { font-size: 11pt; color: var(--text); margin-bottom: 10px; }
-.zert-name { font-family: var(--font-display); font-size: 20pt; font-weight: 800; color: var(--ink); margin: 0 0 20px 0; }
-.zert-text { font-size: 11pt; line-height: 1.7; color: var(--text); max-width: 150mm; margin: 0 auto; }
-.zert-unterschriften { display: flex; justify-content: space-between; gap: 24px; margin-top: auto; padding-top: 34px; }
+.zert-titel {
+  font-family: var(--font-display); font-size: 34pt; font-weight: 800;
+  color: var(--ink); margin: 0 0 3mm 0; letter-spacing: -.5px;
+}
+.zert-titelstrich {
+  width: 26mm; height: 2.4pt; background: var(--teal); margin: 0 auto 9mm auto;
+}
+.zert-einleitung { font-size: 10.5pt; color: var(--muted); margin-bottom: 4mm; }
+.zert-name {
+  font-family: var(--font-display); font-size: 24pt; font-weight: 700;
+  color: var(--ink); margin: 0 0 7mm 0;
+}
+.zert-text { font-size: 11pt; line-height: 1.75; color: var(--text); max-width: 138mm; margin: 0 auto; }
+
+/* Kennzahlen wie auf einer Urkunde: kleines Label, darunter der Wert */
+.zert-daten {
+  display: flex; justify-content: center; gap: 18mm;
+  margin: 12mm 0 0 0; padding-top: 6mm; border-top: 1px solid var(--line);
+}
+.zert-daten > div { text-align: center; }
+.zert-daten .l {
+  font-family: var(--font-display); font-size: 7.5pt; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px; color: var(--muted2);
+  margin-bottom: 1.5mm;
+}
+.zert-daten .v { font-size: 11pt; font-weight: 600; color: var(--ink); }
+
+.zert-unterschriften { display: flex; justify-content: space-between; gap: 16mm; margin-top: 18mm; }
 .zert-unterschrift { flex: 1; text-align: center; }
 .zert-linie { border-top: 1px solid var(--ink); margin-bottom: 5px; }
-.zert-unterschrift span { font-size: 9pt; color: var(--muted); }
-.zert-fuss { font-size: 8.5pt; color: var(--muted); margin-top: 16px; }
+.zert-unterschrift span { font-size: 8.5pt; color: var(--muted); }
 
 /* --- Abschlussbericht --- */
 .bericht-kopf { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 2px solid var(--teal); padding-bottom: 12px; margin-bottom: 18px; }
@@ -639,7 +690,10 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
 
 /* --- Druckausgabe: nur der Druckbereich, nichts von der App --- */
 @media print {
-  @page { size: A4; margin: 14mm; }
+  /* margin 0, damit der Browser keinen Platz fuer seine eigene Kopf- und
+     Fusszeile hat (Dateipfad, Datum, Seitenzahl). Der Seitenrand steckt
+     stattdessen im Padding von .druck-seite. */
+  @page { size: A4; margin: 0; }
   body { display: block; padding: 0; background: #fff; min-height: 0; }
   .app-window, #dialog-overlay { display: none !important; }
   #druck-bereich { display: block; }

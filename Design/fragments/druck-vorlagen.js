@@ -1,6 +1,40 @@
 // Design/fragments/druck-vorlagen.js
-// Baut Bescheinigung und Abschlussbericht als HTML fuer den Druckbereich.
-// Nachbau der tribeta-Vorlage 09_Zertifikat_Vorlage.pdf.
+// Baut Bescheinigung, Anwesenheitsliste und Abschlussbericht als HTML fuer den
+// Druckbereich.
+
+// Untergrund einer Druckseite: sehr helles Feld mit weichen Wellen, darauf das
+// Logo als grosses, fast durchsichtiges Wasserzeichen. Beides sind echte
+// Elemente im Dokument und keine CSS-Hintergruende - Hintergrundgrafiken lassen
+// sich im Druckdialog abschalten, Bilder und Vektoren im Inhalt nicht.
+// staerke: 'voll' fuer die Bescheinigung, 'dezent' fuer Arbeitsdokumente.
+function druckUntergrund(staerke) {
+  const voll = staerke === 'voll';
+  const flaeche = voll ? '#F2F8FB' : '#FAFCFD';
+  const welle = voll ? '#DCEDF3' : '#EDF4F7';
+  const wasserzeichen = voll ? 0.05 : 0.03;
+  // Die Wellen laufen ueber die volle Seite; preserveAspectRatio none streckt
+  // sie auf jedes Seitenformat.
+  const linien = Array.from({ length: 14 }, (_, i) => {
+    const y = 40 + i * 62;
+    return `<path d="M0 ${y} C 210 ${y - 26}, 380 ${y + 26}, 595 ${y - 12}" fill="none" stroke="${welle}" stroke-width="1.1"/>`;
+  }).join('');
+  return `
+      <svg class="druck-grund" viewBox="0 0 595 842" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="0" y="0" width="595" height="842" fill="${flaeche}"/>
+        ${linien}
+        <path d="M0 792 C 150 812, 420 762, 595 786 L595 842 L0 842 Z" fill="#ffffff"/>
+      </svg>
+      <img class="druck-wasserzeichen" src="${window.LOGO_NORMAL}" alt="" style="opacity:${wasserzeichen}" />`;
+}
+
+// Absenderzeile am Fuss jeder Druckseite.
+function druckFusszeile(zusatz) {
+  return `
+      <div class="druck-fusszeile">
+        <div>${zusatz ? escHtml(zusatz) : ''}</div>
+        <img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" />
+      </div>`;
+}
 
 function zertifikatPlatzhalterFuellen(vorlage, werte) {
   return String(vorlage)
@@ -43,21 +77,42 @@ function zertifikatHtml(buchungId) {
 
   return `
     <div class="druck-seite">
-      <div class="zert-rahmen">
-        <div><img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" /></div>
-        <div class="zert-ueberschrift">${escHtml(z.ueberschrift || kurs.titel)}</div>
-        <h1 class="zert-titel">Zertifikat</h1>
-        <div class="zert-einleitung">Hiermit wird bestätigt, dass</div>
-        <div class="zert-name">${escHtml(teilnehmer.name)}</div>
-        <div class="zert-text">${text}</div>
+      ${druckUntergrund('voll')}
+      <div class="druck-inhalt">
+        <div class="zert-kopfmarke">
+          <span class="zert-dokumentart">Teilnahmebescheinigung</span>
+          <img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" />
+        </div>
+
+        <div class="zert-mitte">
+          <div class="zert-ueberschrift">${escHtml(z.ueberschrift || kurs.titel)}</div>
+          <h1 class="zert-titel">Zertifikat</h1>
+          <div class="zert-titelstrich"></div>
+          <div class="zert-einleitung">Hiermit wird bestätigt, dass</div>
+          <div class="zert-name">${escHtml(teilnehmer.name)}</div>
+          <div class="zert-text">${text}</div>
+
+          <div class="zert-daten">
+            <div>
+              <div class="l">Zertifikatsnummer</div>
+              <div class="v">${escHtml(nummer)}</div>
+            </div>
+            <div>
+              <div class="l">Gültigkeit</div>
+              <div class="v">${escHtml(z.gueltigkeit || 'unbefristet')}</div>
+            </div>
+            <div>
+              <div class="l">Umfang</div>
+              <div class="v">${escHtml(String(z.umfangUE || '—'))} UE</div>
+            </div>
+          </div>
+        </div>
+
         <div class="zert-unterschriften">
           <div class="zert-unterschrift"><div class="zert-linie"></div><span>Ort, Datum</span></div>
           <div class="zert-unterschrift"><div class="zert-linie"></div><span>Leitung / Referent:in</span></div>
-          <div class="zert-unterschrift"><div class="zert-linie"></div><span>tribeta</span></div>
         </div>
-        <div class="zert-fuss">
-          Zertifikat-Nr.: ${escHtml(nummer)} &nbsp;·&nbsp; Gültigkeit: ${escHtml(z.gueltigkeit || 'unbefristet')}
-        </div>
+        ${druckFusszeile('tribeta GbR · Schulung und Beratung')}
       </div>
     </div>`;
 }
@@ -116,6 +171,8 @@ function anwesenheitslisteHtml(terminId) {
 
   return `
     <div class="druck-seite">
+      ${druckUntergrund('dezent')}
+      <div class="druck-inhalt">
       <div class="bericht-kopf">
         <div>
           <h1 class="bericht-titel">Anwesenheitsliste</h1>
@@ -156,6 +213,8 @@ function anwesenheitslisteHtml(terminId) {
           <span class="al-linie"></span>
           <div class="al-signatur-label">Unterschrift Trainer</div>
         </div>
+      </div>
+      ${druckFusszeile('tribeta GbR · Schulung und Beratung')}
       </div>
     </div>`;
 }
@@ -210,6 +269,8 @@ function abschlussberichtHtml(terminId) {
 
   return `
     <div class="druck-seite">
+      ${druckUntergrund('dezent')}
+      <div class="druck-inhalt">
       <div class="bericht-kopf">
         <div>
           <h1 class="bericht-titel">Abschlussbericht</h1>
@@ -248,7 +309,9 @@ function abschlussberichtHtml(terminId) {
 
       <div class="bericht-unterschrift">
         <div class="zert-linie"></div>
-        <span style="font-size:9pt; color:#697187;">Unterschrift Trainer</span>
+        <span style="font-size:9pt; color:var(--muted);">Unterschrift Trainer</span>
+      </div>
+      ${druckFusszeile('Internes Archivdokument · tribeta GbR')}
       </div>
     </div>`;
 }
