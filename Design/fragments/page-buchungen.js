@@ -34,7 +34,10 @@ function buchungenZeile(buchung) {
   return `
     <tr class="expand-row ${neu ? 'buchung-neu' : ''}" onclick="buchungenToggleVerlauf('${buchung.id}')">
       <td class="cell-strong">${escHtml(teilnehmer.name)}</td>
-      <td>${escHtml(teilnehmer.firma)} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
+      <td>
+        <div class="zell-haupttext" title="${escAttr(teilnehmer.firma)}">${escHtml(teilnehmer.firma)}</div>
+        ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}
+      </td>
       <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${escHtml(teilnehmer.email)}</td>
       <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}${
         (!buchung.statusManuell && buchung.anmeldestatus === 'bestätigt')

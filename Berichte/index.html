@@ -227,7 +227,9 @@ table.data-table tbody tr:hover { background: var(--card-2); }
 /* In Tabellenzeilen kompakter, damit die Spalte nicht unnoetig breit wird. */
 table.data-table select { font-size: 12.5px; padding: 6px 26px 6px 9px; background-position: right 8px center; }
 table.data-table tbody tr:last-child td { border-bottom: none; }
-table.data-table .cell-strong { color: var(--ink); font-weight: 600; }
+/* Namen und Datumsangaben nicht umbrechen - der Umbruch trieb die Zeilen
+   unnoetig auseinander; zu enge Spalten faengt der Scrollrahmen ab. */
+table.data-table .cell-strong { color: var(--ink); font-weight: 600; white-space: nowrap; }
 
 /* Auswahlfelder app-weit einheitlich. Das native Bedienelement sieht auf
    jedem System anders aus und passte nirgends zum Rest; deshalb eigener
@@ -372,7 +374,16 @@ select:disabled {
 .goal-list li { display: flex; gap: 9px; font-size: 13px; align-items: flex-start; }
 .goal-list li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--indigo-deep); margin-top: 6px; flex: none; }
 .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.pill { font-size: 11.5px; font-family: var(--font-display); font-weight: 600; background: var(--card-2); border: 1px solid var(--line); padding: 4px 10px; border-radius: 8px; color: var(--text); }
+.pill {
+  display: inline-block; line-height: 1.35;
+  font-size: 11.5px; font-family: var(--font-display); font-weight: 600;
+  background: var(--card-2); border: 1px solid var(--line); padding: 4px 10px;
+  border-radius: 8px; color: var(--text);
+}
+/* In Tabellenzellen steht die Pille unter dem Text statt daneben - inline
+   ueberlappte sie die Textzeile, sobald die Spalte schmal wurde. */
+table.data-table .pill { margin-top: 5px; }
+.zell-haupttext { line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Materialien */
 .mat-group-label { font-family: var(--font-display); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin: 4px 0 10px 0; }
@@ -3423,7 +3434,10 @@ function buchungenZeile(buchung) {
   return `
     <tr class="expand-row ${neu ? 'buchung-neu' : ''}" onclick="buchungenToggleVerlauf('${buchung.id}')">
       <td class="cell-strong">${escHtml(teilnehmer.name)}</td>
-      <td>${escHtml(teilnehmer.firma)} ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}</td>
+      <td>
+        <div class="zell-haupttext" title="${escAttr(teilnehmer.firma)}">${escHtml(teilnehmer.firma)}</div>
+        ${teilnehmer.bestandskunde ? '<span class="pill">Bestandskunde</span>' : ''}
+      </td>
       <td class="truncate" style="max-width:200px;" title="${escAttr(teilnehmer.email)}">${escHtml(teilnehmer.email)}</td>
       <td>${anmeldestatusBadgeHtml(buchung.anmeldestatus)}${
         (!buchung.statusManuell && buchung.anmeldestatus === 'bestätigt')
