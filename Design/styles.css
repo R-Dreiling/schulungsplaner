@@ -612,6 +612,7 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
   font-size: 8pt; color: var(--muted2);
 }
 .druck-fusszeile .druck-logo { height: 22px; opacity: .8; }
+.druck-fusszeile div { line-height: 1.5; }
 
 /* --- Bescheinigung ---
    Aufbau nach dem Vorbild einer Zertifizierungsurkunde: ruhige Mitte, klare

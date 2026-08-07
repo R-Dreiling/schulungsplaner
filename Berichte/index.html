@@ -618,6 +618,7 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
   font-size: 8pt; color: var(--muted2);
 }
 .druck-fusszeile .druck-logo { height: 22px; opacity: .8; }
+.druck-fusszeile div { line-height: 1.5; }
 
 /* --- Bescheinigung ---
    Aufbau nach dem Vorbild einer Zertifizierungsurkunde: ruhige Mitte, klare
@@ -1632,6 +1633,13 @@ const EINSTELLUNGEN_VORGABE = {
   unterschriftName: '',
   stempelBild: null,
   ausstellungsort: '',
+  // Vollstaendige Firmierung im Fuss der Bescheinigung. Vorbelegt aus dem
+  // Impressum der tribeta-Website, dort aber als "i.G." gefuehrt - hier ohne
+  // den Zusatz. Handelsregister- und Umsatzsteuernummer fehlen bewusst,
+  // solange sie nicht belegt sind; sie gehoeren ergaenzt, sobald bekannt.
+  firmenangaben: 'tribeta GmbH · Poststraße 67 · 53840 Troisdorf\n'
+    + 'Geschäftsführung: Marco Fütterer, Darius Finocchietti, René Dreiling\n'
+    + 'Amtsgericht Siegburg · Telefon 02241 240 766 19 · info@tribeta-group.de',
 };
 
 function einstellungen() {
@@ -2347,6 +2355,12 @@ function oeffneEinstellungenDialog() {
         <label>Firmenstempel</label>
         ${einstellungenVorschauBild('stempelBild', 'Stempel')}
       </div>
+
+      <div class="field">
+        <label>Firmenangaben im Fuß der Bescheinigung</label>
+        <textarea id="einst-firmenangaben" rows="3">${escHtml(e.firmenangaben || '')}</textarea>
+        <div class="field-hint">Eine Zeile je Angabe. Sobald die Gesellschaft im Handelsregister eingetragen ist, gehören Registernummer und USt-IdNr. hier ergänzt.</div>
+      </div>
     </div>
     <div class="dialog-foot">
       <button type="button" class="btn" onclick="schliesseDialog()">Schließen</button>
@@ -2389,10 +2403,12 @@ function einstellungenBildEntfernen(feld) {
 function einstellungenTexteLesen() {
   const ort = document.getElementById('einst-ort');
   const name = document.getElementById('einst-unterschrift-name');
-  if (!ort || !name) return;
+  const firma = document.getElementById('einst-firmenangaben');
+  if (!ort || !name || !firma) return;
   aktualisiereEinstellungen({
     ausstellungsort: ort.value.trim(),
     unterschriftName: name.value.trim(),
+    firmenangaben: firma.value.trim(),
   });
 }
 
@@ -2425,10 +2441,12 @@ function druckUntergrund(staerke) {
 
 // Absenderzeile am Fuss jeder Druckseite. Ohne Logo - das steht bereits im
 // Kopf der Seite, ein zweites Mal unten wirkt doppelt.
+// Zeilenumbrueche im Text bleiben erhalten (mehrzeilige Firmierung).
 function druckFusszeile(zusatz) {
+  const text = zusatz ? escHtml(zusatz).replace(/\n/g, '<br/>') : '';
   return `
       <div class="druck-fusszeile">
-        <div>${zusatz ? escHtml(zusatz) : ''}</div>
+        <div>${text}</div>
       </div>`;
 }
 
@@ -2530,7 +2548,7 @@ function zertifikatHtml(buchungId) {
         </div>
 
         ${zertifikatZeichnung(buchungId)}
-        ${druckFusszeile('tribeta GmbH')}
+        ${druckFusszeile(einstellungen().firmenangaben)}
       </div>
     </div>`;
 }

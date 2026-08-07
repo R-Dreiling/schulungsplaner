@@ -441,6 +441,13 @@ const EINSTELLUNGEN_VORGABE = {
   unterschriftName: '',
   stempelBild: null,
   ausstellungsort: '',
+  // Vollstaendige Firmierung im Fuss der Bescheinigung. Vorbelegt aus dem
+  // Impressum der tribeta-Website, dort aber als "i.G." gefuehrt - hier ohne
+  // den Zusatz. Handelsregister- und Umsatzsteuernummer fehlen bewusst,
+  // solange sie nicht belegt sind; sie gehoeren ergaenzt, sobald bekannt.
+  firmenangaben: 'tribeta GmbH · Poststraße 67 · 53840 Troisdorf\n'
+    + 'Geschäftsführung: Marco Fütterer, Darius Finocchietti, René Dreiling\n'
+    + 'Amtsgericht Siegburg · Telefon 02241 240 766 19 · info@tribeta-group.de',
 };
 
 function einstellungen() {

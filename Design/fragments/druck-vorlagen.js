@@ -20,10 +20,12 @@ function druckUntergrund(staerke) {
 
 // Absenderzeile am Fuss jeder Druckseite. Ohne Logo - das steht bereits im
 // Kopf der Seite, ein zweites Mal unten wirkt doppelt.
+// Zeilenumbrueche im Text bleiben erhalten (mehrzeilige Firmierung).
 function druckFusszeile(zusatz) {
+  const text = zusatz ? escHtml(zusatz).replace(/\n/g, '<br/>') : '';
   return `
       <div class="druck-fusszeile">
-        <div>${zusatz ? escHtml(zusatz) : ''}</div>
+        <div>${text}</div>
       </div>`;
 }
 
@@ -125,7 +127,7 @@ function zertifikatHtml(buchungId) {
         </div>
 
         ${zertifikatZeichnung(buchungId)}
-        ${druckFusszeile('tribeta GmbH')}
+        ${druckFusszeile(einstellungen().firmenangaben)}
       </div>
     </div>`;
 }

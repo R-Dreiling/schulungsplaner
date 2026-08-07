@@ -59,6 +59,12 @@ function oeffneEinstellungenDialog() {
         <label>Firmenstempel</label>
         ${einstellungenVorschauBild('stempelBild', 'Stempel')}
       </div>
+
+      <div class="field">
+        <label>Firmenangaben im Fuß der Bescheinigung</label>
+        <textarea id="einst-firmenangaben" rows="3">${escHtml(e.firmenangaben || '')}</textarea>
+        <div class="field-hint">Eine Zeile je Angabe. Sobald die Gesellschaft im Handelsregister eingetragen ist, gehören Registernummer und USt-IdNr. hier ergänzt.</div>
+      </div>
     </div>
     <div class="dialog-foot">
       <button type="button" class="btn" onclick="schliesseDialog()">Schließen</button>
@@ -101,10 +107,12 @@ function einstellungenBildEntfernen(feld) {
 function einstellungenTexteLesen() {
   const ort = document.getElementById('einst-ort');
   const name = document.getElementById('einst-unterschrift-name');
-  if (!ort || !name) return;
+  const firma = document.getElementById('einst-firmenangaben');
+  if (!ort || !name || !firma) return;
   aktualisiereEinstellungen({
     ausstellungsort: ort.value.trim(),
     unterschriftName: name.value.trim(),
+    firmenangaben: firma.value.trim(),
   });
 }
 
