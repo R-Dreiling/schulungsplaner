@@ -612,7 +612,10 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
   font-family: var(--font-display); font-size: 8.5pt; font-weight: 700;
   letter-spacing: 1.6px; text-transform: uppercase; color: var(--teal-deep);
 }
-.zert-mitte { text-align: center; }
+/* margin auto oben und unten: der Mittelteil sitzt optisch in der Blattmitte,
+   Unterschriften und Absenderzeile bleiben unten. Sonst klebte alles am Kopf
+   und die untere Blatthaelfte blieb leer. */
+.zert-mitte { text-align: center; margin: auto 0; }
 .zert-ueberschrift {
   font-family: var(--font-display); font-size: 10.5pt; font-weight: 600;
   color: var(--teal-deep); letter-spacing: .6px; margin: 0 0 4mm 0;
@@ -674,9 +677,11 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
 .al-kopfzeile { font-size: 10pt; color: var(--text); margin-bottom: 4px; }
 .al-tabelle { margin-top: 16px; }
 .al-tabelle td { height: 11mm; vertical-align: middle; }
-.al-tabelle .al-nr { width: 12mm; color: var(--muted); }
-.al-tabelle .al-haken { width: 22mm; text-align: center; }
-.al-tabelle .al-unterschrift { width: 58mm; }
+.al-tabelle .al-nr { width: 10mm; color: var(--muted); }
+.al-tabelle .al-haken { width: 20mm; text-align: center; }
+/* Breit genug, dass uebliche Firmenadressen einzeilig bleiben. */
+.al-tabelle .al-kontakt { width: 64mm; font-size: 8.5pt; color: var(--text); }
+.al-tabelle td:nth-child(3) { font-size: 9.5pt; }
 /* Leeres Kaestchen zum Ankreuzen und leere Linie zum Beschriften. */
 .al-kasten {
   display: inline-block; width: 5mm; height: 5mm;

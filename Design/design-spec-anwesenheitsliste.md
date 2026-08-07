@@ -43,8 +43,15 @@ Liste wird gelegentlich auch nachträglich noch einmal gebraucht.
 | Nr. | laufende Nummer, beginnend bei 1 |
 | Name | Name des Teilnehmers |
 | Firma | Firma des Teilnehmers |
+| E-Mail | Kontaktadresse des Teilnehmers |
 | Anwesend | leeres Kästchen zum Abhaken |
-| Unterschrift | leere Linie |
+
+**Korrektur nach der ersten Abnahme:** Ursprünglich hatte jede Zeile eine
+Unterschriftslinie. Geschult wird überwiegend **online** — dort kann niemand
+unterschreiben, die Liste füllt der Trainer aus. Die Spalte ist deshalb entfallen
+und durch die **E-Mail-Adresse** ersetzt: Bei Verbindungsproblemen muss der
+Trainer die Teilnehmer erreichen können. Die Unterschrift des Trainers am Fuß
+des Blattes bleibt — sie trägt den Nachweis.
 
 Sortierung **alphabetisch nach Name** (`localeCompare`, deutsche Sortierung),
 damit der Dozent eine Person schnell findet. Die Buchungsreihenfolge ist auf

@@ -2,37 +2,28 @@
 // Baut Bescheinigung, Anwesenheitsliste und Abschlussbericht als HTML fuer den
 // Druckbereich.
 
-// Untergrund einer Druckseite: sehr helles Feld mit weichen Wellen, darauf das
-// Logo als grosses, fast durchsichtiges Wasserzeichen. Beides sind echte
-// Elemente im Dokument und keine CSS-Hintergruende - Hintergrundgrafiken lassen
-// sich im Druckdialog abschalten, Bilder und Vektoren im Inhalt nicht.
+// Untergrund einer Druckseite: sehr helles Feld, darauf das Signet als grosses,
+// fast durchsichtiges Wasserzeichen. Beides sind echte Elemente im Dokument und
+// keine CSS-Hintergruende - Hintergrundgrafiken lassen sich im Druckdialog
+// abschalten, Bilder und Vektoren im Inhalt nicht.
 // staerke: 'voll' fuer die Bescheinigung, 'dezent' fuer Arbeitsdokumente.
 function druckUntergrund(staerke) {
   const voll = staerke === 'voll';
-  const flaeche = voll ? '#F2F8FB' : '#FAFCFD';
-  const welle = voll ? '#DCEDF3' : '#EDF4F7';
-  const wasserzeichen = voll ? 0.05 : 0.03;
-  // Die Wellen laufen ueber die volle Seite; preserveAspectRatio none streckt
-  // sie auf jedes Seitenformat.
-  const linien = Array.from({ length: 14 }, (_, i) => {
-    const y = 40 + i * 62;
-    return `<path d="M0 ${y} C 210 ${y - 26}, 380 ${y + 26}, 595 ${y - 12}" fill="none" stroke="${welle}" stroke-width="1.1"/>`;
-  }).join('');
+  const flaeche = voll ? '#F4F9FB' : '#FBFDFD';
+  const wasserzeichen = voll ? 0.07 : 0.04;
   return `
       <svg class="druck-grund" viewBox="0 0 595 842" preserveAspectRatio="none" aria-hidden="true">
         <rect x="0" y="0" width="595" height="842" fill="${flaeche}"/>
-        ${linien}
-        <path d="M0 792 C 150 812, 420 762, 595 786 L595 842 L0 842 Z" fill="#ffffff"/>
       </svg>
-      <img class="druck-wasserzeichen" src="${window.LOGO_NORMAL}" alt="" style="opacity:${wasserzeichen}" />`;
+      <img class="druck-wasserzeichen" src="${window.LOGO_ICON}" alt="" style="opacity:${wasserzeichen}" />`;
 }
 
-// Absenderzeile am Fuss jeder Druckseite.
+// Absenderzeile am Fuss jeder Druckseite. Ohne Logo - das steht bereits im
+// Kopf der Seite, ein zweites Mal unten wirkt doppelt.
 function druckFusszeile(zusatz) {
   return `
       <div class="druck-fusszeile">
         <div>${zusatz ? escHtml(zusatz) : ''}</div>
-        <img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" />
       </div>`;
 }
 
@@ -148,13 +139,16 @@ function anwesenheitslisteHtml(terminId) {
     .filter(Boolean)
     .sort((a, b) => a.name.localeCompare(b.name, 'de'));
 
+  // Kontaktspalte statt Unterschriftsspalte: geschult wird ueberwiegend online,
+  // die Liste fuellt der Trainer aus. Bei Verbindungsproblemen muss er die
+  // Teilnehmer erreichen koennen.
   const zeilen = buchungen.map((t, i) => `
       <tr>
         <td class="al-nr">${i + 1}</td>
         <td>${escHtml(t.name)}</td>
         <td>${escHtml(t.firma)}</td>
+        <td class="al-kontakt">${escHtml(t.email || '—')}</td>
         <td class="al-haken"><span class="al-kasten"></span></td>
-        <td><span class="al-linie"></span></td>
       </tr>`).join('');
 
   // Leerzeilen fuer Personen, die spontan dazukommen.
@@ -163,8 +157,8 @@ function anwesenheitslisteHtml(terminId) {
         <td class="al-nr">${buchungen.length + i + 1}</td>
         <td><span class="al-linie"></span></td>
         <td><span class="al-linie"></span></td>
+        <td class="al-kontakt"><span class="al-linie"></span></td>
         <td class="al-haken"><span class="al-kasten"></span></td>
-        <td><span class="al-linie"></span></td>
       </tr>`).join('');
 
   const vertretung = trainerName(termin.vertretungTrainerId);
@@ -194,7 +188,7 @@ function anwesenheitslisteHtml(terminId) {
         <thead>
           <tr>
             <th class="al-nr">Nr.</th><th>Name</th><th>Firma</th>
-            <th class="al-haken">Anwesend</th><th class="al-unterschrift">Unterschrift</th>
+            <th class="al-kontakt">E-Mail</th><th class="al-haken">Anwesend</th>
           </tr>
         </thead>
         <tbody>${zeilen}${leerzeilen}</tbody>
