@@ -126,6 +126,30 @@ async function alleDateienLoeschen() {
 const ZEICHNUNG_MAX_BREITE = 700;   // reicht fuer den Druck bei ~45 mm Breite
 const ZEICHNUNG_MAX_BYTES = 400000; // Sicherheitsgrenze fuer den State
 
+// Unterschriften kommen meist als Scan oder Screenshot mit weissem Grund. Auf
+// dem hellen Untergrund der Bescheinigung waere das ein sichtbarer Kasten.
+// Deshalb wird Helles durchsichtig gemacht - mit weichem Uebergang, damit die
+// Linien nicht ausfransen. Bereits freigestellte Bilder bleiben unveraendert,
+// ihre deckenden Pixel sind ja dunkel.
+const FREISTELLEN_HELL = 240;   // ab hier vollstaendig durchsichtig
+const FREISTELLEN_DUNKEL = 200; // bis hier unveraendert deckend
+
+function weissenHintergrundFreistellen(kontext, leinwand) {
+  const daten = kontext.getImageData(0, 0, leinwand.width, leinwand.height);
+  const p = daten.data;
+  for (let i = 0; i < p.length; i += 4) {
+    if (p[i + 3] === 0) continue;
+    const helligkeit = (p[i] + p[i + 1] + p[i + 2]) / 3;
+    if (helligkeit >= FREISTELLEN_HELL) {
+      p[i + 3] = 0;
+    } else if (helligkeit > FREISTELLEN_DUNKEL) {
+      const anteil = (FREISTELLEN_HELL - helligkeit) / (FREISTELLEN_HELL - FREISTELLEN_DUNKEL);
+      p[i + 3] = Math.round(p[i + 3] * anteil);
+    }
+  }
+  kontext.putImageData(daten, 0, 0);
+}
+
 function bildAufDruckgroesseVerkleinern(datei) {
   return new Promise((resolve, reject) => {
     if (!/^image\//.test(datei.type)) {
@@ -144,7 +168,9 @@ function bildAufDruckgroesseVerkleinern(datei) {
         leinwand.height = Math.round(bild.height * faktor);
         // PNG erhaelt die Transparenz - bei einer Unterschrift ist genau das
         // entscheidend, sonst liegt ein weisser Kasten auf dem Untergrund.
-        leinwand.getContext('2d').drawImage(bild, 0, 0, leinwand.width, leinwand.height);
+        const kontext = leinwand.getContext('2d');
+        kontext.drawImage(bild, 0, 0, leinwand.width, leinwand.height);
+        weissenHintergrundFreistellen(kontext, leinwand);
         const datenUrl = leinwand.toDataURL('image/png');
         if (datenUrl.length > ZEICHNUNG_MAX_BYTES) {
           reject(new Error('Das Bild ist auch verkleinert noch zu groß. Bitte einen engeren Ausschnitt wählen.'));

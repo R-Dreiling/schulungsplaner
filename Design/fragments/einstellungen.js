@@ -19,6 +19,9 @@ function einstellungenVorschauBild(feld, beschriftung) {
           <input type="file" accept="image/*" onchange="einstellungenBildGewaehlt(event, '${escJsArg(feld)}')" />
           <span class="datei-wahl-knopf">${knopfText}</span>
         </label>
+        ${feld === 'stempelBild'
+          ? '<button type="button" class="btn" onclick="einstellungenStempelVorlage()">tribeta-Stempel verwenden</button>'
+          : ''}
         ${bild ? `<button type="button" class="btn btn-ghost-red" onclick="einstellungenBildEntfernen('${escJsArg(feld)}')">Entfernen</button>` : ''}
       </div>
     </div>`;
@@ -76,6 +79,14 @@ function einstellungenBildGewaehlt(ev, feld) {
       oeffneEinstellungenDialog();
     })
     .catch(err => alert(err.message));
+}
+
+// Der mitgelieferte Firmenstempel - ein Klick statt Datei-Upload.
+function einstellungenStempelVorlage() {
+  einstellungenTexteLesen();
+  aktualisiereEinstellungen({ stempelBild: window.STEMPEL_VORLAGE });
+  schliesseDialog();
+  oeffneEinstellungenDialog();
 }
 
 function einstellungenBildEntfernen(feld) {

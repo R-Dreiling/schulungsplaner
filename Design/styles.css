@@ -673,11 +673,11 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
   padding-bottom: 1.5mm;
 }
 .zert-ortdatum { font-size: 10pt; color: var(--ink); }
-.zert-unterschriftbild { max-height: 15mm; max-width: 100%; }
-/* Der Stempel sitzt leicht schraeg neben der Unterschrift, wie von Hand
-   aufgebracht. */
+.zert-unterschriftbild { max-height: 18mm; max-width: 100%; }
+/* Der Stempel sitzt leicht schraeg unter der Unterschrift, wie von Hand
+   aufgebracht. Breit genug, dass die Beschriftung lesbar bleibt. */
 .zert-stempel {
-  position: absolute; right: 6mm; bottom: 2mm; max-height: 26mm; max-width: 42mm;
+  position: absolute; right: 2mm; bottom: -9mm; max-height: 26mm; max-width: 56mm;
   transform: rotate(-7deg); opacity: .92;
 }
 
