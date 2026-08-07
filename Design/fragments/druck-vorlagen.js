@@ -248,6 +248,114 @@ function druckeAnwesenheitsliste(terminId) {
   }
 }
 
+// ---- Nachweis fuer den Arbeitgeber ----
+// Der Kunde muss belegen koennen, dass seine Belegschaft unterwiesen wurde.
+// Bescheinigungen gehen an die Teilnehmer; dieses Blatt fasst alle Personen
+// EINER Firma zusammen und geht an den Arbeitgeber. Datenschutzrechtlich
+// unbedenklich: er kennt seine Beschaeftigten und deren Teilnahme ohnehin -
+// anders als bei einem Sammeldokument ueber mehrere Firmen hinweg.
+
+function firmenNachweisFirmen(terminId) {
+  const namen = anwesenheitsBuchungen(terminId)
+    .map(b => window.STATE.teilnehmer.find(t => t.id === b.teilnehmerId))
+    .filter(Boolean)
+    .map(t => t.firma || '(ohne Firma)');
+  return [...new Set(namen)].sort((a, b) => a.localeCompare(b, 'de'));
+}
+
+function firmenNachweisHtml(terminId, firma) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+  const { kurs, termin } = gefunden;
+  const z = kurs.zertifikat || {};
+  const e = einstellungen();
+
+  const zeilen = anwesenheitsBuchungen(terminId)
+    .map(b => ({ b, t: window.STATE.teilnehmer.find(p => p.id === b.teilnehmerId) }))
+    .filter(x => x.t && (x.t.firma || '(ohne Firma)') === firma)
+    .sort((x, y) => x.t.name.localeCompare(y.t.name, 'de'));
+
+  if (zeilen.length === 0) throw new Error(`Keine Teilnehmer der Firma „${firma}" auf diesem Termin.`);
+
+  const erfuellt = zeilen.filter(x => erfuelltMindestteilnahme(x.b)).length;
+
+  const tabelle = zeilen.map((x, i) => {
+    const erfasst = x.b.anwesenheitProzent !== null && x.b.anwesenheitProzent !== undefined;
+    const ok = erfuelltMindestteilnahme(x.b);
+    return `
+      <tr>
+        <td class="al-nr">${i + 1}</td>
+        <td>${escHtml(x.t.name)}</td>
+        <td${erfasst && !ok ? ' class="negativ"' : ''}>${erfasst ? x.b.anwesenheitProzent + ' %' : 'nicht erfasst'}</td>
+        <td${ok ? '' : ' class="negativ"'}>${x.b.zertifikatNr
+          ? escHtml(x.b.zertifikatNr)
+          : (ok ? 'noch nicht ausgestellt' : 'keine')}</td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <div class="druck-seite">
+      ${druckUntergrund('dezent')}
+      <div class="druck-inhalt">
+      <div class="bericht-kopf">
+        <div>
+          <h1 class="bericht-titel">Schulungsnachweis</h1>
+          <div class="bericht-untertitel">${escHtml(firma)}</div>
+        </div>
+        <img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" />
+      </div>
+
+      <div class="bericht-meta">
+        <div><div class="l">Schulung</div>${escHtml(kurs.titel)}</div>
+        <div><div class="l">Datum</div>${formatiereDatum(termin.datum)}</div>
+        <div><div class="l">Format / Ort</div>${escHtml(kurs.format)} · ${escHtml(termin.ort || '—')}</div>
+        <div><div class="l">Umfang</div>${escHtml(String(z.umfangUE || '—'))} Unterrichtseinheiten</div>
+        <div><div class="l">Trainer</div>${escHtml(trainerName(termin.trainerId) || '—')}</div>
+        <div><div class="l">Teilnehmer dieser Firma</div>${zeilen.length}</div>
+      </div>
+
+      <div class="bericht-abschnitt">Teilnehmende Beschäftigte</div>
+      <table class="bericht-tabelle al-tabelle">
+        <thead><tr><th class="al-nr">Nr.</th><th>Name</th><th>Anwesenheit</th><th>Bescheinigung</th></tr></thead>
+        <tbody>${tabelle}</tbody>
+      </table>
+      <div class="bericht-kennzahlen">
+        <div><strong>${erfuellt}</strong> von <strong>${zeilen.length}</strong> erfüllen die Mindestteilnahme (${MINDEST_ANWESENHEIT} %)</div>
+      </div>
+
+      <div class="al-bestaetigung">
+        Hiermit wird bestätigt, dass die oben genannten Beschäftigten an der
+        bezeichneten Schulung teilgenommen haben. Für Personen, die die
+        Mindestteilnahme erreicht haben, wurde eine persönliche
+        Teilnahmebescheinigung ausgestellt.
+      </div>
+      <div class="al-signatur">
+        <div>
+          <span class="al-linie"></span>
+          <div class="al-signatur-label">${e.ausstellungsort ? escHtml(e.ausstellungsort) + ', Datum' : 'Ort, Datum'}</div>
+        </div>
+        <div>
+          ${e.unterschriftBild ? `<img class="zert-unterschriftbild" src="${escAttr(e.unterschriftBild)}" alt="" />` : ''}
+          <span class="al-linie"></span>
+          <div class="al-signatur-label">${e.unterschriftName ? escHtml(e.unterschriftName) : 'Leitung / Referent:in'}</div>
+        </div>
+      </div>
+      ${druckFusszeile(e.firmenangaben)}
+      </div>
+    </div>`;
+}
+
+function druckeFirmenNachweis(terminId, firma) {
+  try {
+    const gefunden = findeTerminMitKurs(terminId);
+    const html = firmenNachweisHtml(terminId, firma);
+    const dateiname = `Schulungsnachweis_${(firma || '').replace(/\s+/g, '-')}_${gefunden.termin.datum}`;
+    druckeInhalt(html, dateiname);
+  } catch (e) {
+    alert('Nachweis konnte nicht erzeugt werden: ' + e.message);
+  }
+}
+
 // ---- Abschlussbericht ----
 // Internes Archivdokument: enthaelt bewusst ALLE Teilnehmer mit ihren
 // Anwesenheiten, anders als die personenbezogene Bescheinigung.

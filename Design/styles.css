@@ -300,6 +300,13 @@ select:disabled {
 .page-header-text .subtitle { font-size: 13px; color: var(--muted); margin: 0; }
 .page-header-actions { display: flex; gap: 8px; flex: none; }
 
+/* Hinweis auf eine faellige Datensicherung, in der Werkzeugleiste */
+.sicherungshinweis {
+  font-size: 10.5px; line-height: 1.4; color: var(--status-amber-fg);
+  background: var(--status-amber-bg); border-radius: var(--radius-sm);
+  padding: 6px 8px; margin: 2px 0 6px 0;
+}
+
 /* Sidebar Werkzeuge (Export/Import/Reset) */
 .sidebar-tools { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
 .sidebar-tool-btn {
@@ -408,6 +415,20 @@ table.data-table .pill { margin-top: 5px; }
 }
 .datei-wahl-name { font-size: 12px; color: var(--muted2); }
 .datei-wahl-name.gewaehlt { color: var(--text); font-weight: 600; }
+
+/* Faellige Auffrischungen, nach Unternehmen gruppiert */
+.auffrischung-firma { margin-bottom: 18px; }
+.auffrischung-firma:last-child { margin-bottom: 0; }
+.auffrischung-kopf {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid var(--line);
+}
+.auffrischung-kopf strong { font-family: var(--font-display); font-size: 13.5px; color: var(--ink); }
+.auffrischung-kopf span { font-size: 12px; color: var(--muted); }
+
+/* Nachweise je Arbeitgeber, unter der Teilnehmerliste */
+.firmen-nachweise { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.firmen-nachweise-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* Checkliste */
 .check-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }

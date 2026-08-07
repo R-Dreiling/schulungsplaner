@@ -150,7 +150,7 @@ function schulungenKursFormularFelder(kurs) {
   const k = kurs || {
     titel: '', kategorie: '', beschreibung: '', voraussetzungen: 'Keine',
     format: 'Vor Ort', minTeilnehmer: 5, maxTeilnehmer: 30,
-    zertifikat: { kuerzel: '', umfangUE: 8, ueberschrift: '', bestaetigungstext: '', gueltigkeit: 'unbefristet' },
+    zertifikat: { kuerzel: '', umfangUE: 8, ueberschrift: '', bestaetigungstext: '', gueltigkeit: 'unbefristet', auffrischungMonate: 0 },
   };
   const z = k.zertifikat || {};
   return `
@@ -180,6 +180,11 @@ function schulungenKursFormularFelder(kurs) {
     <div class="field"><label>Voraussetzungen</label><input name="voraussetzungen" value="${escAttr(k.voraussetzungen)}" /></div>
     <div class="field"><label>Kürzel für Zertifikatsnummer</label><input name="kuerzel" value="${escAttr(z.kuerzel || '')}" placeholder="z. B. DSB" /></div>
     <div class="field"><label>Gültigkeit der Bescheinigung</label><input name="gueltigkeit" value="${escAttr(z.gueltigkeit || 'unbefristet')}" /></div>
+    <div class="field">
+      <label>Auffrischung nach (Monaten)</label>
+      <input type="number" name="auffrischungMonate" min="0" step="1" value="${z.auffrischungMonate || ''}" placeholder="z. B. 12" />
+      <div class="field-hint">Daraus errechnet die Übersicht, wann Teilnehmer nachzuschulen sind. Leer oder 0 heißt: keine Auffrischung nötig.</div>
+    </div>
     <div class="field">
       <label>Überschrift auf der Bescheinigung</label>
       <input name="ueberschrift" value="${escAttr(z.ueberschrift || '')}" placeholder="z. B. Zertifizierungslehrgang Datenschutzbeauftragte:r" />
@@ -258,6 +263,7 @@ function speichereKursBearbeiten(ev, kursId) {
       kuerzel: felder.kuerzel,
       umfangUE: felder.umfangUE,
       gueltigkeit: felder.gueltigkeit,
+      auffrischungMonate: Number(felder.auffrischungMonate) || 0,
       // Leer gelassen heisst "wie der Kurs heisst" bzw. "Standardwortlaut" -
       // eine Bescheinigung ohne Ueberschrift oder Text waere nicht brauchbar.
       ueberschrift: felder.ueberschrift.trim() || felder.titel,

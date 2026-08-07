@@ -416,6 +416,26 @@ function detailBuchungStatusSetzen(buchungId, wert) {
   if (!detailVersuche(() => aktualisiereBuchungStatus(buchungId, wert))) renderAll();
 }
 
+// Je Firma ein Nachweis fuer den Arbeitgeber. Erscheint nur, wenn ueberhaupt
+// Teilnehmer gebucht sind - und nennt die Firmen einzeln, damit klar ist, dass
+// jeder Kunde nur seine eigenen Beschaeftigten erhaelt.
+function detailFirmenNachweise(termin) {
+  const firmen = firmenNachweisFirmen(termin.id);
+  if (firmen.length === 0) return '';
+  const knoepfe = firmen.map(f =>
+    `<button class="btn" onclick="druckeFirmenNachweis('${escJsArg(termin.id)}', '${escJsArg(f)}')">${escHtml(f)}</button>`
+  ).join('');
+  return `
+      <div class="firmen-nachweise">
+        <div class="mat-group-label" style="margin:0 0 8px 0;">Schulungsnachweis für den Arbeitgeber</div>
+        <p class="field-hint" style="margin:-4px 0 10px 0;">
+          Ein Blatt je Unternehmen mit dessen Beschäftigten, Anwesenheit und Bescheinigungsnummern.
+          Jeder Kunde erhält ausschließlich seine eigenen Personen.
+        </p>
+        <div class="firmen-nachweise-knoepfe">${knoepfe}</div>
+      </div>`;
+}
+
 function detailAbschnittTeilnehmer(kurs, termin) {
   const buchungen = buchungenFuerTermin(termin.id);
   // Abgesagte bleiben als Zeile sichtbar (sie muessen verwaltbar sein), zaehlen
@@ -452,6 +472,7 @@ function detailAbschnittTeilnehmer(kurs, termin) {
           <tbody>${zeilen}</tbody>
         </table>
       </div>
+      ${detailFirmenNachweise(termin)}
     </div>`;
 }
 
@@ -576,6 +597,14 @@ function detailSpeichereAbschluss(ev, terminId) {
   try {
     terminAbschliessen(terminId, felder.vorkommnisse);
     schliesseDialog();
+    // Ein abgeschlossener Termin ist der Moment, in dem die Nachweise
+    // vollstaendig sind - und damit der wichtigste Zeitpunkt fuer eine
+    // Sicherung. Deshalb hier gezielt nachfragen statt nur zu erinnern.
+    if (confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
+      + 'Jetzt eine Datensicherung erstellen? Die Daten liegen nur in diesem Browser – '
+      + 'die Sicherung ist die einzige Kopie außerhalb.')) {
+      exportiereJSON();
+    }
   } catch (e) {
     alert(e.message);
   }

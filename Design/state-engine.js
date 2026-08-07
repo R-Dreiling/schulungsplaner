@@ -22,11 +22,55 @@ function ladeState() {
 
 window.STATE = ladeState();
 
-function speichereState() {
+// zaehlen=false nur fuer Vorgaenge, die selbst keine inhaltliche Aenderung
+// sind (das Vermerken einer Sicherung). Alles andere laeuft hier durch, damit
+// der Sicherungszaehler nicht bei jedem neuen Mutator nachgezogen werden muss.
+function speichereState(zaehlen = true) {
+  if (zaehlen && typeof sicherungZaehlen === 'function') {
+    sicherungZaehlen();
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(window.STATE));
   if (typeof window.renderAll === 'function') {
     window.renderAll();
   }
+}
+
+// ---- Datensicherung ----
+// Der gesamte Bestand liegt im Speicher dieses Browsers. Ein geloeschter
+// Browser-Cache, ein neues Profil oder ein anderer Rechner - und alles ist
+// weg. Die App zaehlt deshalb mit, wie viel sich seit der letzten Sicherung
+// getan hat, und erinnert daran.
+
+const SICHERUNG_AENDERUNGEN = 25;  // ab so vielen Aenderungen faellig
+const SICHERUNG_TAGE = 14;         // oder wenn so lange nichts gesichert wurde
+
+// Wird von den Mutatoren ueber speichereState() nicht automatisch erhoeht:
+// nur inhaltliche Aenderungen zaehlen, nicht jedes Neuzeichnen.
+function sicherungZaehlen() {
+  const e = einstellungen();
+  e.aenderungenSeitSicherung = (e.aenderungenSeitSicherung || 0) + 1;
+}
+
+function sicherungStand() {
+  const e = einstellungen();
+  const aenderungen = e.aenderungenSeitSicherung || 0;
+  const letzte = e.letzteSicherung || null;
+  let tage = null;
+  if (letzte) {
+    tage = Math.floor((new Date().setHours(0, 0, 0, 0) - new Date(letzte).setHours(0, 0, 0, 0)) / 86400000);
+  }
+  // Ohne je erfolgte Sicherung gilt nur die Aenderungsschwelle: sonst stuende
+  // der Hinweis schon beim ersten Ausprobieren mit den Beispieldaten da.
+  const faellig = aenderungen >= SICHERUNG_AENDERUNGEN
+    || (tage !== null && tage >= SICHERUNG_TAGE && aenderungen > 0);
+  return { aenderungen, letzteSicherung: letzte, tageSeitSicherung: tage, faellig };
+}
+
+function sicherungVermerken() {
+  const e = einstellungen();
+  e.letzteSicherung = heuteIso();
+  e.aenderungenSeitSicherung = 0;
+  speichereState(false);
 }
 
 function zuruecksetzenAufBeispieldaten() {
@@ -42,13 +86,14 @@ function exportiereJSON() {
   const blob = new Blob([inhalt], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  const heute = new Date().toISOString().slice(0, 10);
+  const heute = heuteIso();
   link.href = url;
   link.download = `schulungsplaner-export-${heute}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+  sicherungVermerken();
 }
 
 // Prueft die Grobstruktur einer importierten Datei, BEVOR der bestehende
@@ -118,6 +163,27 @@ function importiereJSON(file) {
   });
 }
 
+// ---- Datumshilfen ----
+// toISOString() rechnet nach UTC um. In unserer Zeitzone (UTC+1/+2) faellt
+// dabei das Datum um einen Tag zurueck, sobald ein oertliches Mitternacht
+// umgerechnet wird - eine Auffrischung waere dann immer einen Tag zu frueh
+// faellig. Deshalb wird hier oertlich formatiert.
+function alsIsoDatum(datum) {
+  const monat = String(datum.getMonth() + 1).padStart(2, '0');
+  const tag = String(datum.getDate()).padStart(2, '0');
+  return `${datum.getFullYear()}-${monat}-${tag}`;
+}
+
+function heuteIso() {
+  return alsIsoDatum(new Date());
+}
+
+function inTagenIso(tage) {
+  const d = new Date();
+  d.setDate(d.getDate() + tage);
+  return alsIsoDatum(d);
+}
+
 function naechsteId(praefix, liste) {
   let hoechste = 0;
   for (const eintrag of liste) {
@@ -168,6 +234,7 @@ function erstelleKurs(felder) {
       ueberschrift: felder.ueberschrift || felder.titel,
       bestaetigungstext: felder.bestaetigungstext || STANDARD_BESTAETIGUNGSTEXT,
       gueltigkeit: felder.gueltigkeit || 'unbefristet',
+      auffrischungMonate: Number(felder.auffrischungMonate) || 0,
     },
     agenda: [],
     materialien: { seminarunterlagen: [], vorlagen: [] },
@@ -309,7 +376,7 @@ function erstelleBuchung(felder) {
     teilnehmerId: felder.teilnehmerId,
     terminId: felder.terminId,
     anmeldestatus: felder.anmeldestatus || 'angemeldet',
-    gebuchtAm: new Date().toISOString().slice(0, 10),
+    gebuchtAm: heuteIso(),
     anwesenheitProzent: null,
     fehlgrund: null,
     zertifikatNr: null,
@@ -366,7 +433,7 @@ function terminAuslastung(terminId) {
   // "Unterbesetzt" ist ein Handlungshinweis (Teilnehmer ansprechen, verschieben).
   // Bei einem vergangenen oder bereits abgeschlossenen Termin gibt es nichts mehr
   // zu tun - dort waere das Kennzeichen nur ein Dauer-Fehlalarm.
-  const heute = new Date().toISOString().slice(0, 10);
+  const heute = heuteIso();
   const nochAktionsrelevant = gefunden.termin.status !== 'abgeschlossen'
     && gefunden.termin.datum >= heute;
   return {
@@ -382,7 +449,7 @@ function terminAuslastung(terminId) {
 function naechsteZweiTermine(kursId) {
   const kurs = findeKurs(kursId);
   if (!kurs) throw new Error(`Kurs ${kursId} nicht gefunden`);
-  const heute = new Date().toISOString().slice(0, 10);
+  const heute = heuteIso();
   const sortiert = [...kurs.termine].sort((a, b) => a.datum.localeCompare(b.datum));
   const kommende = sortiert.filter(t => t.datum >= heute);
   const vergangene = sortiert.filter(t => t.datum < heute).reverse();
@@ -441,6 +508,9 @@ const EINSTELLUNGEN_VORGABE = {
   unterschriftName: '',
   stempelBild: null,
   ausstellungsort: '',
+  // Datensicherung: Datum des letzten Exports und Zahl der Aenderungen danach.
+  letzteSicherung: null,
+  aenderungenSeitSicherung: 0,
   // Vollstaendige Firmierung im Fuss der Bescheinigung. Vorbelegt aus dem
   // Impressum der tribeta-Website, dort aber als "i.G." gefuehrt - hier ohne
   // den Zusatz. Handelsregister- und Umsatzsteuernummer fehlen bewusst,
@@ -541,8 +611,8 @@ function termineFuerTrainer(trainerId) {
 
 // Nachweise, die abgelaufen sind oder in den naechsten 60 Tagen ablaufen.
 function trainerDokumentStatus(trainer) {
-  const heute = new Date().toISOString().slice(0, 10);
-  const grenze = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+  const heute = heuteIso();
+  const grenze = inTagenIso(60);
   let abgelaufen = 0;
   let laeuftBaldAb = 0;
   for (const dok of trainer.dokumente || []) {
@@ -559,7 +629,7 @@ function trainerDokumentStatus(trainer) {
 
 function statusAutomatikAnwenden() {
   const fristTage = einstellungen().bestaetigungsfristTage;
-  const heute = new Date().toISOString().slice(0, 10);
+  const heute = heuteIso();
   let geaendert = 0;
 
   for (const buchung of window.STATE.buchungen) {
@@ -739,9 +809,81 @@ function zertifikatAusstellungsdatumFuer(buchungId) {
   const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
   if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
   if (buchung.zertifikatAusgestelltAm) return buchung.zertifikatAusgestelltAm;
-  buchung.zertifikatAusgestelltAm = new Date().toISOString().slice(0, 10);
+  buchung.zertifikatAusgestelltAm = heuteIso();
   speichereState();
   return buchung.zertifikatAusgestelltAm;
+}
+
+// ---- Auffrischungen ----
+// Datenschutz- und Arbeitsschutzunterweisungen muessen wiederholt werden. Aus
+// dem Auffrischungsintervall des Kurses und dem Termindatum errechnet sich,
+// wann eine Person erneut zu schulen ist. Wer die Mindestteilnahme nicht
+// erreicht hat, gilt als nicht wirksam geschult und ist sofort faellig.
+// Wer bereits auf einem kuenftigen Termin desselben Kurses gebucht ist,
+// erscheint nicht - dort ist die Nachschulung schon vereinbart.
+
+function monateAddieren(isoDatum, monate) {
+  const d = new Date(isoDatum + 'T00:00:00');
+  const tagVorher = d.getDate();
+  d.setMonth(d.getMonth() + monate);
+  // Monatsende sauber behandeln: 31.01. + 1 Monat ist der 28./29.02.,
+  // nicht der 02./03.03.
+  if (d.getDate() < tagVorher) d.setDate(0);
+  return alsIsoDatum(d);
+}
+
+function hatFolgebuchung(teilnehmerId, kursId, abDatum) {
+  return window.STATE.buchungen.some(b => {
+    if (b.teilnehmerId !== teilnehmerId) return false;
+    if (b.anmeldestatus === 'abgesagt') return false;
+    const gefunden = findeTerminMitKurs(b.terminId);
+    if (!gefunden || gefunden.kurs.id !== kursId) return false;
+    return gefunden.termin.datum > abDatum;
+  });
+}
+
+function auffrischungenFaellig(horizontTage) {
+  const heute = heuteIso();
+  const grenze = inTagenIso(horizontTage || 90);
+  const eintraege = [];
+
+  for (const kurs of window.STATE.kurse) {
+    const monate = (kurs.zertifikat && kurs.zertifikat.auffrischungMonate) || 0;
+    if (!monate) continue;
+    for (const termin of kurs.termine) {
+      if (termin.datum > heute) continue;
+      for (const buchung of anwesenheitsBuchungen(termin.id)) {
+        const erfasst = buchung.anwesenheitProzent !== null && buchung.anwesenheitProzent !== undefined;
+        if (!erfasst) continue;
+        const teilnehmer = window.STATE.teilnehmer.find(t => t.id === buchung.teilnehmerId);
+        if (!teilnehmer) continue;
+
+        const wirksam = erfuelltMindestteilnahme(buchung);
+        const faelligAm = wirksam ? monateAddieren(termin.datum, monate) : heute;
+        if (faelligAm > grenze) continue;
+        if (hatFolgebuchung(teilnehmer.id, kurs.id, termin.datum)) continue;
+
+        eintraege.push({
+          teilnehmerId: teilnehmer.id, name: teilnehmer.name,
+          firma: teilnehmer.firma || '(ohne Firma)', email: teilnehmer.email || '',
+          kursId: kurs.id, kursTitel: kurs.titel,
+          geschultAm: termin.datum, faelligAm,
+          ueberfaellig: faelligAm < heute,
+          grund: wirksam ? 'Intervall abgelaufen' : `Teilnahme unter ${MINDEST_ANWESENHEIT} %`,
+        });
+      }
+    }
+  }
+
+  // Je Person und Kurs nur der juengste Nachweis zaehlt.
+  const beste = new Map();
+  for (const e of eintraege) {
+    const schluessel = e.teilnehmerId + '|' + e.kursId;
+    const vorhanden = beste.get(schluessel);
+    if (!vorhanden || e.geschultAm > vorhanden.geschultAm) beste.set(schluessel, e);
+  }
+  return [...beste.values()].sort((a, b) =>
+    a.faelligAm.localeCompare(b.faelligAm) || a.firma.localeCompare(b.firma, 'de'));
 }
 
 // ---- Phase 2: Schulungsabschluss ----
@@ -792,7 +934,7 @@ function terminAbschliessen(terminId, vorkommnisse) {
   // verschwinden.
   const bisherige = (gefunden.termin.abschluss && gefunden.termin.abschluss.wiedereroeffnungen) || [];
   gefunden.termin.abschluss = {
-    abgeschlossenAm: new Date().toISOString().slice(0, 10),
+    abgeschlossenAm: heuteIso(),
     vorkommnisse: vorkommnisse || '',
     wiedereroeffnungen: bisherige,
   };
@@ -806,7 +948,7 @@ function terminWiedereroeffnen(terminId) {
   if (!istTerminAbgeschlossen(terminId)) throw new Error('Dieser Termin ist nicht abgeschlossen.');
   // abschluss bleibt erhalten: die Wiedereroeffnung soll sichtbar bleiben,
   // nicht die Spur des Abschlusses loeschen.
-  gefunden.termin.abschluss.wiedereroeffnungen.push(new Date().toISOString().slice(0, 10));
+  gefunden.termin.abschluss.wiedereroeffnungen.push(heuteIso());
   gefunden.termin.status = 'geplant';
   speichereState();
 }

@@ -15,3 +15,20 @@
     <div id="uebersicht-naechste-termine"></div>
   </div>
 </div>
+
+<div class="card" style="padding:18px 22px; margin-top:18px;">
+  <div class="section-title">
+    Fällige Auffrischungen
+    <select id="uebersicht-auffrischung-horizont" class="filter-select" onchange="renderAuffrischungen()">
+      <option value="90">nächste 3 Monate</option>
+      <option value="180">nächste 6 Monate</option>
+      <option value="365">nächste 12 Monate</option>
+      <option value="0">nur bereits überfällige</option>
+    </select>
+  </div>
+  <p class="field-hint" style="margin:-4px 0 12px 0;">
+    Wer nachgeschult werden muss und noch keinen Folgetermin gebucht hat — nach Unternehmen gruppiert,
+    damit du gezielt ansprechen kannst.
+  </p>
+  <div id="uebersicht-auffrischungen"></div>
+</div>

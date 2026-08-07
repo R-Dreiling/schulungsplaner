@@ -55,7 +55,8 @@
       <div class="sidebar-footer">
         <div class="sidebar-tools">
           <button class="sidebar-tool-btn" onclick="oeffneEinstellungenDialog()">Unterschrift &amp; Stempel</button>
-          <button class="sidebar-tool-btn" onclick="exportiereJSON()">Exportieren</button>
+          <button class="sidebar-tool-btn" id="werkzeug-export" onclick="exportiereJSON()">Exportieren</button>
+          <div id="sicherungshinweis" class="sicherungshinweis" style="display:none"></div>
           <button class="sidebar-tool-btn" onclick="document.getElementById('import-input').click()">Importieren</button>
           <button class="sidebar-tool-btn" onclick="zuruecksetzenAufBeispieldaten()">Zurücksetzen</button>
           <button class="sidebar-tool-btn" onclick="alleDatenLeeren()">Alle Daten leeren</button>
@@ -166,7 +167,23 @@ document.getElementById('import-input').addEventListener('change', (ev) => {
   ev.target.value = '';
 });
 
+// Zeigt in der Werkzeugleiste an, wenn seit der letzten Sicherung genug
+// passiert ist. Bewusst dezent und ohne Dialog - beim Schulungsabschluss
+// fragt die App gezielt nach (siehe detailAbschlussSpeichern).
+function renderSicherungshinweis() {
+  const feld = document.getElementById('sicherungshinweis');
+  if (!feld || typeof sicherungStand !== 'function') return;
+  const s = sicherungStand();
+  if (!s.faellig) { feld.style.display = 'none'; return; }
+  const wann = s.letzteSicherung
+    ? `zuletzt vor ${s.tageSeitSicherung} Tag(en)`
+    : 'noch nie gesichert';
+  feld.innerHTML = `Sicherung fällig · ${s.aenderungen} Änderung(en), ${wann}`;
+  feld.style.display = 'block';
+}
+
 function renderAll() {
+  renderSicherungshinweis();
   if (typeof renderUebersicht === 'function') renderUebersicht();
   if (typeof renderSchulungen === 'function') renderSchulungen();
   if (typeof renderSchulungdetail === 'function') renderSchulungdetail(window.AKTUELLER_TERMIN_ID);

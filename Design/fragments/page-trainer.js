@@ -44,8 +44,8 @@ function trainerListeHtml() {
 }
 
 function trainerDokumentZeile(trainer, dok) {
-  const heute = new Date().toISOString().slice(0, 10);
-  const grenze = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+  const heute = heuteIso();
+  const grenze = inTagenIso(60);
   let fristHtml = '<span class="dok-frist ok">ohne Frist</span>';
   if (dok.gueltigBis) {
     let klasse = 'ok';

@@ -71,7 +71,7 @@ function renderUebersicht() {
       </div>`;
   }).join('');
 
-  const heute = new Date().toISOString().slice(0, 10);
+  const heute = heuteIso();
   const alleTermineMitKurs = window.STATE.kurse.flatMap(kurs =>
     kurs.termine.map(termin => ({ kurs, termin }))
   ).filter(({ termin }) =>
@@ -97,9 +97,73 @@ function renderUebersicht() {
         ${chip}
       </div>`;
   }).join('');
+
+  renderAuffrischungen();
 }
 
 function uebersichtToggle(kursId) {
   document.getElementById(`expand-${kursId}`).classList.toggle('open');
   document.getElementById(`toggle-${kursId}`).classList.toggle('open');
+}
+
+// ---- Faellige Auffrischungen ----
+// Zeigt, wer nachzuschulen ist und noch keinen Folgetermin hat. Nach
+// Unternehmen gruppiert: die Ansprache laeuft ueber den Arbeitgeber, nicht
+// ueber einzelne Beschaeftigte.
+
+function renderAuffrischungen() {
+  const container = document.getElementById('uebersicht-auffrischungen');
+  if (!container) return;
+  const wahl = document.getElementById('uebersicht-auffrischung-horizont');
+  const horizont = wahl ? Number(wahl.value) : 90;
+
+  // Ohne hinterlegtes Intervall kann nichts faellig werden - dann lieber
+  // sagen, wo es einzutragen ist, als eine leere Liste zu zeigen.
+  const mitIntervall = window.STATE.kurse.filter(
+    k => (k.zertifikat && k.zertifikat.auffrischungMonate) > 0);
+  if (mitIntervall.length === 0) {
+    container.innerHTML = '<p class="empty-hint">Noch kein Auffrischungsintervall hinterlegt. '
+      + 'Unter „Schulungen" beim Kurs auf „Bearbeiten" und dort „Auffrischung nach (Monaten)" eintragen — '
+      + 'z.&nbsp;B. 12 für eine jährliche Unterweisung.</p>';
+    return;
+  }
+
+  const faellig = auffrischungenFaellig(horizont);
+  if (faellig.length === 0) {
+    container.innerHTML = '<p class="empty-hint">Im gewählten Zeitraum steht keine Auffrischung an.</p>';
+    return;
+  }
+
+  const nachFirma = new Map();
+  for (const e of faellig) {
+    if (!nachFirma.has(e.firma)) nachFirma.set(e.firma, []);
+    nachFirma.get(e.firma).push(e);
+  }
+
+  container.innerHTML = [...nachFirma.entries()].map(([firma, eintraege]) => {
+    const ueberfaellig = eintraege.filter(e => e.ueberfaellig).length;
+    const zeilen = eintraege.map(e => `
+      <tr>
+        <td class="cell-strong">${escHtml(e.name)}</td>
+        <td>${escHtml(e.kursTitel)}</td>
+        <td>${formatiereDatum(e.geschultAm)}</td>
+        <td>${e.ueberfaellig
+          ? `<span class="badge badge-red">seit ${formatiereDatum(e.faelligAm)}</span>`
+          : formatiereDatum(e.faelligAm)}</td>
+        <td>${escHtml(e.grund)}</td>
+      </tr>`).join('');
+    return `
+      <div class="auffrischung-firma">
+        <div class="auffrischung-kopf">
+          <strong>${escHtml(firma)}</strong>
+          <span>${eintraege.length} Person(en)${ueberfaellig ? ` · ${ueberfaellig} überfällig` : ''}</span>
+        </div>
+        <div class="tabelle-scroll">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Schulung</th><th>zuletzt am</th><th>fällig</th><th>Grund</th></tr></thead>
+            <tbody>${zeilen}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('');
 }
