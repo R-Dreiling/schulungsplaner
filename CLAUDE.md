@@ -59,7 +59,8 @@ ausführen — sie brechen bewusst ab, wenn die Daten bereits migriert sind.
 ```
 Kurs (k*)      titel, kategorie, beschreibung, lernziele, voraussetzungen,
                format, minTeilnehmer, maxTeilnehmer,
-               zertifikat{kuerzel, umfangUE, ueberschrift, bestaetigungstext, gueltigkeit},
+               zertifikat{kuerzel, umfangUE, ueberschrift, bestaetigungstext, gueltigkeit,
+                          auffrischungMonate},
                agenda[], materialien{seminarunterlagen[], vorlagen[]}, termine[]
 Termin (s*|tm*) datum, trainerId, vertretungTrainerId, ort, status, checkliste[], abschluss
 Teilnehmer (t*) name, firma, email, bestandskunde
@@ -69,7 +70,8 @@ Buchung (b*)    teilnehmerId, terminId, anmeldestatus, gebuchtAm,
                 zertifikatAusgestelltAm, statusManuell
 Datei (d*)      Inhalt in IndexedDB, Referenz im State
 einstellungen   zertifikatStartNummer (147), bestaetigungsfristTage (7),
-                ausstellungsort, unterschriftBild, unterschriftName, stempelBild
+                ausstellungsort, unterschriftBild, unterschriftName, stempelBild,
+                firmenangaben, letzteSicherung, aenderungenSeitSicherung
 ```
 
 **Kursweit** (gilt für alle Termine): Beschreibung, Lernziele, Agenda, Materialien,
@@ -96,6 +98,9 @@ Teilnehmer, `tm` ist ein neu angelegter Termin.
   Liste. Einmal vergeben, bleiben sie stabil. Laufnummer ist das **letzte**
   Bindestrich-Segment (ein Kürzel darf selbst Bindestriche enthalten).
 - **Abgesagte Buchungen zählen nie zur Auslastung, Anwesenheit oder Bescheinigung.**
+- **Datumsangaben nie über `toISOString()`** — das rechnet nach UTC um und verschiebt in
+  unserer Zeitzone das Datum um einen Tag. Immer `heuteIso()`, `inTagenIso(n)` oder
+  `alsIsoDatum(date)` aus `state-engine.js` verwenden.
 - **Nachweisspuren nie überschreiben.** `wiedereroeffnungen` bleibt beim erneuten
   Abschließen erhalten.
 - Änderungen laufen über die Mutatoren in `state-engine.js`; die rufen `speichereState()`,

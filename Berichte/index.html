@@ -927,6 +927,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
     <p class="subtitle">Alle Anmeldungen, neueste zuerst.</p>
   </div>
   <div class="page-header-actions">
+    <button class="btn" onclick="oeffneSammelDialog()">Liste einfügen</button>
     <button class="btn btn-primary" onclick="oeffneNeueBuchungDialog()">+ Neue Buchung</button>
   </div>
 </div>
@@ -987,6 +988,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
     <button onclick="document.getElementById('hilfe-schritt-6').scrollIntoView({behavior:'smooth', block:'start'})">6. Vorbereitung</button>
     <button onclick="document.getElementById('hilfe-schritt-7').scrollIntoView({behavior:'smooth', block:'start'})">7. Anwesenheit</button>
     <button onclick="document.getElementById('hilfe-schritt-8').scrollIntoView({behavior:'smooth', block:'start'})">8. Abschluss</button>
+    <button onclick="document.getElementById('hilfe-auffrischung').scrollIntoView({behavior:'smooth', block:'start'})">Nachschulung</button>
     <button onclick="document.getElementById('hilfe-wiederfinden').scrollIntoView({behavior:'smooth', block:'start'})">Wiederfinden</button>
     <button onclick="document.getElementById('hilfe-sicherung').scrollIntoView({behavior:'smooth', block:'start'})">Sicherung</button>
     <button onclick="document.getElementById('hilfe-echtstart').scrollIntoView({behavior:'smooth', block:'start'})">Mit echten Daten starten</button>
@@ -1066,6 +1068,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
       <li>Auf der <strong>Detailseite des Termins</strong> über <strong>„+ Teilnehmer"</strong> — praktisch, wenn man ohnehin gerade an diesem Termin arbeitet.</li>
       <li>Im Bereich <strong>Buchungen</strong> über <strong>„+ Neue Buchung"</strong> — dort wählt man zuerst die Person, dann den Termin.</li>
     </ul>
+    <p>Meldet ein Kunde <strong>mehrere Beschäftigte auf einmal</strong>, führt der Weg über <strong>„Liste einfügen"</strong> im Bereich Buchungen: Termin wählen, die Liste aus Excel kopieren oder eintippen, fertig. Erkannt werden Tabulator, Semikolon und Komma; eine Kopfzeile wird übersprungen. Personen, die schon im Bestand sind, werden erkannt und nicht doppelt angelegt.</p>
     <p>In beiden Fällen lässt sich eine <strong>bereits bekannte Person</strong> auswählen oder über „— Neue Person —" eine neue mit Name, Firma und E-Mail anlegen. Ist der Termin voll, fragt das Programm nach, bucht auf Wunsch aber trotzdem.</p>
     <p>Jede Buchung hat einen <strong>Anmeldestatus</strong>: <em>angemeldet</em>, <em>bestätigt</em> oder <em>abgesagt</em>. Eine neue Buchung startet als „angemeldet" und wird automatisch auf „bestätigt" gesetzt, sobald der Termin höchstens sieben Tage entfernt ist. Sobald man den Status einmal von Hand ändert, lässt die Automatik diese Buchung für immer in Ruhe — erkennbar am fehlenden Uhr-Symbol ⏱ hinter dem Status.</p>
     <p><strong>Absagen statt löschen:</strong> Wer absagt, sollte auf „abgesagt" gesetzt und nicht entfernt werden. Abgesagte Buchungen geben ihren Platz wieder frei, bleiben aber als Spur erhalten und zählen später nirgends mit.</p>
@@ -1102,6 +1105,13 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
     <p>Der <strong>Abschlussbericht</strong> ist das Archivdokument für die eigenen Unterlagen. Er enthält Kurs- und Termindaten, die durchgeführte Agenda, alle Teilnehmer mit Anwesenheit und ausgestellter Bescheinigung, Kennzahlen, die Vorkommnisse und eine Unterschriftszeile. Zu erreichen ist er über das Banner auf der Detailseite oder über den Knopf <strong>„Bericht"</strong> in der Terminliste. Anders als die Bescheinigung enthält er bewusst alle Teilnehmer — er ist ein <strong>internes</strong> Dokument und nicht für den Versand an einzelne Teilnehmer gedacht.</p>
   </div>
 
+  <div class="hilfe-block" id="hilfe-auffrischung">
+    <h3>Wer muss nachgeschult werden?</h3>
+    <p>Trage am Kurs unter <strong>„Bearbeiten"</strong> das Feld <strong>„Auffrischung nach (Monaten)"</strong> ein — etwa 12 für eine jährliche Unterweisung. Leer oder 0 heißt: keine Auffrischung nötig.</p>
+    <p>Die <strong>Übersicht</strong> zeigt daraufhin unter „Fällige Auffrischungen", wer nachzuschulen ist — <strong>nach Unternehmen gruppiert</strong>, damit du den Kunden gezielt ansprechen kannst. Der Zeitraum lässt sich umstellen, von „nur bereits überfällige" bis „nächste 12 Monate".</p>
+    <p>Zwei Regeln dabei: Wer bereits auf einem <strong>künftigen Termin desselben Kurses gebucht</strong> ist, erscheint nicht — dort ist die Nachschulung schon vereinbart. Und wer die Mindestteilnahme von 80 % nicht erreicht hat, gilt als nicht wirksam geschult und steht <strong>sofort</strong> als fällig in der Liste.</p>
+  </div>
+
   <div class="hilfe-block" id="hilfe-wiederfinden">
     <h3>Etwas wiederfinden</h3>
     <ul>
@@ -1120,6 +1130,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
       <li><strong>Zurücksetzen</strong> stellt die mitgelieferten Beispieldaten wieder her. Alle eigenen Eingaben gehen verloren.</li>
       <li><strong>Alle Daten leeren</strong> löscht alles inklusive der hochgeladenen Dateien. Nicht umkehrbar.</li>
     </ul>
+    <p>Die App <strong>zählt mit</strong>, wie viel sich seit dem letzten Export getan hat, und weist unten links darauf hin, wenn eine Sicherung fällig ist. Nach dem <strong>Abschluss einer Schulung</strong> fragt sie ausdrücklich nach — dann sind die Nachweise vollständig und die Sicherung am wichtigsten.</p>
     <p>Wer den Browser-Speicher löscht (etwa über „Browserdaten löschen"), löscht damit auch die Daten dieses Programms. Ein Export vorher schützt davor.</p>
   </div>
 
@@ -1194,6 +1205,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
     <p>Bescheinigungen und der Abschlussbericht bleiben jederzeit druckbar. Die kursweiten Inhalte (Beschreibung, Agenda, Materialien) bleiben ebenfalls pflegbar, da sie zu künftigen Terminen desselben Kurses gehören.</p>
     <p>Korrekturen sind trotzdem möglich: <strong>„Wieder öffnen"</strong> hebt den Schutz auf. Das wird mit Datum festgehalten und im Abschlussbericht ausgewiesen — nicht verhindern, aber sichtbar machen.</p>
     <p>Der <strong>Abschlussbericht</strong> ist das interne Archivdokument: Kurs- und Termindaten, durchgeführte Agenda, alle Teilnehmer mit Anwesenheit und ausgestellter Bescheinigung, Kennzahlen, besondere Vorkommnisse und eine Unterschriftszeile. Anders als die Bescheinigung enthält er bewusst alle Teilnehmer. Du erreichst ihn über das Banner auf der Detailseite oder über den Knopf <strong>„Bericht"</strong> in der Terminliste.</p>
+    <p>Für den Kunden gibt es zusätzlich den <strong>Schulungsnachweis für den Arbeitgeber</strong>: unter der Teilnehmerliste steht je Unternehmen ein Knopf. Das Blatt führt nur die Beschäftigten dieses einen Unternehmens auf, mit Anwesenheit und Bescheinigungsnummern — der Arbeitgeber kann es direkt ablegen, ohne zwölf Einzelbescheinigungen zu sammeln.</p>
     <p>Auf der Seite <strong>Schulungen</strong> kannst du über den Filter <strong>„Termine"</strong> gezielt nur offene oder nur abgeschlossene Termine anzeigen. Ein wieder geöffneter Termin zählt dabei erneut als offen — er ist ja wieder in Arbeit; sein Bericht bleibt über „Bericht" trotzdem erreichbar.</p>
   </div>
 
@@ -4488,6 +4500,154 @@ function speichereNeueBuchung(ev) {
     statusManuell: felder.anmeldestatus !== 'angemeldet',
   }))) schliesseDialog();
   return false;
+}
+
+// ---- Teilnehmer sammelweise anlegen ----
+// Meldet ein Kunde mehrere Beschaeftigte, waere Einzeleingabe muehsam. Hier
+// laesst sich eine Liste einfuegen - aus Excel kopiert (Tabulator), als CSV
+// (Semikolon oder Komma) oder von Hand. Derselbe Weg nimmt spaeter die
+// Buchungen der Website entgegen: Zeilen rein, Personen und Buchungen raus.
+
+const SAMMEL_TRENNER = /\t|;|,/;
+
+// Erkennt eine Kopfzeile, damit "Name;Firma;E-Mail" nicht als Person landet.
+function sammelIstKopfzeile(felder) {
+  const erste = (felder[0] || '').toLowerCase();
+  return erste === 'name' || erste === 'nachname' || erste === 'teilnehmer';
+}
+
+function sammelZeilenLesen(text) {
+  const zeilen = String(text || '').split(/\r?\n/).map(z => z.trim()).filter(Boolean);
+  const ergebnis = [];
+  zeilen.forEach((zeile, i) => {
+    const felder = zeile.split(SAMMEL_TRENNER).map(f => f.trim());
+    if (i === 0 && sammelIstKopfzeile(felder)) return;
+    const [name, firma, email] = felder;
+    if (!name) return;
+    // Vorhandene Person: gleicher Name UND gleiche Firma. Nur der Name waere
+    // zu unsicher - Namensgleichheit ueber Unternehmen hinweg kommt vor.
+    const vorhanden = window.STATE.teilnehmer.find(t =>
+      t.name.toLowerCase() === name.toLowerCase()
+      && (t.firma || '').toLowerCase() === (firma || '').toLowerCase());
+    ergebnis.push({
+      name,
+      firma: firma || '',
+      email: email || (vorhanden ? vorhanden.email : ''),
+      vorhandenId: vorhanden ? vorhanden.id : null,
+      fehlt: !firma ? 'Firma fehlt' : (!email && !vorhanden ? 'E-Mail fehlt' : null),
+    });
+  });
+  return ergebnis;
+}
+
+function oeffneSammelDialog() {
+  const terminOptionen = window.STATE.kurse.map(k => `
+    <optgroup label="${escAttr(k.titel)}">
+      ${k.termine.map(t => {
+        const zu = istTerminAbgeschlossen(t.id);
+        return `<option value="${escAttr(t.id)}" ${zu ? 'disabled' : ''}>${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')}${zu ? ' · abgeschlossen' : ''}</option>`;
+      }).join('')}
+    </optgroup>`).join('');
+
+  oeffneDialog(`
+    <div class="dialog-head"><h3>Teilnehmer sammelweise buchen</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
+    <div class="dialog-body">
+      <div class="field">
+        <label>Termin</label>
+        <select id="sammel-termin" required>${terminOptionen}</select>
+      </div>
+      <div class="field">
+        <label>Liste einfügen</label>
+        <textarea id="sammel-text" rows="7" placeholder="Name;Firma;E-Mail&#10;Anna Weber;Muster GmbH;a.weber@muster.de&#10;Tim Below;Muster GmbH;t.below@muster.de"
+                  oninput="sammelVorschau()"></textarea>
+        <div class="field-hint">Eine Person je Zeile. Aus Excel kopierte Spalten funktionieren ebenso wie Semikolon oder Komma. Eine Kopfzeile wird erkannt.</div>
+      </div>
+      <div id="sammel-vorschau"></div>
+    </div>
+    <div class="dialog-foot">
+      <button type="button" class="btn" onclick="schliesseDialog()">Abbrechen</button>
+      <button type="button" class="btn btn-primary" onclick="sammelBuchen()">Buchen</button>
+    </div>`);
+  sammelVorschau();
+}
+
+function sammelVorschau() {
+  const feld = document.getElementById('sammel-vorschau');
+  if (!feld) return;
+  const eintraege = sammelZeilenLesen(document.getElementById('sammel-text').value);
+  if (eintraege.length === 0) {
+    feld.innerHTML = '<p class="empty-hint" style="padding:8px 0;">Noch nichts eingefügt.</p>';
+    return;
+  }
+  const neu = eintraege.filter(e => !e.vorhandenId).length;
+  const zeilen = eintraege.map(e => `
+    <tr>
+      <td class="cell-strong">${escHtml(e.name)}</td>
+      <td>${escHtml(e.firma || '—')}</td>
+      <td class="truncate" style="max-width:170px;" title="${escAttr(e.email)}">${escHtml(e.email || '—')}</td>
+      <td>${e.vorhandenId
+        ? '<span class="badge badge-gray">bekannt</span>'
+        : '<span class="badge badge-green">neu</span>'}
+        ${e.fehlt ? `<span class="badge badge-amber">${escHtml(e.fehlt)}</span>` : ''}</td>
+    </tr>`).join('');
+  feld.innerHTML = `
+    <div class="field-hint" style="margin-bottom:6px;">
+      ${eintraege.length} Person(en) erkannt · ${neu} neu, ${eintraege.length - neu} bereits im Bestand
+    </div>
+    <div class="tabelle-scroll" style="max-height:200px; overflow-y:auto;">
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>Firma</th><th>E-Mail</th><th></th></tr></thead>
+        <tbody>${zeilen}</tbody>
+      </table>
+    </div>`;
+}
+
+function sammelBuchen() {
+  const terminFeld = document.getElementById('sammel-termin');
+  const terminId = terminFeld ? terminFeld.value : '';
+  if (!terminId) { alert('Bitte einen Termin wählen.'); return; }
+  const eintraege = sammelZeilenLesen(document.getElementById('sammel-text').value);
+  if (eintraege.length === 0) { alert('Es wurde keine Person erkannt.'); return; }
+
+  // Riegel vor dem Anlegen: sonst entstuenden Personen ohne Buchung, wenn der
+  // Termin abgeschlossen ist (derselbe Fehler wie frueher im Einzeldialog).
+  if (istTerminAbgeschlossen(terminId)) {
+    alert('Dieser Termin ist abgeschlossen und schreibgeschützt – es lässt sich niemand mehr dazubuchen.');
+    return;
+  }
+
+  const a = terminAuslastung(terminId);
+  const frei = a.kapazitaet - a.belegt;
+  if (eintraege.length > frei && !confirm(
+      `Der Termin hat noch ${frei} freie(n) Platz/Plätze, gebucht werden sollen ${eintraege.length} Personen. Trotzdem fortfahren?`)) {
+    return;
+  }
+
+  let neu = 0, gebucht = 0, uebersprungen = 0;
+  const fehler = [];
+  for (const e of eintraege) {
+    try {
+      let teilnehmerId = e.vorhandenId;
+      if (!teilnehmerId) {
+        teilnehmerId = erstelleTeilnehmer({ name: e.name, firma: e.firma, email: e.email, bestandskunde: false });
+        neu++;
+      }
+      // Doppelbuchung auf denselben Termin vermeiden.
+      const schonGebucht = window.STATE.buchungen.some(
+        b => b.teilnehmerId === teilnehmerId && b.terminId === terminId && b.anmeldestatus !== 'abgesagt');
+      if (schonGebucht) { uebersprungen++; continue; }
+      erstelleBuchung({ teilnehmerId, terminId, anmeldestatus: 'angemeldet' });
+      gebucht++;
+    } catch (fehlerObj) {
+      fehler.push(`${e.name}: ${fehlerObj.message}`);
+    }
+  }
+
+  schliesseDialog();
+  const teile = [`${gebucht} Buchung(en) angelegt`, `${neu} Person(en) neu`];
+  if (uebersprungen) teile.push(`${uebersprungen} bereits auf diesem Termin gebucht`);
+  if (fehler.length) teile.push(`${fehler.length} Fehler:\n` + fehler.join('\n'));
+  alert(teile.join(' · '));
 }
 
 

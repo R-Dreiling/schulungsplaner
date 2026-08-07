@@ -177,3 +177,151 @@ function speichereNeueBuchung(ev) {
   }))) schliesseDialog();
   return false;
 }
+
+// ---- Teilnehmer sammelweise anlegen ----
+// Meldet ein Kunde mehrere Beschaeftigte, waere Einzeleingabe muehsam. Hier
+// laesst sich eine Liste einfuegen - aus Excel kopiert (Tabulator), als CSV
+// (Semikolon oder Komma) oder von Hand. Derselbe Weg nimmt spaeter die
+// Buchungen der Website entgegen: Zeilen rein, Personen und Buchungen raus.
+
+const SAMMEL_TRENNER = /\t|;|,/;
+
+// Erkennt eine Kopfzeile, damit "Name;Firma;E-Mail" nicht als Person landet.
+function sammelIstKopfzeile(felder) {
+  const erste = (felder[0] || '').toLowerCase();
+  return erste === 'name' || erste === 'nachname' || erste === 'teilnehmer';
+}
+
+function sammelZeilenLesen(text) {
+  const zeilen = String(text || '').split(/\r?\n/).map(z => z.trim()).filter(Boolean);
+  const ergebnis = [];
+  zeilen.forEach((zeile, i) => {
+    const felder = zeile.split(SAMMEL_TRENNER).map(f => f.trim());
+    if (i === 0 && sammelIstKopfzeile(felder)) return;
+    const [name, firma, email] = felder;
+    if (!name) return;
+    // Vorhandene Person: gleicher Name UND gleiche Firma. Nur der Name waere
+    // zu unsicher - Namensgleichheit ueber Unternehmen hinweg kommt vor.
+    const vorhanden = window.STATE.teilnehmer.find(t =>
+      t.name.toLowerCase() === name.toLowerCase()
+      && (t.firma || '').toLowerCase() === (firma || '').toLowerCase());
+    ergebnis.push({
+      name,
+      firma: firma || '',
+      email: email || (vorhanden ? vorhanden.email : ''),
+      vorhandenId: vorhanden ? vorhanden.id : null,
+      fehlt: !firma ? 'Firma fehlt' : (!email && !vorhanden ? 'E-Mail fehlt' : null),
+    });
+  });
+  return ergebnis;
+}
+
+function oeffneSammelDialog() {
+  const terminOptionen = window.STATE.kurse.map(k => `
+    <optgroup label="${escAttr(k.titel)}">
+      ${k.termine.map(t => {
+        const zu = istTerminAbgeschlossen(t.id);
+        return `<option value="${escAttr(t.id)}" ${zu ? 'disabled' : ''}>${formatiereDatum(t.datum)} · ${escHtml(trainerName(t.trainerId) || 'Kein Trainer')}${zu ? ' · abgeschlossen' : ''}</option>`;
+      }).join('')}
+    </optgroup>`).join('');
+
+  oeffneDialog(`
+    <div class="dialog-head"><h3>Teilnehmer sammelweise buchen</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
+    <div class="dialog-body">
+      <div class="field">
+        <label>Termin</label>
+        <select id="sammel-termin" required>${terminOptionen}</select>
+      </div>
+      <div class="field">
+        <label>Liste einfügen</label>
+        <textarea id="sammel-text" rows="7" placeholder="Name;Firma;E-Mail&#10;Anna Weber;Muster GmbH;a.weber@muster.de&#10;Tim Below;Muster GmbH;t.below@muster.de"
+                  oninput="sammelVorschau()"></textarea>
+        <div class="field-hint">Eine Person je Zeile. Aus Excel kopierte Spalten funktionieren ebenso wie Semikolon oder Komma. Eine Kopfzeile wird erkannt.</div>
+      </div>
+      <div id="sammel-vorschau"></div>
+    </div>
+    <div class="dialog-foot">
+      <button type="button" class="btn" onclick="schliesseDialog()">Abbrechen</button>
+      <button type="button" class="btn btn-primary" onclick="sammelBuchen()">Buchen</button>
+    </div>`);
+  sammelVorschau();
+}
+
+function sammelVorschau() {
+  const feld = document.getElementById('sammel-vorschau');
+  if (!feld) return;
+  const eintraege = sammelZeilenLesen(document.getElementById('sammel-text').value);
+  if (eintraege.length === 0) {
+    feld.innerHTML = '<p class="empty-hint" style="padding:8px 0;">Noch nichts eingefügt.</p>';
+    return;
+  }
+  const neu = eintraege.filter(e => !e.vorhandenId).length;
+  const zeilen = eintraege.map(e => `
+    <tr>
+      <td class="cell-strong">${escHtml(e.name)}</td>
+      <td>${escHtml(e.firma || '—')}</td>
+      <td class="truncate" style="max-width:170px;" title="${escAttr(e.email)}">${escHtml(e.email || '—')}</td>
+      <td>${e.vorhandenId
+        ? '<span class="badge badge-gray">bekannt</span>'
+        : '<span class="badge badge-green">neu</span>'}
+        ${e.fehlt ? `<span class="badge badge-amber">${escHtml(e.fehlt)}</span>` : ''}</td>
+    </tr>`).join('');
+  feld.innerHTML = `
+    <div class="field-hint" style="margin-bottom:6px;">
+      ${eintraege.length} Person(en) erkannt · ${neu} neu, ${eintraege.length - neu} bereits im Bestand
+    </div>
+    <div class="tabelle-scroll" style="max-height:200px; overflow-y:auto;">
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>Firma</th><th>E-Mail</th><th></th></tr></thead>
+        <tbody>${zeilen}</tbody>
+      </table>
+    </div>`;
+}
+
+function sammelBuchen() {
+  const terminFeld = document.getElementById('sammel-termin');
+  const terminId = terminFeld ? terminFeld.value : '';
+  if (!terminId) { alert('Bitte einen Termin wählen.'); return; }
+  const eintraege = sammelZeilenLesen(document.getElementById('sammel-text').value);
+  if (eintraege.length === 0) { alert('Es wurde keine Person erkannt.'); return; }
+
+  // Riegel vor dem Anlegen: sonst entstuenden Personen ohne Buchung, wenn der
+  // Termin abgeschlossen ist (derselbe Fehler wie frueher im Einzeldialog).
+  if (istTerminAbgeschlossen(terminId)) {
+    alert('Dieser Termin ist abgeschlossen und schreibgeschützt – es lässt sich niemand mehr dazubuchen.');
+    return;
+  }
+
+  const a = terminAuslastung(terminId);
+  const frei = a.kapazitaet - a.belegt;
+  if (eintraege.length > frei && !confirm(
+      `Der Termin hat noch ${frei} freie(n) Platz/Plätze, gebucht werden sollen ${eintraege.length} Personen. Trotzdem fortfahren?`)) {
+    return;
+  }
+
+  let neu = 0, gebucht = 0, uebersprungen = 0;
+  const fehler = [];
+  for (const e of eintraege) {
+    try {
+      let teilnehmerId = e.vorhandenId;
+      if (!teilnehmerId) {
+        teilnehmerId = erstelleTeilnehmer({ name: e.name, firma: e.firma, email: e.email, bestandskunde: false });
+        neu++;
+      }
+      // Doppelbuchung auf denselben Termin vermeiden.
+      const schonGebucht = window.STATE.buchungen.some(
+        b => b.teilnehmerId === teilnehmerId && b.terminId === terminId && b.anmeldestatus !== 'abgesagt');
+      if (schonGebucht) { uebersprungen++; continue; }
+      erstelleBuchung({ teilnehmerId, terminId, anmeldestatus: 'angemeldet' });
+      gebucht++;
+    } catch (fehlerObj) {
+      fehler.push(`${e.name}: ${fehlerObj.message}`);
+    }
+  }
+
+  schliesseDialog();
+  const teile = [`${gebucht} Buchung(en) angelegt`, `${neu} Person(en) neu`];
+  if (uebersprungen) teile.push(`${uebersprungen} bereits auf diesem Termin gebucht`);
+  if (fehler.length) teile.push(`${fehler.length} Fehler:\n` + fehler.join('\n'));
+  alert(teile.join(' · '));
+}

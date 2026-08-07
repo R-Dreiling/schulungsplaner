@@ -25,6 +25,7 @@
     <button onclick="document.getElementById('hilfe-schritt-6').scrollIntoView({behavior:'smooth', block:'start'})">6. Vorbereitung</button>
     <button onclick="document.getElementById('hilfe-schritt-7').scrollIntoView({behavior:'smooth', block:'start'})">7. Anwesenheit</button>
     <button onclick="document.getElementById('hilfe-schritt-8').scrollIntoView({behavior:'smooth', block:'start'})">8. Abschluss</button>
+    <button onclick="document.getElementById('hilfe-auffrischung').scrollIntoView({behavior:'smooth', block:'start'})">Nachschulung</button>
     <button onclick="document.getElementById('hilfe-wiederfinden').scrollIntoView({behavior:'smooth', block:'start'})">Wiederfinden</button>
     <button onclick="document.getElementById('hilfe-sicherung').scrollIntoView({behavior:'smooth', block:'start'})">Sicherung</button>
     <button onclick="document.getElementById('hilfe-echtstart').scrollIntoView({behavior:'smooth', block:'start'})">Mit echten Daten starten</button>
@@ -104,6 +105,7 @@
       <li>Auf der <strong>Detailseite des Termins</strong> über <strong>„+ Teilnehmer"</strong> — praktisch, wenn man ohnehin gerade an diesem Termin arbeitet.</li>
       <li>Im Bereich <strong>Buchungen</strong> über <strong>„+ Neue Buchung"</strong> — dort wählt man zuerst die Person, dann den Termin.</li>
     </ul>
+    <p>Meldet ein Kunde <strong>mehrere Beschäftigte auf einmal</strong>, führt der Weg über <strong>„Liste einfügen"</strong> im Bereich Buchungen: Termin wählen, die Liste aus Excel kopieren oder eintippen, fertig. Erkannt werden Tabulator, Semikolon und Komma; eine Kopfzeile wird übersprungen. Personen, die schon im Bestand sind, werden erkannt und nicht doppelt angelegt.</p>
     <p>In beiden Fällen lässt sich eine <strong>bereits bekannte Person</strong> auswählen oder über „— Neue Person —" eine neue mit Name, Firma und E-Mail anlegen. Ist der Termin voll, fragt das Programm nach, bucht auf Wunsch aber trotzdem.</p>
     <p>Jede Buchung hat einen <strong>Anmeldestatus</strong>: <em>angemeldet</em>, <em>bestätigt</em> oder <em>abgesagt</em>. Eine neue Buchung startet als „angemeldet" und wird automatisch auf „bestätigt" gesetzt, sobald der Termin höchstens sieben Tage entfernt ist. Sobald man den Status einmal von Hand ändert, lässt die Automatik diese Buchung für immer in Ruhe — erkennbar am fehlenden Uhr-Symbol ⏱ hinter dem Status.</p>
     <p><strong>Absagen statt löschen:</strong> Wer absagt, sollte auf „abgesagt" gesetzt und nicht entfernt werden. Abgesagte Buchungen geben ihren Platz wieder frei, bleiben aber als Spur erhalten und zählen später nirgends mit.</p>
@@ -140,6 +142,13 @@
     <p>Der <strong>Abschlussbericht</strong> ist das Archivdokument für die eigenen Unterlagen. Er enthält Kurs- und Termindaten, die durchgeführte Agenda, alle Teilnehmer mit Anwesenheit und ausgestellter Bescheinigung, Kennzahlen, die Vorkommnisse und eine Unterschriftszeile. Zu erreichen ist er über das Banner auf der Detailseite oder über den Knopf <strong>„Bericht"</strong> in der Terminliste. Anders als die Bescheinigung enthält er bewusst alle Teilnehmer — er ist ein <strong>internes</strong> Dokument und nicht für den Versand an einzelne Teilnehmer gedacht.</p>
   </div>
 
+  <div class="hilfe-block" id="hilfe-auffrischung">
+    <h3>Wer muss nachgeschult werden?</h3>
+    <p>Trage am Kurs unter <strong>„Bearbeiten"</strong> das Feld <strong>„Auffrischung nach (Monaten)"</strong> ein — etwa 12 für eine jährliche Unterweisung. Leer oder 0 heißt: keine Auffrischung nötig.</p>
+    <p>Die <strong>Übersicht</strong> zeigt daraufhin unter „Fällige Auffrischungen", wer nachzuschulen ist — <strong>nach Unternehmen gruppiert</strong>, damit du den Kunden gezielt ansprechen kannst. Der Zeitraum lässt sich umstellen, von „nur bereits überfällige" bis „nächste 12 Monate".</p>
+    <p>Zwei Regeln dabei: Wer bereits auf einem <strong>künftigen Termin desselben Kurses gebucht</strong> ist, erscheint nicht — dort ist die Nachschulung schon vereinbart. Und wer die Mindestteilnahme von 80 % nicht erreicht hat, gilt als nicht wirksam geschult und steht <strong>sofort</strong> als fällig in der Liste.</p>
+  </div>
+
   <div class="hilfe-block" id="hilfe-wiederfinden">
     <h3>Etwas wiederfinden</h3>
     <ul>
@@ -158,6 +167,7 @@
       <li><strong>Zurücksetzen</strong> stellt die mitgelieferten Beispieldaten wieder her. Alle eigenen Eingaben gehen verloren.</li>
       <li><strong>Alle Daten leeren</strong> löscht alles inklusive der hochgeladenen Dateien. Nicht umkehrbar.</li>
     </ul>
+    <p>Die App <strong>zählt mit</strong>, wie viel sich seit dem letzten Export getan hat, und weist unten links darauf hin, wenn eine Sicherung fällig ist. Nach dem <strong>Abschluss einer Schulung</strong> fragt sie ausdrücklich nach — dann sind die Nachweise vollständig und die Sicherung am wichtigsten.</p>
     <p>Wer den Browser-Speicher löscht (etwa über „Browserdaten löschen"), löscht damit auch die Daten dieses Programms. Ein Export vorher schützt davor.</p>
   </div>
 
@@ -232,6 +242,7 @@
     <p>Bescheinigungen und der Abschlussbericht bleiben jederzeit druckbar. Die kursweiten Inhalte (Beschreibung, Agenda, Materialien) bleiben ebenfalls pflegbar, da sie zu künftigen Terminen desselben Kurses gehören.</p>
     <p>Korrekturen sind trotzdem möglich: <strong>„Wieder öffnen"</strong> hebt den Schutz auf. Das wird mit Datum festgehalten und im Abschlussbericht ausgewiesen — nicht verhindern, aber sichtbar machen.</p>
     <p>Der <strong>Abschlussbericht</strong> ist das interne Archivdokument: Kurs- und Termindaten, durchgeführte Agenda, alle Teilnehmer mit Anwesenheit und ausgestellter Bescheinigung, Kennzahlen, besondere Vorkommnisse und eine Unterschriftszeile. Anders als die Bescheinigung enthält er bewusst alle Teilnehmer. Du erreichst ihn über das Banner auf der Detailseite oder über den Knopf <strong>„Bericht"</strong> in der Terminliste.</p>
+    <p>Für den Kunden gibt es zusätzlich den <strong>Schulungsnachweis für den Arbeitgeber</strong>: unter der Teilnehmerliste steht je Unternehmen ein Knopf. Das Blatt führt nur die Beschäftigten dieses einen Unternehmens auf, mit Anwesenheit und Bescheinigungsnummern — der Arbeitgeber kann es direkt ablegen, ohne zwölf Einzelbescheinigungen zu sammeln.</p>
     <p>Auf der Seite <strong>Schulungen</strong> kannst du über den Filter <strong>„Termine"</strong> gezielt nur offene oder nur abgeschlossene Termine anzeigen. Ein wieder geöffneter Termin zählt dabei erneut als offen — er ist ja wieder in Arbeit; sein Bericht bleibt über „Bericht" trotzdem erreichbar.</p>
   </div>
 
