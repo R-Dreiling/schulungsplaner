@@ -37,6 +37,31 @@ function zertifikatPlatzhalterFuellen(vorlage, werte) {
     .replace(/\{trainer\}/g, werte.trainer);
 }
 
+// Zeichnungsblock der Bescheinigung: links Ort und Ausstellungsdatum, rechts
+// die Unterschrift. Sind Unterschrift oder Stempel hinterlegt, werden sie
+// gedruckt - sonst bleiben die Linien leer zum Unterschreiben von Hand.
+function zertifikatZeichnung(buchungId) {
+  const e = einstellungen();
+  const datum = formatiereDatum(zertifikatAusstellungsdatumFuer(buchungId));
+  const ortDatum = e.ausstellungsort ? `${escHtml(e.ausstellungsort)}, ${datum}` : datum;
+  const name = e.unterschriftName ? escHtml(e.unterschriftName) : 'Leitung / Referent:in';
+
+  return `
+        <div class="zert-unterschriften">
+          <div class="zert-unterschrift">
+            <div class="zert-zeichnungsfeld"><span class="zert-ortdatum">${ortDatum}</span></div>
+            <div class="zert-linie"></div><span>Ort, Datum</span>
+          </div>
+          <div class="zert-unterschrift">
+            <div class="zert-zeichnungsfeld">
+              ${e.unterschriftBild ? `<img class="zert-unterschriftbild" src="${escAttr(e.unterschriftBild)}" alt="" />` : ''}
+            </div>
+            <div class="zert-linie"></div><span>${name}</span>
+          </div>
+        </div>
+        ${e.stempelBild ? `<img class="zert-stempel" src="${escAttr(e.stempelBild)}" alt="" />` : ''}`;
+}
+
 function zertifikatHtml(buchungId) {
   const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
   if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
@@ -99,10 +124,7 @@ function zertifikatHtml(buchungId) {
           </div>
         </div>
 
-        <div class="zert-unterschriften">
-          <div class="zert-unterschrift"><div class="zert-linie"></div><span>Ort, Datum</span></div>
-          <div class="zert-unterschrift"><div class="zert-linie"></div><span>Leitung / Referent:in</span></div>
-        </div>
+        ${zertifikatZeichnung(buchungId)}
         ${druckFusszeile('tribeta GmbH')}
       </div>
     </div>`;

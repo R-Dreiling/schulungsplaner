@@ -517,6 +517,17 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
 
 /* Schrittnummer vor der Ueberschrift eines Anleitungsschritts */
 .hilfe-schritt h3 { display: flex; align-items: baseline; gap: 9px; }
+/* Einstellungsdialog: Bildfelder fuer Unterschrift und Stempel */
+.einst-bildfeld { display: flex; align-items: center; gap: 12px; }
+.einst-bildvorschau {
+  width: 130px; height: 58px; flex: none; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); background: var(--card-2);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.einst-bildvorschau img { max-width: 100%; max-height: 100%; }
+.einst-bildvorschau.leer span { font-size: 11px; color: var(--muted2); }
+.einst-bildaktionen { display: flex; gap: 8px; flex-wrap: wrap; }
+
 .hilfe-schritt .schritt-nr {
   flex: none; font-size: 11px; font-weight: 700; color: var(--teal-deep);
   background: var(--card-2); border: 1px solid var(--line); border-radius: 999px;
@@ -650,10 +661,25 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
 }
 .zert-daten .v { font-size: 11pt; font-weight: 600; color: var(--ink); }
 
-.zert-unterschriften { display: flex; justify-content: space-between; gap: 16mm; margin-top: 18mm; }
+.zert-unterschriften { display: flex; justify-content: space-between; gap: 16mm; margin-top: 18mm; position: relative; }
 .zert-unterschrift { flex: 1; text-align: center; }
 .zert-linie { border-top: 1px solid var(--ink); margin-bottom: 5px; }
 .zert-unterschrift span { font-size: 8.5pt; color: var(--muted); }
+/* Raum ueber der Linie: dort steht das Ausstellungsdatum bzw. die hinterlegte
+   Unterschrift. Feste Hoehe, damit beide Spalten auf gleicher Linie sitzen -
+   auch wenn nur eine von beiden gefuellt ist. */
+.zert-zeichnungsfeld {
+  height: 16mm; display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 1.5mm;
+}
+.zert-ortdatum { font-size: 10pt; color: var(--ink); }
+.zert-unterschriftbild { max-height: 15mm; max-width: 100%; }
+/* Der Stempel sitzt leicht schraeg neben der Unterschrift, wie von Hand
+   aufgebracht. */
+.zert-stempel {
+  position: absolute; right: 6mm; bottom: 2mm; max-height: 26mm; max-width: 42mm;
+  transform: rotate(-7deg); opacity: .92;
+}
 
 /* --- Abschlussbericht --- */
 .bericht-kopf { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 2px solid var(--teal); padding-bottom: 12px; margin-bottom: 18px; }

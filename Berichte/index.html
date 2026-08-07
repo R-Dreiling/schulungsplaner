@@ -523,6 +523,17 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
 
 /* Schrittnummer vor der Ueberschrift eines Anleitungsschritts */
 .hilfe-schritt h3 { display: flex; align-items: baseline; gap: 9px; }
+/* Einstellungsdialog: Bildfelder fuer Unterschrift und Stempel */
+.einst-bildfeld { display: flex; align-items: center; gap: 12px; }
+.einst-bildvorschau {
+  width: 130px; height: 58px; flex: none; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); background: var(--card-2);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.einst-bildvorschau img { max-width: 100%; max-height: 100%; }
+.einst-bildvorschau.leer span { font-size: 11px; color: var(--muted2); }
+.einst-bildaktionen { display: flex; gap: 8px; flex-wrap: wrap; }
+
 .hilfe-schritt .schritt-nr {
   flex: none; font-size: 11px; font-weight: 700; color: var(--teal-deep);
   background: var(--card-2); border: 1px solid var(--line); border-radius: 999px;
@@ -656,10 +667,25 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
 }
 .zert-daten .v { font-size: 11pt; font-weight: 600; color: var(--ink); }
 
-.zert-unterschriften { display: flex; justify-content: space-between; gap: 16mm; margin-top: 18mm; }
+.zert-unterschriften { display: flex; justify-content: space-between; gap: 16mm; margin-top: 18mm; position: relative; }
 .zert-unterschrift { flex: 1; text-align: center; }
 .zert-linie { border-top: 1px solid var(--ink); margin-bottom: 5px; }
 .zert-unterschrift span { font-size: 8.5pt; color: var(--muted); }
+/* Raum ueber der Linie: dort steht das Ausstellungsdatum bzw. die hinterlegte
+   Unterschrift. Feste Hoehe, damit beide Spalten auf gleicher Linie sitzen -
+   auch wenn nur eine von beiden gefuellt ist. */
+.zert-zeichnungsfeld {
+  height: 16mm; display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 1.5mm;
+}
+.zert-ortdatum { font-size: 10pt; color: var(--ink); }
+.zert-unterschriftbild { max-height: 15mm; max-width: 100%; }
+/* Der Stempel sitzt leicht schraeg neben der Unterschrift, wie von Hand
+   aufgebracht. */
+.zert-stempel {
+  position: absolute; right: 6mm; bottom: 2mm; max-height: 26mm; max-width: 42mm;
+  transform: rotate(-7deg); opacity: .92;
+}
 
 /* --- Abschlussbericht --- */
 .bericht-kopf { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 2px solid var(--teal); padding-bottom: 12px; margin-bottom: 18px; }
@@ -785,6 +811,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
       </div>
       <div class="sidebar-footer">
         <div class="sidebar-tools">
+          <button class="sidebar-tool-btn" onclick="oeffneEinstellungenDialog()">Unterschrift &amp; Stempel</button>
           <button class="sidebar-tool-btn" onclick="exportiereJSON()">Exportieren</button>
           <button class="sidebar-tool-btn" onclick="document.getElementById('import-input').click()">Importieren</button>
           <button class="sidebar-tool-btn" onclick="zuruecksetzenAufBeispieldaten()">Zurücksetzen</button>
@@ -1115,6 +1142,9 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
     <p>Ab <strong>80 % Anwesenheit</strong> lässt sich für eine Person eine <strong>Teilnahmebescheinigung</strong> drucken. Darunter bleibt der Knopf gesperrt; zeigst du mit der Maus darauf, nennt er den Grund. Die Bescheinigung wird bewusst <strong>immer nur einzeln</strong> erzeugt — ein Sammeldokument würde beim Versand an eine Person die Daten aller anderen mitliefern.</p>
     <p>Jede Bescheinigung bekommt eine fortlaufende <strong>Zertifikatsnummer</strong> (Schema Jahr-Kürzel-Nummer, z.&nbsp;B. 2026-DSB-0147). Sie wird beim ersten Druck vergeben und bleibt danach unverändert — ein zweiter Ausdruck trägt dieselbe Nummer.</p>
     <p>Gedruckt wird über die Druckfunktion deines Browsers; dort wählst du „Als PDF speichern". Der vorgeschlagene Dateiname enthält Nummer und Namen.</p>
+    <p><strong>Was auf der Bescheinigung steht, legst du am Kurs fest</strong> — über „Bearbeiten" in der Kurszeile: Überschrift, Bestätigungstext, Kürzel und Gültigkeit. Die Angaben gelten für alle Teilnehmer dieses Kurses gleichzeitig. So bekommt eine Schulung mit Prüfung einen anderen Wortlaut als eine ohne, ohne dass du etwas doppelt pflegst. Im Bestätigungstext dürfen Platzhalter stehen: {teilnehmer}, {kurs}, {umfang}, {datum}, {ort}, {trainer}.</p>
+    <p><strong>Unterschrift und Stempel</strong> hinterlegst du einmal für alle Bescheinigungen unter <strong>„Unterschrift &amp; Stempel"</strong> unten links: Ausstellungsort, ein Unterschriftsbild, der Name darunter und ein Firmenstempel. Am besten PNG mit durchsichtigem Hintergrund; große Bilder werden automatisch verkleinert. Ist nichts hinterlegt, bleiben die Linien frei zum Unterschreiben von Hand.</p>
+    <p>Das <strong>Ausstellungsdatum</strong> ist der Tag, an dem die Bescheinigung erzeugt wird. Es wird wie die Nummer beim ersten Druck festgehalten — ein zweiter Ausdruck trägt dasselbe Datum und ist damit dasselbe Dokument.</p>
   </div>
 
   <div class="hilfe-block">
@@ -1594,6 +1624,14 @@ function materialEntfernen(kursId, bereich, dateiId) {
 const EINSTELLUNGEN_VORGABE = {
   zertifikatStartNummer: 147,
   bestaetigungsfristTage: 7,
+  // Zeichnung der Bescheinigung. Die Bilder liegen als Data-URL direkt im
+  // State und nicht wie Materialien in IndexedDB: die Bescheinigung wird
+  // synchron aufgebaut, ein asynchroner Zugriff waere dort nicht moeglich.
+  // Beim Hochladen werden sie deshalb verkleinert (siehe einstellungBildSetzen).
+  unterschriftBild: null,
+  unterschriftName: '',
+  stempelBild: null,
+  ausstellungsort: '',
 };
 
 function einstellungen() {
@@ -1877,6 +1915,19 @@ function zertifikatNummerFuer(buchungId) {
   return buchung.zertifikatNr;
 }
 
+// Ausstellungsdatum der Bescheinigung: der Tag, an dem sie erzeugt wurde.
+// Wie die Nummer wird es beim ersten Druck festgeschrieben - ein Nachdruck
+// muss dasselbe Dokument ergeben und darf nicht ploetzlich ein spaeteres
+// Datum tragen.
+function zertifikatAusstellungsdatumFuer(buchungId) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  if (buchung.zertifikatAusgestelltAm) return buchung.zertifikatAusgestelltAm;
+  buchung.zertifikatAusgestelltAm = new Date().toISOString().slice(0, 10);
+  speichereState();
+  return buchung.zertifikatAusgestelltAm;
+}
+
 // ---- Phase 2: Schulungsabschluss ----
 // Abschluss bedeutet Festschreibung: eine nachtraeglich beliebig aenderbare
 // Anwesenheitsliste waere als Nachweis wertlos. Wiedereroeffnen bleibt
@@ -2065,6 +2116,56 @@ async function alleDateienLoeschen() {
   });
 }
 
+// ---- Zeichnungsbilder (Unterschrift, Stempel) ----
+// Anders als Materialien landen diese beiden nicht in IndexedDB, sondern als
+// Data-URL im State: die Bescheinigung wird synchron aufgebaut und koennte
+// nicht auf einen asynchronen Datenbankzugriff warten. Damit der localStorage
+// nicht volllaeuft, wird das Bild vorher auf eine Druckgroesse verkleinert.
+
+const ZEICHNUNG_MAX_BREITE = 700;   // reicht fuer den Druck bei ~45 mm Breite
+const ZEICHNUNG_MAX_BYTES = 400000; // Sicherheitsgrenze fuer den State
+
+function bildAufDruckgroesseVerkleinern(datei) {
+  return new Promise((resolve, reject) => {
+    if (!/^image\//.test(datei.type)) {
+      reject(new Error('Bitte eine Bilddatei wählen (PNG mit transparentem Hintergrund ist am besten).'));
+      return;
+    }
+    const leser = new FileReader();
+    leser.onerror = () => reject(new Error('Datei konnte nicht gelesen werden.'));
+    leser.onload = () => {
+      const bild = new Image();
+      bild.onerror = () => reject(new Error('Bild konnte nicht gelesen werden.'));
+      bild.onload = () => {
+        const faktor = Math.min(1, ZEICHNUNG_MAX_BREITE / bild.width);
+        const leinwand = document.createElement('canvas');
+        leinwand.width = Math.round(bild.width * faktor);
+        leinwand.height = Math.round(bild.height * faktor);
+        // PNG erhaelt die Transparenz - bei einer Unterschrift ist genau das
+        // entscheidend, sonst liegt ein weisser Kasten auf dem Untergrund.
+        leinwand.getContext('2d').drawImage(bild, 0, 0, leinwand.width, leinwand.height);
+        const datenUrl = leinwand.toDataURL('image/png');
+        if (datenUrl.length > ZEICHNUNG_MAX_BYTES) {
+          reject(new Error('Das Bild ist auch verkleinert noch zu groß. Bitte einen engeren Ausschnitt wählen.'));
+          return;
+        }
+        resolve(datenUrl);
+      };
+      bild.src = leser.result;
+    };
+    leser.readAsDataURL(datei);
+  });
+}
+
+async function einstellungBildSetzen(feld, datei) {
+  if (feld !== 'unterschriftBild' && feld !== 'stempelBild') {
+    throw new Error(`Unbekanntes Bildfeld: ${feld}`);
+  }
+  const datenUrl = await bildAufDruckgroesseVerkleinern(datei);
+  aktualisiereEinstellungen({ [feld]: datenUrl });
+  return datenUrl;
+}
+
 
 // ---- ui-helpers.js ----
 // Design/ui-helpers.js
@@ -2158,6 +2259,112 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </script>
 <script>
+// ---- einstellungen.js ----
+// Design/fragments/einstellungen.js
+// Dialog fuer die Angaben, die auf jeder Bescheinigung gleich sind:
+// Ausstellungsort, Unterschrift und Firmenstempel. Kein Seiten-Fragment -
+// der Dialog wird aus der Werkzeugleiste der Seitenleiste geoeffnet.
+
+function einstellungenVorschauBild(feld, beschriftung) {
+  const e = einstellungen();
+  const bild = e[feld];
+  const knopfText = bild ? 'Bild ersetzen' : 'Bild wählen';
+  return `
+    <div class="einst-bildfeld">
+      <div class="einst-bildvorschau ${bild ? '' : 'leer'}">
+        ${bild
+          ? `<img src="${escAttr(bild)}" alt="${escAttr(beschriftung)}" />`
+          : '<span>noch kein Bild</span>'}
+      </div>
+      <div class="einst-bildaktionen">
+        <label class="datei-wahl">
+          <input type="file" accept="image/*" onchange="einstellungenBildGewaehlt(event, '${escJsArg(feld)}')" />
+          <span class="datei-wahl-knopf">${knopfText}</span>
+        </label>
+        ${bild ? `<button type="button" class="btn btn-ghost-red" onclick="einstellungenBildEntfernen('${escJsArg(feld)}')">Entfernen</button>` : ''}
+      </div>
+    </div>`;
+}
+
+function oeffneEinstellungenDialog() {
+  const e = einstellungen();
+  oeffneDialog(`
+    <div class="dialog-head"><h3>Bescheinigungen: Ort, Unterschrift, Stempel</h3><button class="dialog-close" onclick="schliesseDialog()">✕</button></div>
+    <div class="dialog-body">
+      <p class="field-hint" style="margin:0;">
+        Diese Angaben erscheinen auf <strong>jeder</strong> Teilnahmebescheinigung.
+        Anwesenheitsliste und Abschlussbericht bleiben zum Unterschreiben von Hand.
+      </p>
+
+      <div class="field">
+        <label>Ausstellungsort</label>
+        <input id="einst-ort" value="${escAttr(e.ausstellungsort || '')}" placeholder="z. B. Hamburg" />
+        <div class="field-hint">Erscheint mit dem Ausstellungsdatum unter der Bescheinigung. Leer lassen heißt: nur das Datum.</div>
+      </div>
+
+      <div class="field">
+        <label>Unterschrift</label>
+        ${einstellungenVorschauBild('unterschriftBild', 'Unterschrift')}
+        <div class="field-hint">PNG mit durchsichtigem Hintergrund sieht am besten aus. Große Bilder werden automatisch verkleinert.</div>
+      </div>
+
+      <div class="field">
+        <label>Name und Funktion unter der Unterschrift</label>
+        <input id="einst-unterschrift-name" value="${escAttr(e.unterschriftName || '')}" placeholder="z. B. Dr. Julia Berg, Geschäftsführung" />
+        <div class="field-hint">Bleibt das Feld leer, steht dort „Leitung / Referent:in".</div>
+      </div>
+
+      <div class="field">
+        <label>Firmenstempel</label>
+        ${einstellungenVorschauBild('stempelBild', 'Stempel')}
+      </div>
+    </div>
+    <div class="dialog-foot">
+      <button type="button" class="btn" onclick="schliesseDialog()">Schließen</button>
+      <button type="button" class="btn btn-primary" onclick="einstellungenTexteSpeichern()">Speichern</button>
+    </div>`);
+}
+
+// Die Bilder werden sofort beim Auswaehlen uebernommen (mit Verkleinerung),
+// die Textfelder erst ueber "Speichern" - deshalb der Dialog danach neu
+// aufgebaut, damit die Vorschau den neuen Stand zeigt.
+function einstellungenBildGewaehlt(ev, feld) {
+  const datei = ev.target.files && ev.target.files[0];
+  if (!datei) return;
+  einstellungBildSetzen(feld, datei)
+    .then(() => {
+      einstellungenTexteLesen();
+      schliesseDialog();
+      oeffneEinstellungenDialog();
+    })
+    .catch(err => alert(err.message));
+}
+
+function einstellungenBildEntfernen(feld) {
+  if (!confirm('Dieses Bild wirklich entfernen?')) return;
+  einstellungenTexteLesen();
+  aktualisiereEinstellungen({ [feld]: null });
+  schliesseDialog();
+  oeffneEinstellungenDialog();
+}
+
+// Liest die Textfelder aus dem offenen Dialog, ohne ihn zu schliessen.
+function einstellungenTexteLesen() {
+  const ort = document.getElementById('einst-ort');
+  const name = document.getElementById('einst-unterschrift-name');
+  if (!ort || !name) return;
+  aktualisiereEinstellungen({
+    ausstellungsort: ort.value.trim(),
+    unterschriftName: name.value.trim(),
+  });
+}
+
+function einstellungenTexteSpeichern() {
+  einstellungenTexteLesen();
+  schliesseDialog();
+}
+
+
 // ---- druck-vorlagen.js ----
 // Design/fragments/druck-vorlagen.js
 // Baut Bescheinigung, Anwesenheitsliste und Abschlussbericht als HTML fuer den
@@ -2196,6 +2403,31 @@ function zertifikatPlatzhalterFuellen(vorlage, werte) {
     .replace(/\{datum\}/g, werte.datum)
     .replace(/\{ort\}/g, werte.ort)
     .replace(/\{trainer\}/g, werte.trainer);
+}
+
+// Zeichnungsblock der Bescheinigung: links Ort und Ausstellungsdatum, rechts
+// die Unterschrift. Sind Unterschrift oder Stempel hinterlegt, werden sie
+// gedruckt - sonst bleiben die Linien leer zum Unterschreiben von Hand.
+function zertifikatZeichnung(buchungId) {
+  const e = einstellungen();
+  const datum = formatiereDatum(zertifikatAusstellungsdatumFuer(buchungId));
+  const ortDatum = e.ausstellungsort ? `${escHtml(e.ausstellungsort)}, ${datum}` : datum;
+  const name = e.unterschriftName ? escHtml(e.unterschriftName) : 'Leitung / Referent:in';
+
+  return `
+        <div class="zert-unterschriften">
+          <div class="zert-unterschrift">
+            <div class="zert-zeichnungsfeld"><span class="zert-ortdatum">${ortDatum}</span></div>
+            <div class="zert-linie"></div><span>Ort, Datum</span>
+          </div>
+          <div class="zert-unterschrift">
+            <div class="zert-zeichnungsfeld">
+              ${e.unterschriftBild ? `<img class="zert-unterschriftbild" src="${escAttr(e.unterschriftBild)}" alt="" />` : ''}
+            </div>
+            <div class="zert-linie"></div><span>${name}</span>
+          </div>
+        </div>
+        ${e.stempelBild ? `<img class="zert-stempel" src="${escAttr(e.stempelBild)}" alt="" />` : ''}`;
 }
 
 function zertifikatHtml(buchungId) {
@@ -2260,10 +2492,7 @@ function zertifikatHtml(buchungId) {
           </div>
         </div>
 
-        <div class="zert-unterschriften">
-          <div class="zert-unterschrift"><div class="zert-linie"></div><span>Ort, Datum</span></div>
-          <div class="zert-unterschrift"><div class="zert-linie"></div><span>Leitung / Referent:in</span></div>
-        </div>
+        ${zertifikatZeichnung(buchungId)}
         ${druckFusszeile('tribeta GmbH')}
       </div>
     </div>`;

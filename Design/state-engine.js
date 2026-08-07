@@ -433,6 +433,14 @@ function materialEntfernen(kursId, bereich, dateiId) {
 const EINSTELLUNGEN_VORGABE = {
   zertifikatStartNummer: 147,
   bestaetigungsfristTage: 7,
+  // Zeichnung der Bescheinigung. Die Bilder liegen als Data-URL direkt im
+  // State und nicht wie Materialien in IndexedDB: die Bescheinigung wird
+  // synchron aufgebaut, ein asynchroner Zugriff waere dort nicht moeglich.
+  // Beim Hochladen werden sie deshalb verkleinert (siehe einstellungBildSetzen).
+  unterschriftBild: null,
+  unterschriftName: '',
+  stempelBild: null,
+  ausstellungsort: '',
 };
 
 function einstellungen() {
@@ -714,6 +722,19 @@ function zertifikatNummerFuer(buchungId) {
   buchung.zertifikatNr = `${jahr}-${kuerzel}-${naechsteZertifikatNummer()}`;
   speichereState();
   return buchung.zertifikatNr;
+}
+
+// Ausstellungsdatum der Bescheinigung: der Tag, an dem sie erzeugt wurde.
+// Wie die Nummer wird es beim ersten Druck festgeschrieben - ein Nachdruck
+// muss dasselbe Dokument ergeben und darf nicht ploetzlich ein spaeteres
+// Datum tragen.
+function zertifikatAusstellungsdatumFuer(buchungId) {
+  const buchung = window.STATE.buchungen.find(b => b.id === buchungId);
+  if (!buchung) throw new Error(`Buchung ${buchungId} nicht gefunden`);
+  if (buchung.zertifikatAusgestelltAm) return buchung.zertifikatAusgestelltAm;
+  buchung.zertifikatAusgestelltAm = new Date().toISOString().slice(0, 10);
+  speichereState();
+  return buchung.zertifikatAusgestelltAm;
 }
 
 // ---- Phase 2: Schulungsabschluss ----

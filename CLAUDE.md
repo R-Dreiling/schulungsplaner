@@ -65,9 +65,11 @@ Termin (s*|tm*) datum, trainerId, vertretungTrainerId, ort, status, checkliste[]
 Teilnehmer (t*) name, firma, email, bestandskunde
 Trainer (tr*)   name, email, telefon, qualifikation, notizen, dokumente[]
 Buchung (b*)    teilnehmerId, terminId, anmeldestatus, gebuchtAm,
-                anwesenheitProzent, fehlgrund, zertifikatNr, statusManuell
+                anwesenheitProzent, fehlgrund, zertifikatNr,
+                zertifikatAusgestelltAm, statusManuell
 Datei (d*)      Inhalt in IndexedDB, Referenz im State
-einstellungen   zertifikatStartNummer (147), bestaetigungsfristTage (7)
+einstellungen   zertifikatStartNummer (147), bestaetigungsfristTage (7),
+                ausstellungsort, unterschriftBild, unterschriftName, stempelBild
 ```
 
 **Kursweit** (gilt für alle Termine): Beschreibung, Lernziele, Agenda, Materialien,

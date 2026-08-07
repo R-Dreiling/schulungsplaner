@@ -37,11 +37,13 @@ for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-
     js = read(FRAGMENTS / f"{name}.js")
     if js.strip():
         page_js_parts.append(f"// ---- {name}.js ----\n{js}")
-# Gemeinsame Druckvorlagen (Bescheinigung/Bericht) - kein Seiten-Fragment,
-# wird aber wie eines eingebettet, damit alle Seiten sie nutzen koennen.
-druck_js = read(FRAGMENTS / "druck-vorlagen.js")
-if druck_js.strip():
-    page_js_parts.insert(0, f"// ---- druck-vorlagen.js ----\n{druck_js}")
+# Gemeinsame Druckvorlagen (Bescheinigung/Bericht) und der Einstellungsdialog -
+# keine Seiten-Fragmente, werden aber wie welche eingebettet, damit alle Seiten
+# sie nutzen koennen.
+for extra in ["druck-vorlagen", "einstellungen"]:
+    extra_js = read(FRAGMENTS / f"{extra}.js")
+    if extra_js.strip():
+        page_js_parts.insert(0, f"// ---- {extra}.js ----\n{extra_js}")
 
 page_js = "\n\n".join(page_js_parts)
 

@@ -116,3 +116,53 @@ async function alleDateienLoeschen() {
     tx.onerror = () => reject(tx.error);
   });
 }
+
+// ---- Zeichnungsbilder (Unterschrift, Stempel) ----
+// Anders als Materialien landen diese beiden nicht in IndexedDB, sondern als
+// Data-URL im State: die Bescheinigung wird synchron aufgebaut und koennte
+// nicht auf einen asynchronen Datenbankzugriff warten. Damit der localStorage
+// nicht volllaeuft, wird das Bild vorher auf eine Druckgroesse verkleinert.
+
+const ZEICHNUNG_MAX_BREITE = 700;   // reicht fuer den Druck bei ~45 mm Breite
+const ZEICHNUNG_MAX_BYTES = 400000; // Sicherheitsgrenze fuer den State
+
+function bildAufDruckgroesseVerkleinern(datei) {
+  return new Promise((resolve, reject) => {
+    if (!/^image\//.test(datei.type)) {
+      reject(new Error('Bitte eine Bilddatei wählen (PNG mit transparentem Hintergrund ist am besten).'));
+      return;
+    }
+    const leser = new FileReader();
+    leser.onerror = () => reject(new Error('Datei konnte nicht gelesen werden.'));
+    leser.onload = () => {
+      const bild = new Image();
+      bild.onerror = () => reject(new Error('Bild konnte nicht gelesen werden.'));
+      bild.onload = () => {
+        const faktor = Math.min(1, ZEICHNUNG_MAX_BREITE / bild.width);
+        const leinwand = document.createElement('canvas');
+        leinwand.width = Math.round(bild.width * faktor);
+        leinwand.height = Math.round(bild.height * faktor);
+        // PNG erhaelt die Transparenz - bei einer Unterschrift ist genau das
+        // entscheidend, sonst liegt ein weisser Kasten auf dem Untergrund.
+        leinwand.getContext('2d').drawImage(bild, 0, 0, leinwand.width, leinwand.height);
+        const datenUrl = leinwand.toDataURL('image/png');
+        if (datenUrl.length > ZEICHNUNG_MAX_BYTES) {
+          reject(new Error('Das Bild ist auch verkleinert noch zu groß. Bitte einen engeren Ausschnitt wählen.'));
+          return;
+        }
+        resolve(datenUrl);
+      };
+      bild.src = leser.result;
+    };
+    leser.readAsDataURL(datei);
+  });
+}
+
+async function einstellungBildSetzen(feld, datei) {
+  if (feld !== 'unterschriftBild' && feld !== 'stempelBild') {
+    throw new Error(`Unbekanntes Bildfeld: ${feld}`);
+  }
+  const datenUrl = await bildAufDruckgroesseVerkleinern(datei);
+  aktualisiereEinstellungen({ [feld]: datenUrl });
+  return datenUrl;
+}
