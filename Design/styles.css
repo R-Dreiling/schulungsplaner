@@ -586,8 +586,11 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
    als CSS-Hintergrund: Hintergrundgrafiken sind im Druckdialog abschaltbar,
    Bilder im Dokument werden immer gedruckt. */
 .druck-grund { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+/* Genau mittig auf dem Blatt. Die Zeichenflaeche des Signets ist exakt auf
+   seine Bounding-Box beschnitten (siehe tribeta-icon.svg) - haette sie Rand,
+   wuerde beim Zentrieren die Flaeche mittig sitzen, nicht das Signet. */
 .druck-wasserzeichen {
-  position: absolute; top: 46%; left: 50%; width: 132mm;
+  position: absolute; top: 50%; left: 50%; width: 128mm;
   transform: translate(-50%, -50%); opacity: .05; z-index: 0;
 }
 .druck-inhalt { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 264mm; }
