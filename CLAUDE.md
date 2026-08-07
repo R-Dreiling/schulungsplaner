@@ -136,6 +136,13 @@ Destruktive oder folgenreiche Aktionen über natives `confirm()` bestätigen.
 Deutsch durchgehend — Oberfläche, Funktions- und Variablennamen, Commit-Nachrichten.
 Umlaute korrekt als UTF-8 in allen ausgelieferten Dateien.
 
+## Firmierung
+
+Der Auftraggeber ist die **tribeta GmbH**. Auf allen ausgelieferten Dokumenten
+(Bescheinigung, Anwesenheitsliste, Abschlussbericht) muss die Rechtsform korrekt
+stehen — sie sind Nachweisdokumente. Keine erfundenen Zusätze wie Claims oder
+Adressen: nur, was tatsächlich belegt ist.
+
 ## Arbeitsweise
 
 Jede Funktion muss einem konkreten Planungs- oder Nachweiszweck dienen — keine

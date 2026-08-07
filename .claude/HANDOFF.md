@@ -16,7 +16,7 @@ Abnahme durch die Nutzerin. Nicht vor der Abnahme nach `master` mergen.**
 ## Auftrag
 
 Der **Schulungsplaner** ist ein lokales, serverloses Einzelplatz-Werkzeug für die tribeta
-GbR zur Planung und Nachweisführung von Schulungen (Datenschutz, Arbeitssicherheit,
+GmbH zur Planung und Nachweisführung von Schulungen (Datenschutz, Arbeitssicherheit,
 Compliance). Eine einzige selbsterklärende `Berichte/index.html`, per Doppelklick
 lauffähig, ohne Server und ohne Internetverbindung. Daten im `localStorage`, hochgeladene
 Dateien in `IndexedDB`.

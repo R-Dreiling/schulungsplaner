@@ -112,7 +112,7 @@ function zertifikatHtml(buchungId) {
           <div class="zert-unterschrift"><div class="zert-linie"></div><span>Ort, Datum</span></div>
           <div class="zert-unterschrift"><div class="zert-linie"></div><span>Leitung / Referent:in</span></div>
         </div>
-        ${druckFusszeile('tribeta GbR · Schulung und Beratung')}
+        ${druckFusszeile('tribeta GmbH')}
       </div>
     </div>`;
 }
@@ -214,7 +214,7 @@ function anwesenheitslisteHtml(terminId) {
           <div class="al-signatur-label">Unterschrift Trainer</div>
         </div>
       </div>
-      ${druckFusszeile('tribeta GbR · Schulung und Beratung')}
+      ${druckFusszeile('tribeta GmbH')}
       </div>
     </div>`;
 }
@@ -311,7 +311,7 @@ function abschlussberichtHtml(terminId) {
         <div class="zert-linie"></div>
         <span style="font-size:9pt; color:var(--muted);">Unterschrift Trainer</span>
       </div>
-      ${druckFusszeile('Internes Archivdokument · tribeta GbR')}
+      ${druckFusszeile('Internes Archivdokument · tribeta GmbH')}
       </div>
     </div>`;
 }
