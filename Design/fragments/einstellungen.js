@@ -70,13 +70,14 @@ function oeffneEinstellungenDialog() {
         <label>Ablageordner für Dokumente und Sicherungen</label>
         <div id="einst-ablage-zustand" class="einst-ablage">wird geprüft …</div>
         <div class="einst-bildaktionen" style="margin-top:8px;">
-          <button type="button" class="btn" onclick="einstellungenAblageWaehlen()">Ordner wählen</button>
-          <button type="button" class="btn" onclick="einstellungenSicherungJetzt()">Sicherung jetzt ablegen</button>
+          <button type="button" class="btn" id="einst-ablage-knopf" onclick="einstellungenAblageWaehlen()">Ordner wählen</button>
+          <button type="button" class="btn" onclick="einstellungenSicherungJetzt()">Alles sichern und ablegen</button>
         </div>
         <div class="field-hint">
           Bescheinigungen, Listen und Berichte werden beim Erzeugen automatisch dort abgelegt —
           je Termin ein Unterordner. Liegt der Ordner in OneDrive, sind sie damit in der Cloud.
-          Abgelegt wird HTML; ein PDF entsteht wie bisher über den Druckdialog.
+          Abgelegt wird HTML; jede Datei öffnet beim Doppelklick den Druckdialog, sodass daraus
+          mit einem Klick ein PDF im selben Ordner entsteht.
         </div>
       </div>
     </div>
@@ -91,22 +92,33 @@ function oeffneEinstellungenDialog() {
 // Dialog wird aber synchron aufgebaut - deshalb nachtraeglich eintragen.
 function einstellungenAblageZustandZeigen() {
   const feld = document.getElementById('einst-ablage-zustand');
+  const knopf = document.getElementById('einst-ablage-knopf');
   if (!feld) return;
+  // Der gemerkte Name steht in den Einstellungen und laesst sich sofort
+  // anzeigen - der Handle-Zustand kommt asynchron nach.
+  const gemerkt = einstellungen().ablageOrdnerName || '';
+  if (gemerkt) {
+    feld.innerHTML = `<span class="einst-ablage-ordner">${escHtml(gemerkt)}</span> <span class="einst-ablage-aus">— Zugriff wird geprüft …</span>`;
+    if (knopf) knopf.textContent = 'Anderen Ordner wählen';
+  }
   ablageZustand().then(z => {
     if (!feld.isConnected) return;
     if (!z.moeglich) {
       feld.innerHTML = '<span class="einst-ablage-aus">Dieser Browser kann nicht in Ordner schreiben. '
         + 'In Chrome oder Edge funktioniert es.</span>';
-    } else if (!z.gewaehlt) {
+      return;
+    }
+    if (!z.gewaehlt) {
       feld.innerHTML = '<span class="einst-ablage-aus">Noch kein Ordner gewählt — '
         + 'Dokumente werden nur gedruckt, nicht abgelegt.</span>';
-    } else if (!z.bereit) {
-      feld.innerHTML = `<strong>${escHtml(z.name)}</strong> — Zugriff muss in dieser Sitzung `
-        + 'noch einmal bestätigt werden. Das passiert beim ersten Ablegen von selbst.';
-    } else {
-      feld.innerHTML = `<strong>${escHtml(z.name)}</strong> — bereit. `
-        + 'Dokumente werden automatisch abgelegt.';
+      if (knopf) knopf.textContent = 'Ordner wählen';
+      return;
     }
+    if (knopf) knopf.textContent = 'Anderen Ordner wählen';
+    feld.innerHTML = `<span class="einst-ablage-ordner">${escHtml(z.name)}</span> `
+      + (z.bereit
+        ? '<span class="einst-ablage-bereit">· bereit, Dokumente werden abgelegt</span>'
+        : '<span class="einst-ablage-aus">· Zugriff wird beim ersten Ablegen einmal bestätigt</span>');
   }).catch(e => { feld.textContent = 'Zustand nicht feststellbar: ' + e.message; });
 }
 
@@ -119,12 +131,40 @@ function einstellungenAblageWaehlen() {
   });
 }
 
+// Legt den Datenbestand ab und dazu die Dokumente aller Termine, die
+// abgeschlossen sind - so ist nach einem Klick alles gesichert, was fertig ist.
 function einstellungenSicherungJetzt() {
-  ablageSicherung().then(ergebnis => {
-    alert(ergebnis.abgelegt
-      ? 'Sicherung abgelegt: ' + ergebnis.pfad
-      : 'Sicherung nicht abgelegt (' + ergebnis.grund + '). '
+  const abgeschlossene = window.STATE.kurse
+    .flatMap(k => k.termine)
+    .filter(t => t.abschluss);
+
+  const frage = abgeschlossene.length
+    ? `Datenbestand sichern und die Dokumente von ${abgeschlossene.length} abgeschlossenen Termin(en) ablegen?\n\n`
+      + 'Dabei werden fehlende Bescheinigungen erzeugt und ihre Nummern vergeben.'
+    : 'Datenbestand jetzt im Ablageordner sichern?';
+  if (!confirm(frage)) return;
+
+  ablageSicherung().then(async ergebnis => {
+    if (!ergebnis.abgelegt) {
+      alert('Sicherung nicht abgelegt (' + ergebnis.grund + ').\n'
         + 'Über „Exportieren" in der Seitenleiste geht es weiterhin als Download.');
+      return;
+    }
+    let dateien = 0;
+    const fehler = [];
+    for (const termin of abgeschlossene) {
+      try {
+        const r = await ablageAlleDokumente(termin.id);
+        dateien += r.erledigt.length;
+        fehler.push(...r.fehler);
+      } catch (e) {
+        fehler.push(e.message);
+      }
+    }
+    const zeilen = ['Datensicherung: ' + ergebnis.pfad];
+    if (abgeschlossene.length) zeilen.push(`${dateien} Dokument(e) abgelegt.`);
+    if (fehler.length) zeilen.push('\nNicht abgelegt:\n' + fehler.join('\n'));
+    alert(zeilen.join('\n'));
   }).catch(e => alert('Sicherung fehlgeschlagen: ' + e.message));
 }
 

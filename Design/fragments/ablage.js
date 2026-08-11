@@ -50,10 +50,19 @@ function ablageMoeglich() {
   return typeof window.showDirectoryPicker === 'function';
 }
 
+// Ein gespeicherter Eintrag kann aus einer aelteren Fassung stammen oder
+// beschaedigt sein. Dann ist es kein Ordnerzugriff, sondern irgendein Objekt -
+// das muss auffallen, bevor darauf zugegriffen wird.
+function istOrdnerZugriff(handle) {
+  return !!handle
+    && typeof handle.queryPermission === 'function'
+    && typeof handle.getDirectoryHandle === 'function';
+}
+
 // Fragt die Schreibberechtigung ab und holt sie bei Bedarf nach. still=true
 // unterdrueckt die Nachfrage - dann wird nur gemeldet, ob es gerade geht.
 async function ablageBerechtigung(handle, still) {
-  if (!handle) return false;
+  if (!istOrdnerZugriff(handle)) return false;
   const optionen = { mode: 'readwrite' };
   if ((await handle.queryPermission(optionen)) === 'granted') return true;
   if (still) return false;
@@ -104,7 +113,7 @@ async function ablageUnterordner(wurzel, teile) {
 
 async function ablageSchreiben(teile, dateiname, inhalt) {
   const handle = await ablageHandleLaden();
-  if (!handle) return { abgelegt: false, grund: 'kein Ordner gewählt' };
+  if (!istOrdnerZugriff(handle)) return { abgelegt: false, grund: 'kein Ordner gewählt' };
   if (!(await ablageBerechtigung(handle))) {
     return { abgelegt: false, grund: 'keine Schreibberechtigung' };
   }
@@ -122,6 +131,8 @@ async function ablageSchreiben(teile, dateiname, inhalt) {
 function ablageDokumentHtml(titel, koerper) {
   const stil = document.querySelector('style');
   const css = stil ? stil.textContent : '';
+  // Der Dateiname des PDF ergibt sich beim Drucken aus dem Dokumenttitel -
+  // deshalb steht hier derselbe Name wie an der HTML-Datei.
   return `<!doctype html>
 <html lang="de">
 <head>
@@ -131,14 +142,30 @@ function ablageDokumentHtml(titel, koerper) {
 ${css}
 /* Ablagefassung: der Druckbereich ist hier der ganze Inhalt. */
 @media screen {
-  body { margin: 0; padding: 24px; background: #E7EBF2; }
+  body { margin: 0; padding: 24px 24px 90px 24px; background: #E7EBF2; }
   .druck-seite { max-width: 210mm; margin: 0 auto; box-shadow: 0 2px 18px rgba(10,16,40,.18); }
 }
 #druck-bereich { display: block; }
+.pdf-leiste {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 12px 18px; background: #0A1028; color: #fff;
+  font-family: 'Mulish', -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 13px;
+}
+.pdf-leiste button {
+  font-family: 'Poppins', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px;
+  border: none; background: #2BD5D8; color: #0A1028; cursor: pointer;
+}
+@media print { .pdf-leiste { display: none; } }
 </style>
 </head>
 <body>
 <div id="druck-bereich">${koerper}</div>
+<div class="pdf-leiste">
+  <span>Als PDF sichern: drucken und im Druckdialog „Als PDF speichern" wählen — am besten in denselben Ordner.</span>
+  <button type="button" onclick="window.print()">Als PDF speichern</button>
+</div>
 </body>
 </html>`;
 }
@@ -167,11 +194,64 @@ async function ablageSicherung() {
   return ergebnis;
 }
 
+// Legt zu einem Termin alle Dokumente auf einmal ab: Anwesenheitsliste,
+// Abschlussbericht, je Firma einen Arbeitgebernachweis und fuer jede Person
+// mit erfuellter Mindestteilnahme die Bescheinigung.
+//
+// ACHTUNG Zertifikatsnummern: zertifikatHtml() vergibt beim ersten Aufruf eine
+// Nummer. Hier entstehen also Nummern fuer alle Berechtigten - das ist beim
+// Abschluss einer Schulung gewollt (die Bescheinigungen werden ohnehin
+// ausgestellt), waere beim blossen Anschauen einer Liste aber falsch. Deshalb
+// laeuft dieser Weg ausschliesslich ueber eine ausdrueckliche Aktion.
+async function ablageAlleDokumente(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+
+  const erledigt = [];
+  const fehler = [];
+  const ablegen = async (unterordner, dateiname, titel, html) => {
+    try {
+      const r = await ablageDokument(terminId, unterordner, dateiname, titel, html);
+      if (r.abgelegt) erledigt.push(r.pfad); else fehler.push(`${dateiname}: ${r.grund}`);
+    } catch (e) {
+      fehler.push(`${dateiname}: ${e.message}`);
+    }
+  };
+
+  await ablegen([], 'Anwesenheitsliste', 'Anwesenheitsliste', anwesenheitslisteHtml(terminId));
+
+  if (gefunden.termin.abschluss) {
+    await ablegen([], 'Abschlussbericht', 'Abschlussbericht', abschlussberichtHtml(terminId));
+  }
+
+  for (const firma of firmenNachweisFirmen(terminId)) {
+    await ablegen(['Arbeitgebernachweise'], `Schulungsnachweis ${firma}`,
+      'Schulungsnachweis', firmenNachweisHtml(terminId, firma));
+  }
+
+  for (const buchung of anwesenheitsBuchungen(terminId)) {
+    if (!erfuelltMindestteilnahme(buchung)) continue;
+    const person = window.STATE.teilnehmer.find(t => t.id === buchung.teilnehmerId);
+    if (!person) continue;
+    const html = zertifikatHtml(buchung.id);   // vergibt die Nummer, falls noch keine
+    await ablegen(['Bescheinigungen'], `${buchung.zertifikatNr} ${person.name}`,
+      'Teilnahmebescheinigung', html);
+  }
+
+  const sicherung = await ablageSicherung();
+  return { erledigt, fehler, sicherung };
+}
+
 // Zustand fuer die Anzeige im Einstellungsdialog.
 async function ablageZustand() {
   if (!ablageMoeglich()) return { moeglich: false };
-  const handle = await ablageHandleLaden();
-  if (!handle) return { moeglich: true, gewaehlt: false };
+  let handle = null;
+  try {
+    handle = await ablageHandleLaden();
+  } catch (e) {
+    return { moeglich: true, gewaehlt: false, hinweis: e.message };
+  }
+  if (!istOrdnerZugriff(handle)) return { moeglich: true, gewaehlt: false };
   return {
     moeglich: true,
     gewaehlt: true,

@@ -597,18 +597,40 @@ function detailSpeichereAbschluss(ev, terminId) {
   try {
     terminAbschliessen(terminId, felder.vorkommnisse);
     schliesseDialog();
-    // Ein abgeschlossener Termin ist der Moment, in dem die Nachweise
-    // vollstaendig sind - und damit der wichtigste Zeitpunkt fuer eine
-    // Sicherung. Deshalb hier gezielt nachfragen statt nur zu erinnern.
-    if (confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
-      + 'Jetzt eine Datensicherung erstellen? Die Daten liegen nur in diesem Browser – '
-      + 'die Sicherung ist die einzige Kopie außerhalb.')) {
-      exportiereJSON();
-    }
+    detailNachAbschlussSichern(terminId);
   } catch (e) {
     alert(e.message);
   }
   return false;
+}
+
+// Der Abschluss ist der Moment, in dem die Nachweise vollstaendig sind - und
+// damit der wichtigste Zeitpunkt, alles wegzuschreiben. Ist ein Ablageordner
+// eingerichtet, landen Liste, Bericht, Arbeitgebernachweise, alle
+// Bescheinigungen und die Datensicherung in einem Zug dort. Ohne Ordner bleibt
+// es beim Download der Sicherung.
+function detailNachAbschlussSichern(terminId) {
+  ablageZustand().then(z => {
+    if (z.moeglich && z.gewaehlt) {
+      if (!confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
+        + 'Jetzt alle Dokumente und die Datensicherung im Ablageordner speichern?\n'
+        + 'Dabei werden auch die Bescheinigungen erzeugt und ihre Nummern vergeben.')) return;
+      ablageAlleDokumente(terminId).then(r => {
+        const zeilen = [`${r.erledigt.length} Datei(en) abgelegt.`];
+        if (r.sicherung.abgelegt) zeilen.push('Datensicherung: ' + r.sicherung.pfad);
+        if (r.fehler.length) zeilen.push('\nNicht abgelegt:\n' + r.fehler.join('\n'));
+        alert(zeilen.join('\n'));
+      }).catch(e => alert('Ablage fehlgeschlagen: ' + e.message));
+      return;
+    }
+    if (confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
+      + 'Jetzt eine Datensicherung herunterladen? Die Daten liegen nur in diesem Browser – '
+      + 'die Sicherung ist die einzige Kopie außerhalb.\n\n'
+      + 'Tipp: Unter „Unterschrift & Stempel" lässt sich ein Ablageordner wählen; '
+      + 'dann werden künftig alle Dokumente automatisch dort gespeichert.')) {
+      exportiereJSON();
+    }
+  });
 }
 
 function detailWiedereroeffnen(terminId) {

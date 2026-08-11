@@ -557,6 +557,8 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
 .einst-ablage { font-size: 12px; line-height: 1.5; color: var(--text); }
 .einst-ablage strong { color: var(--ink); }
 .einst-ablage-aus { color: var(--muted2); }
+.einst-ablage-ordner { font-weight: 600; color: var(--ink); }
+.einst-ablage-bereit { color: var(--status-green-fg); font-weight: 600; }
 
 .hilfe-schritt .schritt-nr {
   flex: none; font-size: 11px; font-weight: 700; color: var(--teal-deep);
@@ -2544,10 +2546,19 @@ function ablageMoeglich() {
   return typeof window.showDirectoryPicker === 'function';
 }
 
+// Ein gespeicherter Eintrag kann aus einer aelteren Fassung stammen oder
+// beschaedigt sein. Dann ist es kein Ordnerzugriff, sondern irgendein Objekt -
+// das muss auffallen, bevor darauf zugegriffen wird.
+function istOrdnerZugriff(handle) {
+  return !!handle
+    && typeof handle.queryPermission === 'function'
+    && typeof handle.getDirectoryHandle === 'function';
+}
+
 // Fragt die Schreibberechtigung ab und holt sie bei Bedarf nach. still=true
 // unterdrueckt die Nachfrage - dann wird nur gemeldet, ob es gerade geht.
 async function ablageBerechtigung(handle, still) {
-  if (!handle) return false;
+  if (!istOrdnerZugriff(handle)) return false;
   const optionen = { mode: 'readwrite' };
   if ((await handle.queryPermission(optionen)) === 'granted') return true;
   if (still) return false;
@@ -2598,7 +2609,7 @@ async function ablageUnterordner(wurzel, teile) {
 
 async function ablageSchreiben(teile, dateiname, inhalt) {
   const handle = await ablageHandleLaden();
-  if (!handle) return { abgelegt: false, grund: 'kein Ordner gewählt' };
+  if (!istOrdnerZugriff(handle)) return { abgelegt: false, grund: 'kein Ordner gewählt' };
   if (!(await ablageBerechtigung(handle))) {
     return { abgelegt: false, grund: 'keine Schreibberechtigung' };
   }
@@ -2616,6 +2627,8 @@ async function ablageSchreiben(teile, dateiname, inhalt) {
 function ablageDokumentHtml(titel, koerper) {
   const stil = document.querySelector('style');
   const css = stil ? stil.textContent : '';
+  // Der Dateiname des PDF ergibt sich beim Drucken aus dem Dokumenttitel -
+  // deshalb steht hier derselbe Name wie an der HTML-Datei.
   return `<!doctype html>
 <html lang="de">
 <head>
@@ -2625,14 +2638,30 @@ function ablageDokumentHtml(titel, koerper) {
 ${css}
 /* Ablagefassung: der Druckbereich ist hier der ganze Inhalt. */
 @media screen {
-  body { margin: 0; padding: 24px; background: #E7EBF2; }
+  body { margin: 0; padding: 24px 24px 90px 24px; background: #E7EBF2; }
   .druck-seite { max-width: 210mm; margin: 0 auto; box-shadow: 0 2px 18px rgba(10,16,40,.18); }
 }
 #druck-bereich { display: block; }
+.pdf-leiste {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 12px 18px; background: #0A1028; color: #fff;
+  font-family: 'Mulish', -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 13px;
+}
+.pdf-leiste button {
+  font-family: 'Poppins', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px;
+  border: none; background: #2BD5D8; color: #0A1028; cursor: pointer;
+}
+@media print { .pdf-leiste { display: none; } }
 </style>
 </head>
 <body>
 <div id="druck-bereich">${koerper}</div>
+<div class="pdf-leiste">
+  <span>Als PDF sichern: drucken und im Druckdialog „Als PDF speichern" wählen — am besten in denselben Ordner.</span>
+  <button type="button" onclick="window.print()">Als PDF speichern</button>
+</div>
 </body>
 </html>`;
 }
@@ -2661,11 +2690,64 @@ async function ablageSicherung() {
   return ergebnis;
 }
 
+// Legt zu einem Termin alle Dokumente auf einmal ab: Anwesenheitsliste,
+// Abschlussbericht, je Firma einen Arbeitgebernachweis und fuer jede Person
+// mit erfuellter Mindestteilnahme die Bescheinigung.
+//
+// ACHTUNG Zertifikatsnummern: zertifikatHtml() vergibt beim ersten Aufruf eine
+// Nummer. Hier entstehen also Nummern fuer alle Berechtigten - das ist beim
+// Abschluss einer Schulung gewollt (die Bescheinigungen werden ohnehin
+// ausgestellt), waere beim blossen Anschauen einer Liste aber falsch. Deshalb
+// laeuft dieser Weg ausschliesslich ueber eine ausdrueckliche Aktion.
+async function ablageAlleDokumente(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) throw new Error(`Termin ${terminId} nicht gefunden`);
+
+  const erledigt = [];
+  const fehler = [];
+  const ablegen = async (unterordner, dateiname, titel, html) => {
+    try {
+      const r = await ablageDokument(terminId, unterordner, dateiname, titel, html);
+      if (r.abgelegt) erledigt.push(r.pfad); else fehler.push(`${dateiname}: ${r.grund}`);
+    } catch (e) {
+      fehler.push(`${dateiname}: ${e.message}`);
+    }
+  };
+
+  await ablegen([], 'Anwesenheitsliste', 'Anwesenheitsliste', anwesenheitslisteHtml(terminId));
+
+  if (gefunden.termin.abschluss) {
+    await ablegen([], 'Abschlussbericht', 'Abschlussbericht', abschlussberichtHtml(terminId));
+  }
+
+  for (const firma of firmenNachweisFirmen(terminId)) {
+    await ablegen(['Arbeitgebernachweise'], `Schulungsnachweis ${firma}`,
+      'Schulungsnachweis', firmenNachweisHtml(terminId, firma));
+  }
+
+  for (const buchung of anwesenheitsBuchungen(terminId)) {
+    if (!erfuelltMindestteilnahme(buchung)) continue;
+    const person = window.STATE.teilnehmer.find(t => t.id === buchung.teilnehmerId);
+    if (!person) continue;
+    const html = zertifikatHtml(buchung.id);   // vergibt die Nummer, falls noch keine
+    await ablegen(['Bescheinigungen'], `${buchung.zertifikatNr} ${person.name}`,
+      'Teilnahmebescheinigung', html);
+  }
+
+  const sicherung = await ablageSicherung();
+  return { erledigt, fehler, sicherung };
+}
+
 // Zustand fuer die Anzeige im Einstellungsdialog.
 async function ablageZustand() {
   if (!ablageMoeglich()) return { moeglich: false };
-  const handle = await ablageHandleLaden();
-  if (!handle) return { moeglich: true, gewaehlt: false };
+  let handle = null;
+  try {
+    handle = await ablageHandleLaden();
+  } catch (e) {
+    return { moeglich: true, gewaehlt: false, hinweis: e.message };
+  }
+  if (!istOrdnerZugriff(handle)) return { moeglich: true, gewaehlt: false };
   return {
     moeglich: true,
     gewaehlt: true,
@@ -2748,13 +2830,14 @@ function oeffneEinstellungenDialog() {
         <label>Ablageordner für Dokumente und Sicherungen</label>
         <div id="einst-ablage-zustand" class="einst-ablage">wird geprüft …</div>
         <div class="einst-bildaktionen" style="margin-top:8px;">
-          <button type="button" class="btn" onclick="einstellungenAblageWaehlen()">Ordner wählen</button>
-          <button type="button" class="btn" onclick="einstellungenSicherungJetzt()">Sicherung jetzt ablegen</button>
+          <button type="button" class="btn" id="einst-ablage-knopf" onclick="einstellungenAblageWaehlen()">Ordner wählen</button>
+          <button type="button" class="btn" onclick="einstellungenSicherungJetzt()">Alles sichern und ablegen</button>
         </div>
         <div class="field-hint">
           Bescheinigungen, Listen und Berichte werden beim Erzeugen automatisch dort abgelegt —
           je Termin ein Unterordner. Liegt der Ordner in OneDrive, sind sie damit in der Cloud.
-          Abgelegt wird HTML; ein PDF entsteht wie bisher über den Druckdialog.
+          Abgelegt wird HTML; jede Datei öffnet beim Doppelklick den Druckdialog, sodass daraus
+          mit einem Klick ein PDF im selben Ordner entsteht.
         </div>
       </div>
     </div>
@@ -2769,22 +2852,33 @@ function oeffneEinstellungenDialog() {
 // Dialog wird aber synchron aufgebaut - deshalb nachtraeglich eintragen.
 function einstellungenAblageZustandZeigen() {
   const feld = document.getElementById('einst-ablage-zustand');
+  const knopf = document.getElementById('einst-ablage-knopf');
   if (!feld) return;
+  // Der gemerkte Name steht in den Einstellungen und laesst sich sofort
+  // anzeigen - der Handle-Zustand kommt asynchron nach.
+  const gemerkt = einstellungen().ablageOrdnerName || '';
+  if (gemerkt) {
+    feld.innerHTML = `<span class="einst-ablage-ordner">${escHtml(gemerkt)}</span> <span class="einst-ablage-aus">— Zugriff wird geprüft …</span>`;
+    if (knopf) knopf.textContent = 'Anderen Ordner wählen';
+  }
   ablageZustand().then(z => {
     if (!feld.isConnected) return;
     if (!z.moeglich) {
       feld.innerHTML = '<span class="einst-ablage-aus">Dieser Browser kann nicht in Ordner schreiben. '
         + 'In Chrome oder Edge funktioniert es.</span>';
-    } else if (!z.gewaehlt) {
+      return;
+    }
+    if (!z.gewaehlt) {
       feld.innerHTML = '<span class="einst-ablage-aus">Noch kein Ordner gewählt — '
         + 'Dokumente werden nur gedruckt, nicht abgelegt.</span>';
-    } else if (!z.bereit) {
-      feld.innerHTML = `<strong>${escHtml(z.name)}</strong> — Zugriff muss in dieser Sitzung `
-        + 'noch einmal bestätigt werden. Das passiert beim ersten Ablegen von selbst.';
-    } else {
-      feld.innerHTML = `<strong>${escHtml(z.name)}</strong> — bereit. `
-        + 'Dokumente werden automatisch abgelegt.';
+      if (knopf) knopf.textContent = 'Ordner wählen';
+      return;
     }
+    if (knopf) knopf.textContent = 'Anderen Ordner wählen';
+    feld.innerHTML = `<span class="einst-ablage-ordner">${escHtml(z.name)}</span> `
+      + (z.bereit
+        ? '<span class="einst-ablage-bereit">· bereit, Dokumente werden abgelegt</span>'
+        : '<span class="einst-ablage-aus">· Zugriff wird beim ersten Ablegen einmal bestätigt</span>');
   }).catch(e => { feld.textContent = 'Zustand nicht feststellbar: ' + e.message; });
 }
 
@@ -2797,12 +2891,40 @@ function einstellungenAblageWaehlen() {
   });
 }
 
+// Legt den Datenbestand ab und dazu die Dokumente aller Termine, die
+// abgeschlossen sind - so ist nach einem Klick alles gesichert, was fertig ist.
 function einstellungenSicherungJetzt() {
-  ablageSicherung().then(ergebnis => {
-    alert(ergebnis.abgelegt
-      ? 'Sicherung abgelegt: ' + ergebnis.pfad
-      : 'Sicherung nicht abgelegt (' + ergebnis.grund + '). '
+  const abgeschlossene = window.STATE.kurse
+    .flatMap(k => k.termine)
+    .filter(t => t.abschluss);
+
+  const frage = abgeschlossene.length
+    ? `Datenbestand sichern und die Dokumente von ${abgeschlossene.length} abgeschlossenen Termin(en) ablegen?\n\n`
+      + 'Dabei werden fehlende Bescheinigungen erzeugt und ihre Nummern vergeben.'
+    : 'Datenbestand jetzt im Ablageordner sichern?';
+  if (!confirm(frage)) return;
+
+  ablageSicherung().then(async ergebnis => {
+    if (!ergebnis.abgelegt) {
+      alert('Sicherung nicht abgelegt (' + ergebnis.grund + ').\n'
         + 'Über „Exportieren" in der Seitenleiste geht es weiterhin als Download.');
+      return;
+    }
+    let dateien = 0;
+    const fehler = [];
+    for (const termin of abgeschlossene) {
+      try {
+        const r = await ablageAlleDokumente(termin.id);
+        dateien += r.erledigt.length;
+        fehler.push(...r.fehler);
+      } catch (e) {
+        fehler.push(e.message);
+      }
+    }
+    const zeilen = ['Datensicherung: ' + ergebnis.pfad];
+    if (abgeschlossene.length) zeilen.push(`${dateien} Dokument(e) abgelegt.`);
+    if (fehler.length) zeilen.push('\nNicht abgelegt:\n' + fehler.join('\n'));
+    alert(zeilen.join('\n'));
   }).catch(e => alert('Sicherung fehlgeschlagen: ' + e.message));
 }
 
@@ -4469,18 +4591,40 @@ function detailSpeichereAbschluss(ev, terminId) {
   try {
     terminAbschliessen(terminId, felder.vorkommnisse);
     schliesseDialog();
-    // Ein abgeschlossener Termin ist der Moment, in dem die Nachweise
-    // vollstaendig sind - und damit der wichtigste Zeitpunkt fuer eine
-    // Sicherung. Deshalb hier gezielt nachfragen statt nur zu erinnern.
-    if (confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
-      + 'Jetzt eine Datensicherung erstellen? Die Daten liegen nur in diesem Browser – '
-      + 'die Sicherung ist die einzige Kopie außerhalb.')) {
-      exportiereJSON();
-    }
+    detailNachAbschlussSichern(terminId);
   } catch (e) {
     alert(e.message);
   }
   return false;
+}
+
+// Der Abschluss ist der Moment, in dem die Nachweise vollstaendig sind - und
+// damit der wichtigste Zeitpunkt, alles wegzuschreiben. Ist ein Ablageordner
+// eingerichtet, landen Liste, Bericht, Arbeitgebernachweise, alle
+// Bescheinigungen und die Datensicherung in einem Zug dort. Ohne Ordner bleibt
+// es beim Download der Sicherung.
+function detailNachAbschlussSichern(terminId) {
+  ablageZustand().then(z => {
+    if (z.moeglich && z.gewaehlt) {
+      if (!confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
+        + 'Jetzt alle Dokumente und die Datensicherung im Ablageordner speichern?\n'
+        + 'Dabei werden auch die Bescheinigungen erzeugt und ihre Nummern vergeben.')) return;
+      ablageAlleDokumente(terminId).then(r => {
+        const zeilen = [`${r.erledigt.length} Datei(en) abgelegt.`];
+        if (r.sicherung.abgelegt) zeilen.push('Datensicherung: ' + r.sicherung.pfad);
+        if (r.fehler.length) zeilen.push('\nNicht abgelegt:\n' + r.fehler.join('\n'));
+        alert(zeilen.join('\n'));
+      }).catch(e => alert('Ablage fehlgeschlagen: ' + e.message));
+      return;
+    }
+    if (confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
+      + 'Jetzt eine Datensicherung herunterladen? Die Daten liegen nur in diesem Browser – '
+      + 'die Sicherung ist die einzige Kopie außerhalb.\n\n'
+      + 'Tipp: Unter „Unterschrift & Stempel" lässt sich ein Ablageordner wählen; '
+      + 'dann werden künftig alle Dokumente automatisch dort gespeichert.')) {
+      exportiereJSON();
+    }
+  });
 }
 
 function detailWiedereroeffnen(terminId) {
