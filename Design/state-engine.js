@@ -511,6 +511,8 @@ const EINSTELLUNGEN_VORGABE = {
   // Datensicherung: Datum des letzten Exports und Zahl der Aenderungen danach.
   letzteSicherung: null,
   aenderungenSeitSicherung: 0,
+  // Nur zur Anzeige - der eigentliche Ordnerzugriff liegt in IndexedDB.
+  ablageOrdnerName: '',
   // Vollstaendige Firmierung im Fuss der Bescheinigung. Vorbelegt aus dem
   // Impressum der tribeta-Website, dort aber als "i.G." gefuehrt - hier ohne
   // den Zusatz. Handelsregister- und Umsatzsteuernummer fehlen bewusst,

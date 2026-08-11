@@ -65,11 +65,67 @@ function oeffneEinstellungenDialog() {
         <textarea id="einst-firmenangaben" rows="3">${escHtml(e.firmenangaben || '')}</textarea>
         <div class="field-hint">Eine Zeile je Angabe. Sobald die Gesellschaft im Handelsregister eingetragen ist, gehören Registernummer und USt-IdNr. hier ergänzt.</div>
       </div>
+
+      <div class="field">
+        <label>Ablageordner für Dokumente und Sicherungen</label>
+        <div id="einst-ablage-zustand" class="einst-ablage">wird geprüft …</div>
+        <div class="einst-bildaktionen" style="margin-top:8px;">
+          <button type="button" class="btn" onclick="einstellungenAblageWaehlen()">Ordner wählen</button>
+          <button type="button" class="btn" onclick="einstellungenSicherungJetzt()">Sicherung jetzt ablegen</button>
+        </div>
+        <div class="field-hint">
+          Bescheinigungen, Listen und Berichte werden beim Erzeugen automatisch dort abgelegt —
+          je Termin ein Unterordner. Liegt der Ordner in OneDrive, sind sie damit in der Cloud.
+          Abgelegt wird HTML; ein PDF entsteht wie bisher über den Druckdialog.
+        </div>
+      </div>
     </div>
     <div class="dialog-foot">
       <button type="button" class="btn" onclick="schliesseDialog()">Schließen</button>
       <button type="button" class="btn btn-primary" onclick="einstellungenTexteSpeichern()">Speichern</button>
     </div>`);
+  einstellungenAblageZustandZeigen();
+}
+
+// Der Zustand des Ablageordners laesst sich nur asynchron feststellen, der
+// Dialog wird aber synchron aufgebaut - deshalb nachtraeglich eintragen.
+function einstellungenAblageZustandZeigen() {
+  const feld = document.getElementById('einst-ablage-zustand');
+  if (!feld) return;
+  ablageZustand().then(z => {
+    if (!feld.isConnected) return;
+    if (!z.moeglich) {
+      feld.innerHTML = '<span class="einst-ablage-aus">Dieser Browser kann nicht in Ordner schreiben. '
+        + 'In Chrome oder Edge funktioniert es.</span>';
+    } else if (!z.gewaehlt) {
+      feld.innerHTML = '<span class="einst-ablage-aus">Noch kein Ordner gewählt — '
+        + 'Dokumente werden nur gedruckt, nicht abgelegt.</span>';
+    } else if (!z.bereit) {
+      feld.innerHTML = `<strong>${escHtml(z.name)}</strong> — Zugriff muss in dieser Sitzung `
+        + 'noch einmal bestätigt werden. Das passiert beim ersten Ablegen von selbst.';
+    } else {
+      feld.innerHTML = `<strong>${escHtml(z.name)}</strong> — bereit. `
+        + 'Dokumente werden automatisch abgelegt.';
+    }
+  }).catch(e => { feld.textContent = 'Zustand nicht feststellbar: ' + e.message; });
+}
+
+function einstellungenAblageWaehlen() {
+  einstellungenTexteLesen();
+  ablageOrdnerWaehlen().then(handle => {
+    if (!handle) return;
+    schliesseDialog();
+    oeffneEinstellungenDialog();
+  });
+}
+
+function einstellungenSicherungJetzt() {
+  ablageSicherung().then(ergebnis => {
+    alert(ergebnis.abgelegt
+      ? 'Sicherung abgelegt: ' + ergebnis.pfad
+      : 'Sicherung nicht abgelegt (' + ergebnis.grund + '). '
+        + 'Über „Exportieren" in der Seitenleiste geht es weiterhin als Download.');
+  }).catch(e => alert('Sicherung fehlgeschlagen: ' + e.message));
 }
 
 // Die Bilder werden sofort beim Auswaehlen uebernommen (mit Verkleinerung),

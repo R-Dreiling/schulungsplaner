@@ -554,6 +554,9 @@ table.data-table.fixed-rows tbody tr { height: 46px; }
 .einst-bildvorschau img { max-width: 100%; max-height: 100%; }
 .einst-bildvorschau.leer span { font-size: 11px; color: var(--muted2); }
 .einst-bildaktionen { display: flex; gap: 8px; flex-wrap: wrap; }
+.einst-ablage { font-size: 12px; line-height: 1.5; color: var(--text); }
+.einst-ablage strong { color: var(--ink); }
+.einst-ablage-aus { color: var(--muted2); }
 
 .hilfe-schritt .schritt-nr {
   flex: none; font-size: 11px; font-weight: 700; color: var(--teal-deep);
@@ -1754,6 +1757,8 @@ const EINSTELLUNGEN_VORGABE = {
   // Datensicherung: Datum des letzten Exports und Zahl der Aenderungen danach.
   letzteSicherung: null,
   aenderungenSeitSicherung: 0,
+  // Nur zur Anzeige - der eigentliche Ordnerzugriff liegt in IndexedDB.
+  ablageOrdnerName: '',
   // Vollstaendige Firmierung im Fuss der Bescheinigung. Vorbelegt aus dem
   // Impressum der tribeta-Website, dort aber als "i.G." gefuehrt - hier ohne
   // den Zusatz. Handelsregister- und Umsatzsteuernummer fehlen bewusst,
@@ -2486,6 +2491,190 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </script>
 <script>
+// ---- ablage.js ----
+// Design/fragments/ablage.js
+// Legt die erzeugten Dokumente und Sicherungen in einem Ordner ab, den die
+// Nutzerin einmal auswaehlt. Liegt dieser Ordner in OneDrive, sind die
+// Nachweise damit automatisch in der Cloud und fuer alle sichtbar.
+//
+// Grenzen, die man kennen muss:
+// - Der Browser darf nur in Ordner schreiben, die ausdruecklich freigegeben
+//   wurden. Die Freigabe holt showDirectoryPicker(); der Zugriff wird in
+//   IndexedDB gemerkt, muss je nach Browser aber pro Sitzung einmal
+//   bestaetigt werden.
+// - Abgelegt wird HTML, nicht PDF: Ein PDF entsteht erst im Druckdialog des
+//   Browsers, und an diese Datei kommt die App nicht heran. Die HTML-Fassung
+//   ist vollstaendig (Layout und Logo eingebettet) und laesst sich jederzeit
+//   oeffnen und drucken.
+
+const ABLAGE_DB = 'schulungsplaner_ablage';
+const ABLAGE_STORE = 'handles';
+const ABLAGE_SCHLUESSEL = 'wurzel';
+
+function ablageDbOeffnen() {
+  return new Promise((resolve, reject) => {
+    const anfrage = indexedDB.open(ABLAGE_DB, 1);
+    anfrage.onupgradeneeded = () => anfrage.result.createObjectStore(ABLAGE_STORE);
+    anfrage.onsuccess = () => resolve(anfrage.result);
+    anfrage.onerror = () => reject(anfrage.error);
+  });
+}
+
+async function ablageHandleMerken(handle) {
+  const db = await ablageDbOeffnen();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(ABLAGE_STORE, 'readwrite');
+    tx.objectStore(ABLAGE_STORE).put(handle, ABLAGE_SCHLUESSEL);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function ablageHandleLaden() {
+  const db = await ablageDbOeffnen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(ABLAGE_STORE, 'readonly');
+    const anfrage = tx.objectStore(ABLAGE_STORE).get(ABLAGE_SCHLUESSEL);
+    anfrage.onsuccess = () => resolve(anfrage.result || null);
+    anfrage.onerror = () => reject(anfrage.error);
+  });
+}
+
+function ablageMoeglich() {
+  return typeof window.showDirectoryPicker === 'function';
+}
+
+// Fragt die Schreibberechtigung ab und holt sie bei Bedarf nach. still=true
+// unterdrueckt die Nachfrage - dann wird nur gemeldet, ob es gerade geht.
+async function ablageBerechtigung(handle, still) {
+  if (!handle) return false;
+  const optionen = { mode: 'readwrite' };
+  if ((await handle.queryPermission(optionen)) === 'granted') return true;
+  if (still) return false;
+  return (await handle.requestPermission(optionen)) === 'granted';
+}
+
+async function ablageOrdnerWaehlen() {
+  if (!ablageMoeglich()) {
+    alert('Dieser Browser kann nicht in Ordner schreiben. In Chrome oder Edge funktioniert es.');
+    return null;
+  }
+  try {
+    const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    await ablageHandleMerken(handle);
+    aktualisiereEinstellungen({ ablageOrdnerName: handle.name });
+    return handle;
+  } catch (e) {
+    // Abbruch durch die Nutzerin ist kein Fehler.
+    if (e && e.name === 'AbortError') return null;
+    alert('Ordner konnte nicht übernommen werden: ' + e.message);
+    return null;
+  }
+}
+
+// Dateisystemfreundlicher Name: die verbotenen Zeichen raus, Laenge begrenzt.
+function dateinameSicher(text) {
+  return String(text || '')
+    .replace(/[\\/:*?"<>|]/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 120) || 'ohne-Namen';
+}
+
+// Ordner je Termin: "2026-08-12 Datenschutzbeauftragter Grundlagenschulung"
+function ablageTerminOrdner(terminId) {
+  const gefunden = findeTerminMitKurs(terminId);
+  if (!gefunden) return null;
+  return dateinameSicher(`${gefunden.termin.datum} ${gefunden.kurs.titel}`);
+}
+
+async function ablageUnterordner(wurzel, teile) {
+  let ordner = wurzel;
+  for (const teil of teile) {
+    ordner = await ordner.getDirectoryHandle(teil, { create: true });
+  }
+  return ordner;
+}
+
+async function ablageSchreiben(teile, dateiname, inhalt) {
+  const handle = await ablageHandleLaden();
+  if (!handle) return { abgelegt: false, grund: 'kein Ordner gewählt' };
+  if (!(await ablageBerechtigung(handle))) {
+    return { abgelegt: false, grund: 'keine Schreibberechtigung' };
+  }
+  const ordner = await ablageUnterordner(handle, teile);
+  const datei = await ordner.getFileHandle(dateiname, { create: true });
+  const strom = await datei.createWritable();
+  await strom.write(inhalt);
+  await strom.close();
+  return { abgelegt: true, pfad: teile.join('/') + '/' + dateiname };
+}
+
+// Baut aus einer Druckvorlage ein eigenstaendiges Dokument: das Stylesheet der
+// App wird mitgegeben, Logo und Unterschrift stecken ohnehin als Data-URL im
+// HTML. Die Datei laesst sich damit ohne die App oeffnen und drucken.
+function ablageDokumentHtml(titel, koerper) {
+  const stil = document.querySelector('style');
+  const css = stil ? stil.textContent : '';
+  return `<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>${escHtml(titel)}</title>
+<style>
+${css}
+/* Ablagefassung: der Druckbereich ist hier der ganze Inhalt. */
+@media screen {
+  body { margin: 0; padding: 24px; background: #E7EBF2; }
+  .druck-seite { max-width: 210mm; margin: 0 auto; box-shadow: 0 2px 18px rgba(10,16,40,.18); }
+}
+#druck-bereich { display: block; }
+</style>
+</head>
+<body>
+<div id="druck-bereich">${koerper}</div>
+</body>
+</html>`;
+}
+
+// Legt ein Dokument ab und meldet den Ausgang zurueck, ohne den Druck
+// aufzuhalten. Fehler landen in der Konsole und im Rueckgabewert - ein
+// misslungener Ablageversuch darf den Ausdruck nie verhindern.
+function ablageDokument(terminId, unterordner, dateiname, titel, koerper) {
+  const ordner = ablageTerminOrdner(terminId);
+  if (!ordner) return Promise.resolve({ abgelegt: false, grund: 'Termin nicht gefunden' });
+  const teile = ['Schulungen', ordner].concat(unterordner || []);
+  return ablageSchreiben(teile, dateinameSicher(dateiname) + '.html', ablageDokumentHtml(titel, koerper))
+    .catch(e => {
+      console.warn('Ablage fehlgeschlagen:', e);
+      return { abgelegt: false, grund: e.message };
+    });
+}
+
+// Sicherung des Datenbestands. Wird nach dem Abschluss einer Schulung
+// angeboten und kann jederzeit von Hand ausgeloest werden.
+async function ablageSicherung() {
+  const inhalt = JSON.stringify(window.STATE, null, 2);
+  const name = `${heuteIso()} Datenbestand.json`;
+  const ergebnis = await ablageSchreiben(['Sicherungen'], name, inhalt);
+  if (ergebnis.abgelegt) sicherungVermerken();
+  return ergebnis;
+}
+
+// Zustand fuer die Anzeige im Einstellungsdialog.
+async function ablageZustand() {
+  if (!ablageMoeglich()) return { moeglich: false };
+  const handle = await ablageHandleLaden();
+  if (!handle) return { moeglich: true, gewaehlt: false };
+  return {
+    moeglich: true,
+    gewaehlt: true,
+    name: handle.name,
+    bereit: await ablageBerechtigung(handle, true),
+  };
+}
+
+
 // ---- einstellungen.js ----
 // Design/fragments/einstellungen.js
 // Dialog fuer die Angaben, die auf jeder Bescheinigung gleich sind:
@@ -2554,11 +2743,67 @@ function oeffneEinstellungenDialog() {
         <textarea id="einst-firmenangaben" rows="3">${escHtml(e.firmenangaben || '')}</textarea>
         <div class="field-hint">Eine Zeile je Angabe. Sobald die Gesellschaft im Handelsregister eingetragen ist, gehören Registernummer und USt-IdNr. hier ergänzt.</div>
       </div>
+
+      <div class="field">
+        <label>Ablageordner für Dokumente und Sicherungen</label>
+        <div id="einst-ablage-zustand" class="einst-ablage">wird geprüft …</div>
+        <div class="einst-bildaktionen" style="margin-top:8px;">
+          <button type="button" class="btn" onclick="einstellungenAblageWaehlen()">Ordner wählen</button>
+          <button type="button" class="btn" onclick="einstellungenSicherungJetzt()">Sicherung jetzt ablegen</button>
+        </div>
+        <div class="field-hint">
+          Bescheinigungen, Listen und Berichte werden beim Erzeugen automatisch dort abgelegt —
+          je Termin ein Unterordner. Liegt der Ordner in OneDrive, sind sie damit in der Cloud.
+          Abgelegt wird HTML; ein PDF entsteht wie bisher über den Druckdialog.
+        </div>
+      </div>
     </div>
     <div class="dialog-foot">
       <button type="button" class="btn" onclick="schliesseDialog()">Schließen</button>
       <button type="button" class="btn btn-primary" onclick="einstellungenTexteSpeichern()">Speichern</button>
     </div>`);
+  einstellungenAblageZustandZeigen();
+}
+
+// Der Zustand des Ablageordners laesst sich nur asynchron feststellen, der
+// Dialog wird aber synchron aufgebaut - deshalb nachtraeglich eintragen.
+function einstellungenAblageZustandZeigen() {
+  const feld = document.getElementById('einst-ablage-zustand');
+  if (!feld) return;
+  ablageZustand().then(z => {
+    if (!feld.isConnected) return;
+    if (!z.moeglich) {
+      feld.innerHTML = '<span class="einst-ablage-aus">Dieser Browser kann nicht in Ordner schreiben. '
+        + 'In Chrome oder Edge funktioniert es.</span>';
+    } else if (!z.gewaehlt) {
+      feld.innerHTML = '<span class="einst-ablage-aus">Noch kein Ordner gewählt — '
+        + 'Dokumente werden nur gedruckt, nicht abgelegt.</span>';
+    } else if (!z.bereit) {
+      feld.innerHTML = `<strong>${escHtml(z.name)}</strong> — Zugriff muss in dieser Sitzung `
+        + 'noch einmal bestätigt werden. Das passiert beim ersten Ablegen von selbst.';
+    } else {
+      feld.innerHTML = `<strong>${escHtml(z.name)}</strong> — bereit. `
+        + 'Dokumente werden automatisch abgelegt.';
+    }
+  }).catch(e => { feld.textContent = 'Zustand nicht feststellbar: ' + e.message; });
+}
+
+function einstellungenAblageWaehlen() {
+  einstellungenTexteLesen();
+  ablageOrdnerWaehlen().then(handle => {
+    if (!handle) return;
+    schliesseDialog();
+    oeffneEinstellungenDialog();
+  });
+}
+
+function einstellungenSicherungJetzt() {
+  ablageSicherung().then(ergebnis => {
+    alert(ergebnis.abgelegt
+      ? 'Sicherung abgelegt: ' + ergebnis.pfad
+      : 'Sicherung nicht abgelegt (' + ergebnis.grund + '). '
+        + 'Über „Exportieren" in der Seitenleiste geht es weiterhin als Download.');
+  }).catch(e => alert('Sicherung fehlgeschlagen: ' + e.message));
 }
 
 // Die Bilder werden sofort beim Auswaehlen uebernommen (mit Verkleinerung),
@@ -2752,6 +2997,9 @@ function druckeZertifikat(buchungId) {
     const teilnehmer = buchung && window.STATE.teilnehmer.find(t => t.id === buchung.teilnehmerId);
     const html = zertifikatHtml(buchungId);
     const dateiname = `Zertifikat_${buchung.zertifikatNr}_${(teilnehmer.name || '').replace(/\s+/g, '-')}`;
+    // Ablage anstossen, bevor der Druckdialog den Ablauf anhaelt.
+    ablageDokument(buchung.terminId, ['Bescheinigungen'],
+      `${buchung.zertifikatNr} ${teilnehmer.name}`, 'Teilnahmebescheinigung', html);
     druckeInhalt(html, dateiname);
   } catch (e) {
     alert('Bescheinigung konnte nicht erzeugt werden: ' + e.message);
@@ -2856,6 +3104,7 @@ function druckeAnwesenheitsliste(terminId) {
     const gefunden = findeTerminMitKurs(terminId);
     const html = anwesenheitslisteHtml(terminId);
     const dateiname = `Anwesenheitsliste_${gefunden.termin.datum}_${(gefunden.kurs.titel || '').replace(/\s+/g, '-')}`;
+    ablageDokument(terminId, [], 'Anwesenheitsliste', 'Anwesenheitsliste', html);
     druckeInhalt(html, dateiname);
   } catch (e) {
     alert('Anwesenheitsliste konnte nicht erzeugt werden: ' + e.message);
@@ -2964,6 +3213,8 @@ function druckeFirmenNachweis(terminId, firma) {
     const gefunden = findeTerminMitKurs(terminId);
     const html = firmenNachweisHtml(terminId, firma);
     const dateiname = `Schulungsnachweis_${(firma || '').replace(/\s+/g, '-')}_${gefunden.termin.datum}`;
+    ablageDokument(terminId, ['Arbeitgebernachweise'],
+      `Schulungsnachweis ${firma}`, 'Schulungsnachweis', html);
     druckeInhalt(html, dateiname);
   } catch (e) {
     alert('Nachweis konnte nicht erzeugt werden: ' + e.message);
@@ -3061,6 +3312,7 @@ function druckeAbschlussbericht(terminId) {
     const gefunden = findeTerminMitKurs(terminId);
     const html = abschlussberichtHtml(terminId);
     const dateiname = `Abschlussbericht_${gefunden.termin.datum}_${(gefunden.kurs.titel || '').replace(/\s+/g, '-')}`;
+    ablageDokument(terminId, [], 'Abschlussbericht', 'Abschlussbericht', html);
     druckeInhalt(html, dateiname);
   } catch (e) {
     alert('Abschlussbericht konnte nicht erzeugt werden: ' + e.message);

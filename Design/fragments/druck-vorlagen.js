@@ -138,6 +138,9 @@ function druckeZertifikat(buchungId) {
     const teilnehmer = buchung && window.STATE.teilnehmer.find(t => t.id === buchung.teilnehmerId);
     const html = zertifikatHtml(buchungId);
     const dateiname = `Zertifikat_${buchung.zertifikatNr}_${(teilnehmer.name || '').replace(/\s+/g, '-')}`;
+    // Ablage anstossen, bevor der Druckdialog den Ablauf anhaelt.
+    ablageDokument(buchung.terminId, ['Bescheinigungen'],
+      `${buchung.zertifikatNr} ${teilnehmer.name}`, 'Teilnahmebescheinigung', html);
     druckeInhalt(html, dateiname);
   } catch (e) {
     alert('Bescheinigung konnte nicht erzeugt werden: ' + e.message);
@@ -242,6 +245,7 @@ function druckeAnwesenheitsliste(terminId) {
     const gefunden = findeTerminMitKurs(terminId);
     const html = anwesenheitslisteHtml(terminId);
     const dateiname = `Anwesenheitsliste_${gefunden.termin.datum}_${(gefunden.kurs.titel || '').replace(/\s+/g, '-')}`;
+    ablageDokument(terminId, [], 'Anwesenheitsliste', 'Anwesenheitsliste', html);
     druckeInhalt(html, dateiname);
   } catch (e) {
     alert('Anwesenheitsliste konnte nicht erzeugt werden: ' + e.message);
@@ -350,6 +354,8 @@ function druckeFirmenNachweis(terminId, firma) {
     const gefunden = findeTerminMitKurs(terminId);
     const html = firmenNachweisHtml(terminId, firma);
     const dateiname = `Schulungsnachweis_${(firma || '').replace(/\s+/g, '-')}_${gefunden.termin.datum}`;
+    ablageDokument(terminId, ['Arbeitgebernachweise'],
+      `Schulungsnachweis ${firma}`, 'Schulungsnachweis', html);
     druckeInhalt(html, dateiname);
   } catch (e) {
     alert('Nachweis konnte nicht erzeugt werden: ' + e.message);
@@ -447,6 +453,7 @@ function druckeAbschlussbericht(terminId) {
     const gefunden = findeTerminMitKurs(terminId);
     const html = abschlussberichtHtml(terminId);
     const dateiname = `Abschlussbericht_${gefunden.termin.datum}_${(gefunden.kurs.titel || '').replace(/\s+/g, '-')}`;
+    ablageDokument(terminId, [], 'Abschlussbericht', 'Abschlussbericht', html);
     druckeInhalt(html, dateiname);
   } catch (e) {
     alert('Abschlussbericht konnte nicht erzeugt werden: ' + e.message);
