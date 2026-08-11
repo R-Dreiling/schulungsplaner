@@ -200,6 +200,19 @@ if (typeof statusAutomatikAnwenden === 'function') {
 
 renderAll();
 
+// Ist ein Ablageordner eingerichtet, ist die Datei dort der gemeinsame Stand.
+// Sie wird nach dem ersten Zeichnen geladen (der Zugriff ist asynchron und
+// braucht ggf. eine Bestaetigung) und ersetzt dann die lokale Kopie.
+if (typeof ablageBeimStartLaden === 'function') {
+  ablageBeimStartLaden().then(function (r) {
+    if (r.geladen) {
+      statusAutomatikAnwenden();
+      renderAll();
+      console.info('Gemeinsamer Datenbestand aus dem Ablageordner geladen.');
+    }
+  });
+}
+
 // Deep-Link ueber URL-Hash, z.B. index.html#schulungen oder index.html#detail-s1
 (function () {
   var hash = location.hash.replace('#', '');

@@ -78,6 +78,26 @@ async function ablageOrdnerWaehlen() {
     const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
     await ablageHandleMerken(handle);
     aktualisiereEinstellungen({ ablageOrdnerName: handle.name });
+    await ablageKennungSchreiben(handle);
+    // Liegt dort schon ein gemeinsamer Datenbestand, hat er Vorrang vor dem
+    // lokalen - sonst ueberschreibt der erste Speichervorgang die Arbeit der
+    // anderen. Die Nutzerin entscheidet ausdruecklich.
+    const vorhanden = await ablageDatenLesen();
+    if (vorhanden) {
+      const eigene = (window.STATE.buchungen || []).length;
+      const fremde = (vorhanden.buchungen || []).length;
+      if (confirm('In diesem Ordner liegt bereits ein gemeinsamer Datenbestand '
+        + `(${fremde} Buchungen). Auf diesem Rechner sind es ${eigene}.\n\n`
+        + 'Den gemeinsamen Stand jetzt übernehmen?\n\n'
+        + 'OK = gemeinsamen Stand laden (empfohlen, damit alle gleich arbeiten)\n'
+        + 'Abbrechen = eigenen Stand behalten und beim nächsten Speichern dorthin schreiben')) {
+        pruefeImportStruktur(vorhanden);
+        window.STATE = vorhanden;
+        speichereState(false);
+      }
+    } else {
+      await ablageDatenSchreiben(true);
+    }
     return handle;
   } catch (e) {
     // Abbruch durch die Nutzerin ist kein Fehler.
@@ -258,4 +278,121 @@ async function ablageZustand() {
     name: handle.name,
     bereit: await ablageBerechtigung(handle, true),
   };
+}
+
+// ---- Gemeinsamer Datenbestand ----
+// Damit mehrere Personen mit demselben Stand arbeiten koennen, liegt der
+// Datenbestand nicht nur im Browser, sondern als Datei im Ablageordner. Liegt
+// dieser Ordner in OneDrive, synchronisiert OneDrive die Datei - jeder oeffnet
+// die App, waehlt einmal denselben Ordner und sieht denselben Stand.
+//
+// Grenze, die man kennen muss: Das ist kein Mehrbenutzerbetrieb mit
+// Datenbank. Arbeiten zwei Personen GLEICHZEITIG, gewinnt beim Speichern die
+// letzte - deshalb prueft die App vor jedem Schreiben, ob die Datei inzwischen
+// fremd veraendert wurde, und fragt dann nach, statt stillschweigend zu
+// ueberschreiben.
+
+const ABLAGE_DATEN = 'Schulungsplaner-Daten.json';
+const ABLAGE_KENNUNG = 'ABLAGE-Schulungsplaner.txt';
+
+// Stand der zuletzt gelesenen oder geschriebenen Datei, um Fremdaenderungen
+// zu erkennen.
+window.ABLAGE_STAND = { zeit: null, groesse: null };
+
+async function ablageDatenDatei(handle) {
+  return handle.getFileHandle(ABLAGE_DATEN, { create: true });
+}
+
+// Liest den gemeinsamen Datenbestand. Gibt null zurueck, wenn es noch keinen
+// gibt (dann bleibt es beim lokalen Stand).
+async function ablageDatenLesen() {
+  const handle = await ablageHandleLaden();
+  if (!istOrdnerZugriff(handle)) return null;
+  if (!(await ablageBerechtigung(handle))) return null;
+  const dateiHandle = await ablageDatenDatei(handle);
+  const datei = await dateiHandle.getFile();
+  if (datei.size === 0) return null;
+  const text = await datei.text();
+  window.ABLAGE_STAND = { zeit: datei.lastModified, groesse: datei.size };
+  return JSON.parse(text);
+}
+
+// Prueft, ob die Datei seit dem letzten Lesen/Schreiben fremd veraendert wurde.
+async function ablageFremdGeaendert(handle) {
+  if (window.ABLAGE_STAND.zeit === null) return false;
+  const dateiHandle = await ablageDatenDatei(handle);
+  const datei = await dateiHandle.getFile();
+  if (datei.size === 0) return false;
+  return datei.lastModified > window.ABLAGE_STAND.zeit + 1500;
+}
+
+// Schreibt den Datenbestand in den Ablageordner.
+async function ablageDatenSchreiben(erzwingen) {
+  const handle = await ablageHandleLaden();
+  if (!istOrdnerZugriff(handle)) return { abgelegt: false, grund: 'kein Ordner gewählt' };
+  if (!(await ablageBerechtigung(handle, true))) {
+    return { abgelegt: false, grund: 'Zugriff noch nicht bestätigt' };
+  }
+  if (!erzwingen && (await ablageFremdGeaendert(handle))) {
+    return { abgelegt: false, grund: 'fremd geändert', konflikt: true };
+  }
+  const dateiHandle = await ablageDatenDatei(handle);
+  const strom = await dateiHandle.createWritable();
+  await strom.write(JSON.stringify(window.STATE, null, 2));
+  await strom.close();
+  const datei = await dateiHandle.getFile();
+  window.ABLAGE_STAND = { zeit: datei.lastModified, groesse: datei.size };
+  return { abgelegt: true, pfad: ABLAGE_DATEN };
+}
+
+// Legt eine Kennungsdatei ab, damit im Explorer erkennbar ist, welcher Ordner
+// eingerichtet wurde - der Browser gibt den vollen Pfad nicht preis.
+async function ablageKennungSchreiben(handle) {
+  const dateiHandle = await handle.getFileHandle(ABLAGE_KENNUNG, { create: true });
+  const strom = await dateiHandle.createWritable();
+  await strom.write(
+    'Ablageordner des Schulungsplaners\r\n'
+    + '=================================\r\n\r\n'
+    + `Eingerichtet am ${heuteIso()}\r\n\r\n`
+    + 'Hier liegen:\r\n'
+    + `  ${ABLAGE_DATEN}  - der gemeinsame Datenbestand (nicht von Hand ändern)\r\n`
+    + '  Schulungen\...          - Listen, Berichte, Bescheinigungen je Termin\r\n'
+    + '  Sicherungen\...         - datierte Kopien des Datenbestands\r\n\r\n'
+    + 'Wer mitarbeiten möchte: den Schulungsplaner öffnen, unter\r\n'
+    + '"Unterschrift & Stempel" auf "Ordner wählen" und genau diesen Ordner\r\n'
+    + 'auswählen. Danach arbeiten alle auf demselben Stand.\r\n');
+  await strom.close();
+}
+
+// Beim Start: gemeinsamen Stand uebernehmen, falls vorhanden und neuer.
+async function ablageBeimStartLaden() {
+  try {
+    const daten = await ablageDatenLesen();
+    if (!daten) return { geladen: false };
+    if (typeof pruefeImportStruktur === 'function') pruefeImportStruktur(daten);
+    window.STATE = daten;
+    speichereState(false);
+    return { geladen: true };
+  } catch (e) {
+    console.warn('Gemeinsamer Datenbestand nicht ladbar:', e);
+    return { geladen: false, grund: e.message };
+  }
+}
+
+// Nach jeder Aenderung schreiben - gebuendelt, damit nicht jede Eingabe
+// einzeln auf die Platte geht.
+let ablageSchreibTimer = null;
+function ablageDatenSpaeterSchreiben() {
+  if (ablageSchreibTimer) clearTimeout(ablageSchreibTimer);
+  ablageSchreibTimer = setTimeout(() => {
+    ablageSchreibTimer = null;
+    ablageDatenSchreiben().then(r => {
+      if (r.konflikt) {
+        alert('Achtung: Der gemeinsame Datenbestand wurde zwischenzeitlich von jemand anderem geändert.\n\n'
+          + 'Deine Änderung wurde NICHT gespeichert, damit nichts verloren geht.\n'
+          + 'Bitte die App neu laden (Strg+R), damit du den aktuellen Stand siehst, '
+          + 'und deine Änderung dann erneut eintragen.');
+      }
+    }).catch(e => console.warn('Ablage des Datenbestands fehlgeschlagen:', e));
+  }, 1200);
 }

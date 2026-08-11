@@ -74,10 +74,11 @@ function oeffneEinstellungenDialog() {
           <button type="button" class="btn" onclick="einstellungenSicherungJetzt()">Alles sichern und ablegen</button>
         </div>
         <div class="field-hint">
-          Bescheinigungen, Listen und Berichte werden beim Erzeugen automatisch dort abgelegt —
-          je Termin ein Unterordner. Liegt der Ordner in OneDrive, sind sie damit in der Cloud.
-          Abgelegt wird HTML; jede Datei öffnet beim Doppelklick den Druckdialog, sodass daraus
-          mit einem Klick ein PDF im selben Ordner entsteht.
+          Dort landen die Dokumente (je Termin ein Unterordner) <strong>und der gemeinsame
+          Datenbestand</strong>. Liegt der Ordner in OneDrive, arbeiten alle auf demselben Stand:
+          App öffnen, hier denselben Ordner wählen, fertig. Zur Sicherheit liegt im Ordner die
+          Datei <em>ABLAGE-Schulungsplaner.txt</em>, damit im Explorer erkennbar ist, welcher es ist.
+          Abgelegt wird HTML; jede Datei hat einen Knopf „Als PDF speichern".
         </div>
       </div>
     </div>
@@ -115,10 +116,14 @@ function einstellungenAblageZustandZeigen() {
       return;
     }
     if (knopf) knopf.textContent = 'Anderen Ordner wählen';
-    feld.innerHTML = `<span class="einst-ablage-ordner">${escHtml(z.name)}</span> `
+    feld.innerHTML = `Ordner <span class="einst-ablage-ordner">${escHtml(z.name)}</span> `
       + (z.bereit
-        ? '<span class="einst-ablage-bereit">· bereit, Dokumente werden abgelegt</span>'
-        : '<span class="einst-ablage-aus">· Zugriff wird beim ersten Ablegen einmal bestätigt</span>');
+        ? '<span class="einst-ablage-bereit">· bereit</span>'
+        : '<span class="einst-ablage-aus">· Zugriff wird beim ersten Ablegen einmal bestätigt</span>')
+      + '<div class="einst-ablage-aus" style="margin-top:4px;">'
+      + 'Den vollständigen Pfad gibt der Browser aus Sicherheitsgründen nicht preis. '
+      + 'Zum Wiedererkennen liegt im Ordner die Datei <em>ABLAGE-Schulungsplaner.txt</em>.'
+      + '</div>';
   }).catch(e => { feld.textContent = 'Zustand nicht feststellbar: ' + e.message; });
 }
 
