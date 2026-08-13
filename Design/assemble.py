@@ -20,6 +20,8 @@ logo_normal_b64 = read(BASE / "logo.b64.txt").strip()
 logo_icon_b64 = read(BASE / "icon.b64.txt").strip()
 # Mitgelieferter Firmenstempel, im Einstellungsdialog per Knopf uebernehmbar.
 stempel_b64 = read(BASE / "stempel.b64.txt").strip()
+# Vendored MSAL.js-Browserbundle fuer die Microsoft-Anmeldung.
+msal_js = read(BASE / "vendor" / "msal-browser.min.js")
 
 page_css_parts = []
 for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-buchungen", "page-trainer", "page-hilfe"]:
@@ -71,6 +73,7 @@ html = html.replace("{{LOGO_B64}}", logo_b64)
 html = html.replace("{{LOGO_NORMAL_B64}}", logo_normal_b64)
 html = html.replace("{{LOGO_ICON_B64}}", logo_icon_b64)
 html = html.replace("{{STEMPEL_B64}}", stempel_b64)
+html = html.replace("{{MSAL_JS}}", msal_js)
 html = html.replace("{{CORE_JS}}", core_js)
 html = html.replace("{{PAGE_JS}}", page_js)
 html = html.replace("{{DATA_JSON}}", data_json_str)
