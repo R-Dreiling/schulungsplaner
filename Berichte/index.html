@@ -763,7 +763,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
      stattdessen im Padding von .druck-seite. */
   @page { size: A4; margin: 0; }
   body { display: block; padding: 0; background: #fff; min-height: 0; }
-  .app-window, #dialog-overlay { display: none !important; }
+  .app-window, #dialog-overlay, #anmelde-bildschirm { display: none !important; }
   #druck-bereich { display: block; }
   .druck-seite { page-break-after: always; }
   .druck-seite:last-child { page-break-after: auto; }
@@ -772,6 +772,37 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
   /* Kopfzeile der Anwesenheitsliste auf Folgeseiten wiederholen. */
   table.al-tabelle thead { display: table-header-group; }
   .al-bestaetigung, .al-signatur { page-break-inside: avoid; }
+}
+
+/* ---- Anmelde-Bildschirm (Microsoft-Login) ---- */
+.anmelde-bildschirm {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.anmelde-karte {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  padding: 40px 48px;
+  text-align: center;
+  max-width: 360px;
+}
+.anmelde-karte h1 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+.anmelde-karte p {
+  font-family: var(--font-body);
+  color: var(--text);
+  margin: 0 0 20px;
 }
 
 
@@ -1234,6 +1265,14 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
 
 <div id="dialog-overlay" class="dialog-overlay" style="display:none">
   <div id="dialog-container" class="dialog"></div>
+</div>
+
+<div id="anmelde-bildschirm" class="anmelde-bildschirm">
+  <div class="anmelde-karte">
+    <h1>Schulungsplaner</h1>
+    <p id="anmelde-text">Anmeldung wird geprüft …</p>
+    <button id="anmelde-knopf" class="btn btn-primary" style="display:none" onclick="anmeldeStarten()">Mit Microsoft anmelden</button>
+  </div>
 </div>
 
 <!-- Wird nur beim Drucken sichtbar (siehe @media print in styles.css) und
@@ -5823,26 +5862,53 @@ function renderAll() {
 }
 window.renderAll = renderAll;
 
-// Status-Automatik laeuft genau einmal beim Laden - bewusst vor dem ersten
-// Rendern und ausserhalb davon, damit das Rendern seiteneffektfrei bleibt.
-if (typeof statusAutomatikAnwenden === 'function') {
-  statusAutomatikAnwenden();
+// Status-Automatik laeuft erst NACH dem Laden des gemeinsamen Standes
+// (siehe anmeldeLadeUndZeige) - vorher wuerde sie auf dem gleich wieder
+// verworfenen lokalen Zwischenstand rechnen.
+
+// Erst anmelden und den gemeinsamen Stand laden, dann rendern - vorher
+// zeigt die App bewusst nichts (siehe design-spec-cloud-sync.md, Abschnitt
+// "Anmeldung": "Ohne gueltige Anmeldung: ausschliesslich der
+// Anmelde-Bildschirm, keine Daten, keine Formulare").
+async function anmeldeLadeUndZeige() {
+  document.getElementById('anmelde-text').textContent = 'Daten werden geladen …';
+  await graphBeimStartLaden();
+  if (typeof statusAutomatikAnwenden === 'function') statusAutomatikAnwenden();
+  renderAll();
+  document.getElementById('anmelde-bildschirm').style.display = 'none';
 }
 
-renderAll();
-
-// Ist ein Ablageordner eingerichtet, ist die Datei dort der gemeinsame Stand.
-// Sie wird nach dem ersten Zeichnen geladen (der Zugriff ist asynchron und
-// braucht ggf. eine Bestaetigung) und ersetzt dann die lokale Kopie.
-if (typeof ablageBeimStartLaden === 'function') {
-  ablageBeimStartLaden().then(function (r) {
-    if (r.geladen) {
-      statusAutomatikAnwenden();
-      renderAll();
-      console.info('Gemeinsamer Datenbestand aus dem Ablageordner geladen.');
-    }
-  });
+async function anmeldeAblauf() {
+  const text = document.getElementById('anmelde-text');
+  const knopf = document.getElementById('anmelde-knopf');
+  text.textContent = 'Anmeldung wird geprüft …';
+  const still = await graphSilentAnmeldung().catch(() => null);
+  if (!still) {
+    text.textContent = 'Bitte mit dem tribeta-Microsoft-Konto anmelden.';
+    knopf.style.display = '';
+    return;
+  }
+  await anmeldeLadeUndZeige();
 }
+
+// Nur aus diesem Klick-Handler heraus interaktiv anmelden - Popups ohne
+// direkte Nutzeraktion werden vom Browser blockiert.
+async function anmeldeStarten() {
+  const text = document.getElementById('anmelde-text');
+  const knopf = document.getElementById('anmelde-knopf');
+  knopf.style.display = 'none';
+  text.textContent = 'Anmeldung läuft …';
+  try {
+    await graphInteraktiveAnmeldung();
+    await anmeldeLadeUndZeige();
+  } catch (e) {
+    console.warn('Anmeldung fehlgeschlagen:', e);
+    text.textContent = 'Anmeldung fehlgeschlagen oder abgebrochen.';
+    knopf.style.display = '';
+  }
+}
+
+anmeldeAblauf();
 
 // Deep-Link ueber URL-Hash, z.B. index.html#schulungen oder index.html#detail-s1
 (function () {
