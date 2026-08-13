@@ -1023,8 +1023,19 @@ git commit -m "feat: alte Ablage-Loesung entfernen, Cloud-Anmeldestatus im Einst
 
 ## Task 11: Hilfeseite aktualisieren
 
+> **Nachtrag aus der Umsetzung:** Die Bestätigungstexte von `zuruecksetzenAufBeispieldaten()`
+> und `alleDatenLeeren()` (`Design/state-engine.js`) warnten noch so, als
+> betreffe die Aktion nur den lokalen Browser — tatsächlich schreiben beide
+> über `speichereState()` jetzt automatisch in den gemeinsamen Cloud-Bestand,
+> betreffen also alle angemeldeten Personen. Beide Texte ergänzt: "Das
+> betrifft den gemeinsamen Datenbestand in der Cloud — alle angemeldeten
+> Personen [...]". Nicht ursprünglich in diesem Plan vorgesehen, aber eine
+> direkte Konsequenz der Umstellung und sicherheitsrelevant genug, um sie
+> hier mitzunehmen statt zu verschieben.
+
 **Files:**
 - Modify: `Design/fragments/page-hilfe.html`
+- Modify: `Design/state-engine.js` (Bestätigungstexte von `zuruecksetzenAufBeispieldaten()` und `alleDatenLeeren()`)
 
 - [ ] **Step 1: "Wo die Daten liegen" korrigieren**
 

@@ -79,7 +79,9 @@ function sicherungVermerken() {
 }
 
 function zuruecksetzenAufBeispieldaten() {
-  if (!confirm('Wirklich alle Kurse, Termine, Buchungen und Trainer löschen und auf den Auslieferungszustand zurücksetzen?')) {
+  if (!confirm('Wirklich alle Kurse, Termine, Buchungen und Trainer löschen und auf den '
+    + 'Auslieferungszustand zurücksetzen?\n\nDas betrifft den gemeinsamen Datenbestand in der '
+    + 'Cloud — alle angemeldeten Personen sehen danach den leeren Stand.')) {
     return;
   }
   window.STATE = JSON.parse(JSON.stringify(window.SEED_DATA));
@@ -688,7 +690,9 @@ async function alleDatenLeeren() {
   if (!confirm(
     'Wirklich ALLE Daten unwiderruflich löschen?\n\n'
     + 'Kurse, Termine, Buchungen, Teilnehmer, Trainer und alle hochgeladenen '
-    + 'Dateien werden entfernt. Das lässt sich nicht rückgängig machen.\n\n'
+    + 'Dateien werden entfernt. Das betrifft den gemeinsamen Datenbestand in der '
+    + 'Cloud — alle angemeldeten Personen sind betroffen. Das lässt sich nicht '
+    + 'rückgängig machen.\n\n'
     + 'Tipp: Vorher „Exportieren“ anklicken, falls du eine Sicherung möchtest.'
   )) {
     return;
