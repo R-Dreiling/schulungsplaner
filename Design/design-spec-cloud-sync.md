@@ -78,7 +78,11 @@ Anwendungsserver, den jemand betreiben und absichern müsste.
   Konten aus dem tribeta-Tenant können sich überhaupt anmelden — kein
   Fremdzugriff, selbst wenn jemand die GitHub-Pages-URL kennt). Einmalige
   Einrichtung mit Admin-Zugriff.
-- Berechtigung (Scope): `Files.ReadWrite`, delegiert. Kein
+- Berechtigung (Scope): `Files.ReadWrite.All`, delegiert. **Nicht** das
+  engere `Files.ReadWrite` — das deckt in Azure AD nur die eigenen Dateien
+  der angemeldeten Person ab; der Ablageordner gehört der Admin-Nutzerin und
+  ist mit den anderen nur geteilt, ohne „.All" könnten Kolleginnen ihn nicht
+  lesen/schreiben (in der Praxis bei der Einrichtung so festgestellt). Kein
   Application-Permission, keine tenant-weite Admin-Zustimmung über einzelne
   Nutzerfreigabe hinaus nötig, solange die Tenant-Richtlinien
   Nutzer-Zustimmung erlauben (Prüfung Teil der Einrichtung).
@@ -158,7 +162,7 @@ Gemeinsam mit der Nutzerin, die über Admin-Zugriff auf das
 tribeta-Microsoft-365-Tenant verfügt:
 
 1. Azure-AD-App-Registrierung anlegen (Single-Tenant, Redirect-URI = die
-   spätere GitHub-Pages-URL, Scope `Files.ReadWrite`).
+   spätere GitHub-Pages-URL, Scope `Files.ReadWrite.All`).
 2. Der bestehende, bereits geteilte OneDrive-Ordner „Schulungsplaner" wird
    weiterverwendet — keine neue Freigabe nötig.
 3. GitHub-Repository + GitHub-Pages-Seite für den Code einrichten

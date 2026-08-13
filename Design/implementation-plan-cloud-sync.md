@@ -258,7 +258,16 @@ Kein Code-Task, braucht den Admin-Zugriff der Nutzerin im Microsoft-365-Tenant.
   - „Anwendungs-ID (Client)" → das ist `clientId`
   - „Verzeichnis-ID (Mandant)" → das ist `tenantId`
 - [ ] **Step 4:** API-Berechtigungen → Berechtigung hinzufügen → Microsoft Graph
-  → Delegierte Berechtigungen → `Files.ReadWrite` auswählen → Hinzufügen.
+  → Delegierte Berechtigungen → `Files.ReadWrite.All` auswählen → Hinzufügen.
+  **Nicht** das engere `Files.ReadWrite` — Azure zeigt bei der Auswahl selbst
+  den Unterschied an: `Files.ReadWrite` = „Vollzugriff auf Benutzerdateien"
+  (nur die eigenen), `Files.ReadWrite.All` = „Vollzugriff auf alle Dateien,
+  auf die der Benutzer zugreifen kann" (schließt geteilte Ordner ein — genau
+  unser Fall, der Ablageordner gehört der Admin-Nutzerin, nicht jeder
+  einzelnen Kollegin).
+- [ ] **Step 4b:** Direkt im Anschluss auf „Administratorzustimmung für
+  [Tenant] erteilen" klicken und bestätigen — dann muss keine einzelne
+  Kollegin beim ersten Login extra zustimmen.
 - [ ] **Step 5:** Diese beiden Werte (Client-ID, Tenant-ID) für Task 6 bereithalten.
 
 **Kein Commit in diesem Task.**
@@ -266,6 +275,11 @@ Kein Code-Task, braucht den Admin-Zugriff der Nutzerin im Microsoft-365-Tenant.
 ---
 
 ## Task 5: `graph-config.js` mit echten Werten befüllen
+
+> **Nachtrag aus der Umsetzung:** App-Registrierung „Schulungsplaner" im
+> Tenant „HinSchG Meldungen GbR" — `clientId` `f3c14c0a-1442-4cd5-8231-692a7938ad02`,
+> `tenantId` `473ae1a6-c24a-4f5e-a00b-1dc5ef3f4793`. Beide unbedenklich im
+> öffentlichen Repo, siehe Kommentar in `graph-config.js`.
 
 **Files:**
 - Modify: `Design/graph-config.js`
@@ -332,7 +346,11 @@ git commit -m "feat: Azure-AD-App-Registrierung in graph-config.js eintragen"
 // graphSilentAnmeldung() beim Start (kein Popup, meldet nur ein vorhandenes
 // Konto an), graphInteraktiveAnmeldung() nur aus einem Knopf-Klick heraus.
 
-const GRAPH_SCOPES = ['Files.ReadWrite'];
+// Files.ReadWrite.All statt Files.ReadWrite: Letzteres deckt in Azure AD nur
+// die eigenen Dateien der angemeldeten Person ab. Der Ablageordner gehoert
+// aber der Admin-Nutzerin und ist mit den anderen nur GETEILT - ohne ".All"
+// koennten Kolleginnen ihn nicht lesen/schreiben.
+const GRAPH_SCOPES = ['Files.ReadWrite.All'];
 
 let msalApp = null;
 

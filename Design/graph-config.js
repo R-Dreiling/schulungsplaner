@@ -4,8 +4,8 @@
 // einer Public-Client-SPA ist nicht vertraulich, das Deployment ist bewusst
 // oeffentlich (siehe design-spec-cloud-sync.md, Abschnitt "Architektur").
 window.GRAPH_CONFIG = {
-  clientId: '',    // Anwendungs-ID (Client) aus der Azure-AD-App-Registrierung
-  tenantId: '',    // Verzeichnis-ID (Mandant) aus der Azure-AD-App-Registrierung
+  clientId: 'f3c14c0a-1442-4cd5-8231-692a7938ad02',
+  tenantId: '473ae1a6-c24a-4f5e-a00b-1dc5ef3f4793',
   redirectUri: window.location.origin + window.location.pathname,
   driveId: '',     // OneDrive-Laufwerks-ID des freigegebenen Ordners
   itemId: '',      // Element-ID des Ordners "Schulungsplaner" in diesem Laufwerk

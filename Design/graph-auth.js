@@ -4,7 +4,11 @@
 // graphSilentAnmeldung() beim Start (kein Popup, meldet nur ein vorhandenes
 // Konto an), graphInteraktiveAnmeldung() nur aus einem Knopf-Klick heraus.
 
-const GRAPH_SCOPES = ['Files.ReadWrite'];
+// Files.ReadWrite.All statt Files.ReadWrite: Letzteres deckt in Azure AD nur
+// die eigenen Dateien der angemeldeten Person ab. Der Ablageordner gehoert
+// aber der Admin-Nutzerin und ist mit den anderen nur GETEILT - ohne ".All"
+// koennten Kolleginnen ihn nicht lesen/schreiben.
+const GRAPH_SCOPES = ['Files.ReadWrite.All'];
 
 let msalApp = null;
 
