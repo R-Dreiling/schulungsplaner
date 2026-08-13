@@ -1812,6 +1812,10 @@ function erstelleKurs(felder) {
     minTeilnehmer: felder.minTeilnehmer || 5,
     maxTeilnehmer: felder.maxTeilnehmer || 30,
     zertifikat: {
+      // Teilnahmebescheinigung (reine Anwesenheitsbestaetigung) vs. Zertifikat
+      // (setzt i. d. R. eine Pruefung/Bewertung voraus) - zwei unterschiedliche
+      // Dokumentarten, die auf dem Ausdruck nicht widersprechen duerfen.
+      dokumentart: felder.dokumentart || 'Teilnahmebescheinigung',
       kuerzel: felder.kuerzel || '',
       umfangUE: felder.umfangUE || 8,
       ueberschrift: felder.ueberschrift || felder.titel,
@@ -3065,13 +3069,13 @@ function zertifikatHtml(buchungId) {
       ${druckUntergrund('voll')}
       <div class="druck-inhalt">
         <div class="zert-kopfmarke">
-          <span class="zert-dokumentart">Teilnahmebescheinigung</span>
+          <span class="zert-dokumentart">${escHtml(z.dokumentart || 'Teilnahmebescheinigung')}</span>
           <img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" />
         </div>
 
         <div class="zert-mitte">
           <div class="zert-ueberschrift">${escHtml(z.ueberschrift || kurs.titel)}</div>
-          <h1 class="zert-titel">Zertifikat</h1>
+          <h1 class="zert-titel">${escHtml(z.dokumentart || 'Teilnahmebescheinigung')}</h1>
           <div class="zert-titelstrich"></div>
           <div class="zert-einleitung">Hiermit wird bestätigt, dass</div>
           <div class="zert-name">${escHtml(teilnehmer.name)}</div>
@@ -3746,12 +3750,20 @@ function schulungenKursFormularFelder(kurs) {
   const k = kurs || {
     titel: '', kategorie: '', beschreibung: '', voraussetzungen: 'Keine',
     format: 'Vor Ort', minTeilnehmer: 5, maxTeilnehmer: 30,
-    zertifikat: { kuerzel: '', umfangUE: 8, ueberschrift: '', bestaetigungstext: '', gueltigkeit: 'unbefristet', auffrischungMonate: 0 },
+    zertifikat: { dokumentart: 'Teilnahmebescheinigung', kuerzel: '', umfangUE: 8, ueberschrift: '', bestaetigungstext: '', gueltigkeit: 'unbefristet', auffrischungMonate: 0 },
   };
   const z = k.zertifikat || {};
   return `
     ${schulungenKategorieDatalist()}
     <div class="field"><label>Titel</label><input name="titel" value="${escAttr(k.titel)}" required /></div>
+    <div class="field">
+      <label>Dokumentart</label>
+      <select name="dokumentart">
+        <option ${(z.dokumentart || 'Teilnahmebescheinigung') === 'Teilnahmebescheinigung' ? 'selected' : ''}>Teilnahmebescheinigung</option>
+        <option ${z.dokumentart === 'Zertifikat' ? 'selected' : ''}>Zertifikat</option>
+      </select>
+      <div class="field-hint">Teilnahmebescheinigung bestätigt nur die Anwesenheit; Zertifikat setzt üblicherweise eine Prüfung/Bewertung voraus.</div>
+    </div>
     <div class="field">
       <label>Kategorie</label>
       <input name="kategorie" list="kategorien-liste" value="${escAttr(k.kategorie)}" required />
@@ -3856,6 +3868,7 @@ function speichereKursBearbeiten(ev, kursId) {
     maxTeilnehmer: felder.maxTeilnehmer,
     zertifikat: {
       ...kurs.zertifikat,
+      dokumentart: felder.dokumentart || 'Teilnahmebescheinigung',
       kuerzel: felder.kuerzel,
       umfangUE: felder.umfangUE,
       gueltigkeit: felder.gueltigkeit,

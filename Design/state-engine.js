@@ -236,6 +236,10 @@ function erstelleKurs(felder) {
     minTeilnehmer: felder.minTeilnehmer || 5,
     maxTeilnehmer: felder.maxTeilnehmer || 30,
     zertifikat: {
+      // Teilnahmebescheinigung (reine Anwesenheitsbestaetigung) vs. Zertifikat
+      // (setzt i. d. R. eine Pruefung/Bewertung voraus) - zwei unterschiedliche
+      // Dokumentarten, die auf dem Ausdruck nicht widersprechen duerfen.
+      dokumentart: felder.dokumentart || 'Teilnahmebescheinigung',
       kuerzel: felder.kuerzel || '',
       umfangUE: felder.umfangUE || 8,
       ueberschrift: felder.ueberschrift || felder.titel,

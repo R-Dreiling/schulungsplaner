@@ -98,13 +98,13 @@ function zertifikatHtml(buchungId) {
       ${druckUntergrund('voll')}
       <div class="druck-inhalt">
         <div class="zert-kopfmarke">
-          <span class="zert-dokumentart">Teilnahmebescheinigung</span>
+          <span class="zert-dokumentart">${escHtml(z.dokumentart || 'Teilnahmebescheinigung')}</span>
           <img class="druck-logo" src="${window.LOGO_NORMAL}" alt="tribeta" />
         </div>
 
         <div class="zert-mitte">
           <div class="zert-ueberschrift">${escHtml(z.ueberschrift || kurs.titel)}</div>
-          <h1 class="zert-titel">Zertifikat</h1>
+          <h1 class="zert-titel">${escHtml(z.dokumentart || 'Teilnahmebescheinigung')}</h1>
           <div class="zert-titelstrich"></div>
           <div class="zert-einleitung">Hiermit wird bestätigt, dass</div>
           <div class="zert-name">${escHtml(teilnehmer.name)}</div>
