@@ -79,7 +79,7 @@ function sicherungVermerken() {
 }
 
 function zuruecksetzenAufBeispieldaten() {
-  if (!confirm('Wirklich alle Änderungen verwerfen und auf die Beispieldaten zurücksetzen?')) {
+  if (!confirm('Wirklich alle Kurse, Termine, Buchungen und Trainer löschen und auf den Auslieferungszustand zurücksetzen?')) {
     return;
   }
   window.STATE = JSON.parse(JSON.stringify(window.SEED_DATA));

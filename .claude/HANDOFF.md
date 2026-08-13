@@ -1,7 +1,49 @@
 # HANDOFF — Schulungsplaner
 
-Stand: Ende der Session, Branch `feature/kurs-termin-buchung`, HEAD `a6d36d4`.
-Arbeitsbaum sauber, **keine Datei in einem halbfertigen Zustand**.
+Stand: Ende der Session, Branch `feature/kurs-termin-buchung`, HEAD noch offen
+(diese Session fügt einen weiteren Commit an). Arbeitsbaum sauber, **keine Datei
+in einem halbfertigen Zustand**.
+
+## Diese Session: Klarstellung Cloud-Architektur + Nachzügler aus einer Parallel-Session
+
+Eine andere Claude-Code-Session lief zeitgleich im **alten** Verzeichnis unter
+`Desktop\Persönlich\Claude Code\Projekt-Systeme\Schulungsplanner` — ohne zu
+wissen, dass das Projekt hierher umgezogen ist (die Nutzerin hatte das gewusst,
+aber der neuen Session beim Start nicht mitgeteilt). Diese Session hat dort
+eigenständig weitergearbeitet und sogar einen kompletten Architekturentwurf für
+einen Microsoft-Graph-API-/Azure-AD-Login-Ansatz ausgearbeitet, **bevor** der
+Doppelgänger-Ordner auffiel.
+
+**Ergebnis der Klärung mit der Nutzerin:** Der Graph-API-Ansatz ist unnötig
+komplex für den tatsächlichen Bedarf. Die hier bereits gebaute
+**Ablage-Lösung** (gemeinsamer, per `showDirectoryPicker()` gewählter,
+OneDrive-synchronisierter Ordner) deckt den eigentlichen Fall — Zugriffsverlust
+bei Rechnerausfall, Vertretung durch Kolleginnen — bereits ab, weil sowohl der
+App-Code als auch der Ablageordner ohnehin in diesem einen OneDrive-Baum liegen
+und mit den 2–4 anderen Personen geteilt werden können. Einzige Voraussetzung:
+OneDrive-Client auf dem jeweiligen Rechner eingerichtet, dann einmalig den
+Ordner im Browser auswählen — kein Login-System, kein Hosting nötig. **Dieser
+Weg wird weiterverfolgt, der Graph-API-Entwurf wird nicht umgesetzt.**
+
+Aus der Parallel-Session wurden folgende sinnvolle, unabhängige Verbesserungen
+hierher übertragen (nicht der Architekturentwurf selbst):
+
+| Änderung | Datei(en) |
+|---|---|
+| Beispieldaten geleert (App startet leer statt mit 8 Demo-Kursen/33 Demo-Teilnehmern) | `Daten/schulungsdaten.json` |
+| Hart codierte „5 Trainer"-Prüfung aus der Migrationsverifikation entfernt (wäre bei jeder echten Dateneingabe künftig fälschlich rot gewesen) | `Design/verify_migration_v3.py` |
+| Hilfetexte zu „Zurücksetzen"/„Mit echten Daten starten" korrigiert (sprachen noch von „mitgelieferten Beispieldaten", die es jetzt nicht mehr gibt) | `Design/fragments/page-hilfe.html`, `Design/state-engine.js` |
+| Browser-Tab-Icon (Favicon) ergänzt — nutzt das schon vorhandene türkise Signet, das bislang nur fürs Wasserzeichen verwendet wurde | `Design/shell-template.html`, `Berichte/tribeta-icon.ico` (neu) |
+| Desktop-Verknüpfung `Schulungsplaner.lnk` zeigte noch auf das alte, jetzt endgültig überflüssige Desktop-Verzeichnis — auf diesen Ordner umgebogen, inkl. neuem Icon | (außerhalb des Repos, Windows-Verknüpfung) |
+
+**Das alte Verzeichnis unter `Desktop\Persönlich\Claude Code\Projekt-Systeme\Schulungsplanner`
+ist damit endgültig ohne Funktion** — nichts zeigt mehr darauf, alle
+brauchbaren Änderungen daraus sind hier eingepflegt. Es enthält allerdings noch
+einen eigenständigen Design-Entwurf für den verworfenen Graph-API-Ansatz
+(`Design/design-spec-cloud-sync.md`) als Dokumentation der Diskussion, falls
+der Bedarf sich später doch einmal in Richtung „echter Mehrbenutzerbetrieb mit
+Login von jedem beliebigen Gerät" verschiebt. Löschen kann die Nutzerin es
+selbst, sobald sie möchte — nicht automatisch von einer Session aus erledigt.
 
 **Projektpfad seit dem Umzug:**
 `C:\Hinschg\OneDrive - HinSchG Meldungen GbR\Claude-tribeta-Tools\Schulungsplaner`

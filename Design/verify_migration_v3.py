@@ -20,8 +20,6 @@ def main():
         raise SystemExit(1)
 
     trainer_ids = {t["id"] for t in data["trainer"]}
-    if len(data["trainer"]) != 5:
-        fehler.append(f"Erwartet 5 Trainer, gefunden {len(data['trainer'])}")
     for t in data["trainer"]:
         for feld in ("id", "name", "email", "telefon", "qualifikation", "notizen", "dokumente"):
             if feld not in t:
