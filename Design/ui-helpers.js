@@ -77,12 +77,8 @@ function anmeldestatusBadgeHtml(status) {
   return `<span class="badge ${klasse}">${label}</span>`;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const overlay = document.getElementById('dialog-overlay');
-  overlay.addEventListener('click', (ev) => {
-    if (ev.target === overlay) schliesseDialog();
-  });
-  document.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape') schliesseDialog();
-  });
-});
+// Bewusst KEIN Schliessen per Klick daneben oder Esc: in einem laengeren
+// Formular (z. B. "Neuen Kurs anlegen") fuehrte ein versehentlicher Klick auf
+// den abgedunkelten Rand oder ein Esc-Tastendruck sonst zum sofortigen,
+// unwiderruflichen Verlust aller eingetragenen Werte, ohne Nachfrage.
+// Schliessen geht nur noch ueber die expliziten Knoepfe (Abbrechen/✕).
