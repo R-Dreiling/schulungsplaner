@@ -7,6 +7,9 @@ from pathlib import Path
 BASE = Path(__file__).parent
 FRAGMENTS = BASE / "fragments"
 OUT = BASE.parent / "Berichte" / "index.html"
+# GitHub Pages kann nur "/ (root)" oder "/docs" als Quelle - docs/index.html
+# ist die veroeffentlichte Kopie, Berichte/index.html bleibt der kanonische Build.
+DOCS_OUT = BASE.parent / "docs" / "index.html"
 
 def read(path, default=""):
     p = Path(path)
@@ -83,3 +86,7 @@ for key, content in pages.items():
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(html, encoding="utf-8")
 print("Geschrieben:", OUT, len(html), "Zeichen")
+
+DOCS_OUT.parent.mkdir(parents=True, exist_ok=True)
+DOCS_OUT.write_text(html, encoding="utf-8")
+print("Geschrieben:", DOCS_OUT, len(html), "Zeichen")
