@@ -1,159 +1,176 @@
 # HANDOFF — Schulungsplaner
 
-Stand: Ende der Session, Branch `feature/kurs-termin-buchung`, HEAD noch offen
-(diese Session fügt einen weiteren Commit an). Arbeitsbaum sauber, **keine Datei
-in einem halbfertigen Zustand**.
-
-## Diese Session: Klarstellung Cloud-Architektur + Nachzügler aus einer Parallel-Session
-
-Eine andere Claude-Code-Session lief zeitgleich im **alten** Verzeichnis unter
-`Desktop\Persönlich\Claude Code\Projekt-Systeme\Schulungsplanner` — ohne zu
-wissen, dass das Projekt hierher umgezogen ist (die Nutzerin hatte das gewusst,
-aber der neuen Session beim Start nicht mitgeteilt). Diese Session hat dort
-eigenständig weitergearbeitet und sogar einen kompletten Architekturentwurf für
-einen Microsoft-Graph-API-/Azure-AD-Login-Ansatz ausgearbeitet, **bevor** der
-Doppelgänger-Ordner auffiel.
-
-**Ergebnis der Klärung mit der Nutzerin:** Der Graph-API-Ansatz ist unnötig
-komplex für den tatsächlichen Bedarf. Die hier bereits gebaute
-**Ablage-Lösung** (gemeinsamer, per `showDirectoryPicker()` gewählter,
-OneDrive-synchronisierter Ordner) deckt den eigentlichen Fall — Zugriffsverlust
-bei Rechnerausfall, Vertretung durch Kolleginnen — bereits ab, weil sowohl der
-App-Code als auch der Ablageordner ohnehin in diesem einen OneDrive-Baum liegen
-und mit den 2–4 anderen Personen geteilt werden können. Einzige Voraussetzung:
-OneDrive-Client auf dem jeweiligen Rechner eingerichtet, dann einmalig den
-Ordner im Browser auswählen — kein Login-System, kein Hosting nötig. **Dieser
-Weg wird weiterverfolgt, der Graph-API-Entwurf wird nicht umgesetzt.**
-
-Aus der Parallel-Session wurden folgende sinnvolle, unabhängige Verbesserungen
-hierher übertragen (nicht der Architekturentwurf selbst):
-
-| Änderung | Datei(en) |
-|---|---|
-| Beispieldaten geleert (App startet leer statt mit 8 Demo-Kursen/33 Demo-Teilnehmern) | `Daten/schulungsdaten.json` |
-| Hart codierte „5 Trainer"-Prüfung aus der Migrationsverifikation entfernt (wäre bei jeder echten Dateneingabe künftig fälschlich rot gewesen) | `Design/verify_migration_v3.py` |
-| Hilfetexte zu „Zurücksetzen"/„Mit echten Daten starten" korrigiert (sprachen noch von „mitgelieferten Beispieldaten", die es jetzt nicht mehr gibt) | `Design/fragments/page-hilfe.html`, `Design/state-engine.js` |
-| Browser-Tab-Icon (Favicon) ergänzt — nutzt das schon vorhandene türkise Signet, das bislang nur fürs Wasserzeichen verwendet wurde | `Design/shell-template.html`, `Berichte/tribeta-icon.ico` (neu) |
-| Desktop-Verknüpfung `Schulungsplaner.lnk` zeigte noch auf das alte, jetzt endgültig überflüssige Desktop-Verzeichnis — auf diesen Ordner umgebogen, inkl. neuem Icon | (außerhalb des Repos, Windows-Verknüpfung) |
-
-**Das alte Verzeichnis unter `Desktop\Persönlich\Claude Code\Projekt-Systeme\Schulungsplanner`
-wurde auf Wunsch der Nutzerin gelöscht** (Inhalt vollständig entfernt; die leere
-Ordnerhülle selbst hing noch kurz am Bash-Prozess der löschenden Session fest —
-verschwindet spätestens mit deren Ende). Der darin enthaltene
-Graph-API-Architekturentwurf ist damit weg; die Begründung, warum dieser Weg
-verworfen wurde, steht oben und reicht als Dokumentation, falls der Bedarf sich
-später doch einmal in Richtung „echter Mehrbenutzerbetrieb mit Login von jedem
-beliebigen Gerät" verschiebt.
-
-**Zugriff der Kolleginnen bestätigt:** Die Nutzerin hat rückgemeldet, dass die
-2–4 anderen Personen bereits Zugriff auf den aktuellen OneDrive-Ordner haben
-(Freigabe erledigt). Ob der Ablageordner-Workflow (`showDirectoryPicker()` +
-gemeinsamer Datenbestand) bei ihnen auch tatsächlich funktioniert, wenn sie ihn
-zum ersten Mal in der App auswählen, ist damit noch nicht geprüft — das bleibt
-der nächste sinnvolle Test.
-
-**Projektpfad seit dem Umzug:**
-`C:\Hinschg\OneDrive - HinSchG Meldungen GbR\Claude-tribeta-Tools\Schulungsplaner`
-
-Das alte Verzeichnis unter `Desktop\Persönlich\Claude Code\Projekt-Systeme\Schulungsplanner`
-ist gelöscht (siehe oben). Die Wurzel-`CLAUDE.md` mit den tribeta-Designregeln
-lag dort und gilt hier **nicht automatisch** — die relevanten Regeln stehen in
-der projektlokalen `CLAUDE.md`.
+Stand: Cloud-Sync-Migration abgeschlossen und mit echtem Kollegen-Test
+verifiziert. Branch `feature/kurs-termin-buchung`, Arbeitsbaum sauber.
 
 ## Was das ist
 
-Lokales, serverloses Werkzeug für die **tribeta GmbH** zur Planung und
-Nachweisführung von Schulungen. Eine einzige `Berichte/index.html`, per
-Doppelklick oder als App-Fenster lauffähig, ohne Server und ohne Internet.
+Schulungsplanungs-Werkzeug für die **tribeta GmbH**: Kurse/Termine/Buchungen,
+Trainer mit Nachweisen, Anwesenheit mit 80-%-Regel, Bescheinigungen, Abschluss
+mit Festschreibung, Abschlussbericht, Anwesenheitsliste, Arbeitgebernachweis,
+fällige Auffrischungen, Sammelbuchung, PDF-Erzeugung. Technisch eine einzige
+`index.html` (kein Server, kein Build-Tool außer dem lokalen `assemble.py`),
+aber **kein reines Einzelplatz-Werkzeug mehr** — der Datenbestand liegt
+gemeinsam in der Cloud, mehrere Personen arbeiten gleichzeitig daran.
 
-## Stand: einsatzbereit, in der Testphase
+## Architektur: gehostet + Microsoft-Login + Graph API
 
-Fertig und im Einsatz: Kurse/Termine/Buchungen, Trainer mit Nachweisen,
-Anwesenheit mit 80-%-Regel, Bescheinigungen, Abschluss mit Festschreibung,
-Abschlussbericht, Anwesenheitsliste, Arbeitgebernachweis, fällige
-Auffrischungen, Sammelbuchung, Ablage in einen Ordner, gemeinsamer
-Datenbestand, PDF-Erzeugung.
+Frühere Ansätze (lokaler `localStorage`, dann ein per `showDirectoryPicker()`
+gewählter Ablageordner) sind **beide gescheitert** — Letzterer erst nach einem
+echten Test mit einem Kollegen: weder sah er die vorhandenen Daten, noch kamen
+neue Einträge bei der anderen Seite an. Die jetzige, dritte Lösung wurde
+ebenfalls mit einem echten Kollegen-Test verifiziert und funktioniert:
 
-### Zuletzt gebaut (diese Session)
+1. **Code liegt öffentlich auf GitHub Pages.** Repo:
+   `https://github.com/R-Dreiling/schulungsplaner` (öffentlich, unbedenklich,
+   da nur App-Code drin liegt, keine Nachweisdaten). Live-URL:
+   **`https://r-dreiling.github.io/schulungsplaner/`**. GitHub Pages
+   unterstützt nur `/ (root)` oder `/docs` als Quelle — deshalb schreibt
+   `assemble.py` die gebaute App **zweimal**: nach `Berichte/index.html` (der
+   kanonische Build, für den lokalen/OneDrive-Gebrauch) und zusätzlich nach
+   `docs/index.html` (identischer Inhalt, nur für GitHub Pages). Bei jeder
+   Änderung **beide** committen und pushen — `assemble.py` erledigt das
+   Schreiben automatisch, git-Add/Push bleibt manuell.
+2. **Anmeldung über das tribeta-Microsoft-Konto** (Azure AD / Microsoft Entra
+   ID, Tenant „HinSchG Meldungen GbR", Single-Tenant-App-Registrierung
+   „Schulungsplaner", clientId `f3c14c0a-1442-4cd5-8231-692a7938ad02`,
+   tenantId `473ae1a6-c24a-4f5e-a00b-1dc5ef3f4793`). MSAL.js (vendored unter
+   `Design/vendor/msal-browser.min.js`) übernimmt Login/Token. Jede Person
+   meldet sich mit ihrem eigenen Konto an (Single Sign-on, falls im Browser
+   schon angemeldet — sonst einmalig Konto auswählen).
+3. **Der gemeinsame Datenbestand liegt als einzelne JSON-Datei
+   (`schulungsdaten.json`) im OneDrive von `info@tribeta-group.de`**, Ordner
+   `Claude-tribeta-Tools/Schulungsplaner`. Zugriff läuft über Microsoft Graph
+   (`Design/graph-sync.js`), `driveId`/`itemId` stehen fest in
+   `Design/graph-config.js`. Kein Push/Websocket — jede Person lädt beim
+   Öffnen/Neuladen (F5) den aktuellen Stand; Änderungen anderer erscheinen
+   nicht von selbst, ein Neuladen reicht aber.
 
-| Commit | Inhalt |
-|---|---|
-| `9f43f34` | Auffrischungen, Arbeitgeber-Nachweis, Sicherungserinnerung — dabei **Datumsfehler** gefunden: `toISOString()` verschob alle Daten um einen Tag |
-| `f7b6c4c` | Teilnehmer sammelweise buchen (Excel/CSV einfügen) |
-| `94fdc85` | Ablage der Dokumente in einen Ordner |
-| `48d173e` | Ablageordner sichtbar, alles auf einmal ablegen |
-| `fced2d7` | **Gemeinsamer Datenbestand** im Ablageordner |
-| `a6d36d4` | **PDF-Erzeugung** über Chrome headless |
+### Wichtige Stolperfalle, die beim erstmaligen Aufsetzen aufgetreten ist
 
-## Die drei Bausteine, die man verstanden haben muss
+`Files.ReadWrite.All` als Graph-Berechtigung (auch mit Tenant-weitem Admin-
+Consent) reicht **allein nicht**, damit eine andere Person als der Ordner-
+Eigentümer die Datei lesen/schreiben kann — das ist nur die App-Berechtigung,
+Graph prüft zusätzlich die tatsächliche OneDrive-**Freigabe** des Ordners.
+Ohne explizite Freigabe bekommt jede andere Person ein `403 Forbidden`, auch
+mit gültigem Login und korrekt gesetzter App-Berechtigung.
 
-**1. Ablage** (`Design/fragments/ablage.js`)
-Ordner wird einmal über `showDirectoryPicker()` gewählt, der Zugriff liegt in
-IndexedDB. Dokumente landen als HTML unter `Schulungen/<Datum Kurs>/…`,
-Sicherungen unter `Sicherungen/`. Ein ungültiger gespeicherter Eintrag gilt als
-„kein Ordner gewählt" (`istOrdnerZugriff`) — vorher zerlegte er die Oberfläche.
+Behoben durch: Ordner `Schulungsplaner` in `info@tribeta-group.de`s OneDrive
+→ „Freigeben" → Link-Bereich **„Personen in [Organisation]"**, Rolle **„Kann
+bearbeiten"**. Zweite Falle dabei: Bei einer neu erstellten organisationsweiten
+Freigabe bleibt `grantedToIdentitiesV2` leer, bis eine Person den Freigabe-
+**Link tatsächlich einmal im Browser öffnet** — erst danach funktioniert der
+direkte Graph-API-Zugriff (also NICHT über den Link, sondern direkt per
+Item-ID, wie es die App tut) auch für diese Person. Bei künftigen neuen
+Kolleg:innen: einmalig den Freigabe-Link öffnen lassen, bevor sie die App
+benutzen — sonst bekommen sie denselben 403-Fehler.
 
-**2. Gemeinsamer Datenbestand**
-`Schulungsplaner-Daten.json` im Ablageordner ist die Wahrheit, `localStorage`
-nur die schnelle Kopie. Beim Start wird die Datei geladen, jede Änderung
-gebündelt (1,2 s) zurückgeschrieben. Vor dem Schreiben prüft die App den
-Zeitstempel: fremd geändert → **nicht schreiben**, sondern melden.
-**Grenze:** kein echter Mehrbenutzerbetrieb. Gleichzeitiges Arbeiten führt zu
-Konflikten; nacheinander ist sicher.
+## Einmalige Einrichtung (bereits erledigt, hier nur als Referenz)
 
-**3. PDF**
-Die App kann keine PDFs erzeugen — ein PDF entsteht erst im Druckdialog.
-`Design/pdf_erzeugen.py` (bzw. `PDFs-erzeugen.cmd`) lässt Chrome headless über
-den Ablageordner laufen und erzeugt zu jedem HTML ein PDF. Absolute Pfade sind
-Pflicht, eigenes Browserprofil je Lauf ebenfalls.
+- GitHub-Repo + Pages-Quelle `main`/`docs` — siehe oben.
+- Azure-AD-App-Registrierung: Single-Tenant, Plattform „Single-Page
+  Application (SPA)", Redirect-URI = exakt die GitHub-Pages-URL (inkl.
+  abschließendem `/`, sonst schlägt der Login fehl). API-Berechtigung
+  Microsoft Graph → Delegiert → `Files.ReadWrite.All` → Admin-Zustimmung für
+  den ganzen Tenant erteilt.
+- `driveId`/`itemId` in `Design/graph-config.js` über Graph Explorer
+  aufgelöst (Endpunkt `/users/info@tribeta-group.de/drive/root:/<Pfad>` bzw.
+  `/users/info@tribeta-group.de/drive?$select=id`).
+- OneDrive-Ordner-Freigabe wie oben beschrieben.
+- Desktop-Verknüpfung `Schulungsplaner.lnk` (auf dem Rechner der Nutzerin)
+  zeigt jetzt auf die GitHub-Pages-URL statt auf die lokale Datei (Chrome im
+  App-Modus: `--app="https://r-dreiling.github.io/schulungsplaner/"`) — die
+  Anmeldung ist an eine feste, registrierte Web-Adresse gebunden, `file://`
+  funktioniert dafür nicht. Kolleg:innen richten sich das über Chromes
+  eigene Funktion „Als App installieren" ein (Adressleiste bzw.
+  Drei-Punkte-Menü), sobald sie auf der Live-URL angemeldet sind.
+
+## Bekannte Bugs, die in dieser Session gefunden und behoben wurden
+
+- **Fehlendes Status-Element** (`692dd7f`): `graph-sync.js` aktualisierte seit
+  dem Cloud-Umbau ein Element mit der ID `graph-sync-status`, das es in
+  `shell-template.html` nie gab — der Speicherstatus („Speichert …",
+  „Gespeichert um HH:MM Uhr", „Nicht gespeichert — erneut versuchen") wurde
+  dadurch nirgends angezeigt, stattdessen blieb die alte, statische
+  Vor-Cloud-Meldung „Lokal gespeichert im Browser" stehen. Das hatte den
+  ersten Kollegen-Test unnötig erschwert, weil nicht erkennbar war, ob ein
+  Speichern erfolgreich war oder fehlschlug.
+- **Dialoge schlossen sich beim Klick daneben oder mit Esc** (`347b024`),
+  ohne Rückfrage — alle eingetragenen Werte gingen dabei verloren. Betraf
+  jedes Formular in der App (Kurs/Termin/Trainer/Buchung anlegen usw.), nicht
+  nur eines. Ursache war ein globaler Klick-/Keydown-Listener in
+  `ui-helpers.js`, der ersatzlos entfernt wurde. Dialoge schließen sich jetzt
+  nur noch über die expliziten Knöpfe (✕ / „Abbrechen").
+
+## Verifiziert (diese Session)
+
+- Solo-Test: Login, Kurs angelegt, Datei direkt im synchronisierten
+  OneDrive-Pfad geprüft — Eintrag korrekt angekommen.
+- Gemeinsamer Test mit Kollegen: nach Beheben der Freigabe-Stolperfalle hat
+  der Kollege erfolgreich einen Eintrag angelegt, die Nutzerin sah ihn nach
+  F5. Umgekehrte Richtung ebenfalls bestätigt.
+- Dialog-Fix vom Kollegen bzw. der Nutzerin selbst nach hartem Neuladen
+  gegengetestet und bestätigt.
 
 ## Offen
 
-- **Node.js ist NICHT installiert** (Registry geprüft). Sobald es da ist:
-  automatisierte Tests für die Nachweislogik (Anwesenheitsgrenze,
-  Zertifikatsnummern, Auffrischungsfristen, Datumsrechnung), Start über
-  lokalen Server (dauerhafte Ordnerberechtigung).
-- **Echter Mehrbenutzerbetrieb** braucht eine gehostete Fassung mit Datenbank.
-  Dieselbe Grundlage benötigen die geplanten Schnittstellen zu **sevDesk**
-  (Rechnungen) und zur **Website** (Buchungen). Eine Entscheidungsvorlage dazu
-  wurde angeboten, aber noch nicht geschrieben.
-- **Handelsregisternummer und USt-IdNr.** fehlen im Fuß der Bescheinigung —
-  sobald die Eintragung durch ist, im Dialog „Unterschrift & Stempel" ergänzen.
-- Zugriffsfreigabe für die Kolleginnen ist laut Nutzerin erledigt (siehe oben).
-  Noch nicht geprüft: ob sich der Ordner bei ihnen tatsächlich über
-  `showDirectoryPicker()` verbinden lässt und ob beim Abschluss alle Dokumente
-  im richtigen Unterordner landen.
+- **Datei-Uploads** (Materialien bei Kursen, Nachweise bei Trainern) liegen
+  weiterhin nur in `IndexedDB` des jeweiligen Browsers — **nicht** Teil
+  dieser Migration, bewusst ausgeklammert (siehe
+  `Design/implementation-plan-cloud-sync.md`, Abschnitt „Nicht im Scope").
+  Diese Dateien sind also weiterhin nicht zwischen den Rechnern geteilt.
+  Braucht eine eigene Folgeplanung (Graph-Upload in denselben OneDrive-Ordner
+  wäre der naheliegende nächste Schritt).
+- **Kein Live-Push**: Änderungen anderer Personen erscheinen erst nach
+  Neuladen (F5) der Seite, nicht automatisch während die App offen bleibt.
+  Bewusst einfach gehalten (kein Server im Hintergrund). Falls das im Alltag
+  stört, wäre ein Auto-Refresh-Intervall (z. B. alle 30 s) eine kleine
+  spätere Ergänzung.
+- Temporärer Admin-Zugriff, den `dreiling@tribeta-group.de` sich zur
+  Diagnose über das M365 Admin Center auf das OneDrive von
+  `info@tribeta-group.de` gegeben hat, ist noch nicht wieder entfernt (reine
+  Aufräumarbeit, kein Blocker).
+- Handelsregisternummer und USt-IdNr. fehlen weiterhin im Fuß der
+  Bescheinigung — sobald die Eintragung durch ist, im Dialog „Unterschrift &
+  Stempel" ergänzen.
 
-## Feste Regeln (Auszug, vollständig in CLAUDE.md)
+## Feste Regeln (Auszug, vollständig in `Design/design-spec-cloud-sync.md` und
+## den älteren `design-spec*.md`)
 
-- `Berichte/index.html` **nie von Hand** bearbeiten — immer `python Design/assemble.py`.
+- `Berichte/index.html` **und** `docs/index.html` **nie von Hand**
+  bearbeiten — immer `python Design/assemble.py` (schreibt beide).
 - Sperrzustand über `istTerminAbgeschlossen()`, nie über `!!termin.abschluss`.
-- Datumsangaben nie über `toISOString()` — `heuteIso()`, `inTagenIso()`, `alsIsoDatum()`.
+- Datumsangaben nie über `toISOString()` — `heuteIso()`, `inTagenIso()`,
+  `alsIsoDatum()`.
 - Bescheinigungen nur einzeln, nie als Sammeldokument.
 - Zertifikatsnummern erst beim tatsächlichen Druck vergeben.
 - Firmierung **tribeta GmbH**, keine erfundenen Angaben auf Dokumenten.
 
 ## Umgebung
 
-**Build:** `python Design/assemble.py` — reproduzierbar (byte-identisch).
+**Build:** `python Design/assemble.py` — reproduzierbar, schreibt
+`Berichte/index.html` und `docs/index.html`.
 **Datenprüfung:** `python Design/verify_migration_v3.py` — grün.
-**Automatisierte Tests:** keine (kein Node.js).
+**Automatisierte Tests:** keine (kein Node.js in dieser Umgebung).
+**Veröffentlichen:** `git push origin HEAD:main` — braucht interaktive
+GitHub-Anmeldung (Browser-Popup), lief in dieser Session nur über die
+Nutzerin selbst im Terminal, nicht automatisiert (Sandbox-Einschränkung).
 
 **Prüftechniken, die sich bewährt haben:**
-- Druckvorlagen mit Chrome headless rendern (`--screenshot`, `--print-to-pdf`)
-  und das Bild ansehen — so wurden Layoutfehler gefunden, die reine
-  DOM-Messungen nicht zeigten.
-- PDFs mit `pypdf` gegenprüfen: Seitenzahl, Format, eingebettete Bilder, Text.
-- Testfassungen der App **immer am letzten** `</body>` einhängen
-  (`rpartition`) — ein globales `replace` trifft das `</body>` im
-  Template-String von `ablageDokumentHtml` und zerlegt das Skript.
-- Der Browser-Vorschaubereich zeigt Dateien außerhalb des Arbeitsverzeichnisses
-  nur als statisches Abbild ohne JavaScript. Für interaktive Prüfungen eine
-  Kopie ins Arbeitsverzeichnis legen und danach löschen.
-
-**Eigenheiten:**
+- Graph-Explorer-Abfragen: nach dem Eintippen der URL **zweimal** auf
+  „Run query" klicken bzw. sicherstellen, dass kein Autovervollständigen-
+  Vorschlag den eingetippten Text überschrieben hat — das Tool läuft sonst
+  eine völlig andere, zuletzt aktive Beispielabfrage. Im Zweifel den
+  tatsächlichen Wert des Adressfelds per `document.querySelector('[aria-
+  label="Query sample input"]').value` gegenprüfen, nicht per Screenshot
+  ablesen (lange IDs wie `driveId`/`itemId` sind per Bildschirmfoto sehr
+  fehleranfällig zu lesen — `0`/`O`, `1`/`l`/`I`, `3`/`8` etc.).
+- Der sandboxed Browser dieser Umgebung kann grundsätzlich keine lokalen
+  Dateien öffnen (auch nicht aus dem Scratchpad) — Verifikation von
+  UI-Änderungen lief deshalb strukturell (grep/Python gegen die gebaute
+  `index.html`), nicht per Live-Browsertest. Live-Tests liefen über
+  Screenshots, die die Nutzerin bzw. ihr Kollege im echten Browser gemacht
+  haben.
 - Bash zeigt Umlaute falsch an, auch wenn die Datei korrekt ist — immer am
   Dateiinhalt prüfen.
 - `window.print()` blockiert die Umgebung — nie aufrufen.
-- PowerShell-Here-Strings kommen bei `git commit -F -` nicht an; Commit-Text in
-  eine Datei schreiben und mit `-F <datei>` übergeben.
