@@ -67,18 +67,15 @@ function oeffneEinstellungenDialog() {
       </div>
 
       <div class="field">
-        <label>Ablageordner für Dokumente und Sicherungen</label>
-        <div id="einst-ablage-zustand" class="einst-ablage">wird geprüft …</div>
+        <label>Cloud-Verbindung</label>
+        <div class="einst-ablage">Angemeldet als <strong>${escHtml(graphAngemeldeterName() || 'unbekannt')}</strong></div>
         <div class="einst-bildaktionen" style="margin-top:8px;">
-          <button type="button" class="btn" id="einst-ablage-knopf" onclick="einstellungenAblageWaehlen()">Ordner wählen</button>
-          <button type="button" class="btn" onclick="einstellungenSicherungJetzt()">Alles sichern und ablegen</button>
+          <button type="button" class="btn btn-ghost-red" onclick="graphAbmelden()">Abmelden</button>
         </div>
         <div class="field-hint">
-          Dort landen die Dokumente (je Termin ein Unterordner) <strong>und der gemeinsame
-          Datenbestand</strong>. Liegt der Ordner in OneDrive, arbeiten alle auf demselben Stand:
-          App öffnen, hier denselben Ordner wählen, fertig. Zur Sicherheit liegt im Ordner die
-          Datei <em>ABLAGE-Schulungsplaner.txt</em>, damit im Explorer erkennbar ist, welcher es ist.
-          Abgelegt wird HTML; jede Datei hat einen Knopf „Als PDF speichern".
+          Kurse, Termine, Buchungen und Teilnehmer liegen automatisch im gemeinsamen
+          OneDrive-Ordner. Jede angemeldete Person sieht denselben Stand — kein
+          manuelles Verbinden nötig.
         </div>
       </div>
     </div>
@@ -86,91 +83,6 @@ function oeffneEinstellungenDialog() {
       <button type="button" class="btn" onclick="schliesseDialog()">Schließen</button>
       <button type="button" class="btn btn-primary" onclick="einstellungenTexteSpeichern()">Speichern</button>
     </div>`);
-  einstellungenAblageZustandZeigen();
-}
-
-// Der Zustand des Ablageordners laesst sich nur asynchron feststellen, der
-// Dialog wird aber synchron aufgebaut - deshalb nachtraeglich eintragen.
-function einstellungenAblageZustandZeigen() {
-  const feld = document.getElementById('einst-ablage-zustand');
-  const knopf = document.getElementById('einst-ablage-knopf');
-  if (!feld) return;
-  // Der gemerkte Name steht in den Einstellungen und laesst sich sofort
-  // anzeigen - der Handle-Zustand kommt asynchron nach.
-  const gemerkt = einstellungen().ablageOrdnerName || '';
-  if (gemerkt) {
-    feld.innerHTML = `<span class="einst-ablage-ordner">${escHtml(gemerkt)}</span> <span class="einst-ablage-aus">— Zugriff wird geprüft …</span>`;
-    if (knopf) knopf.textContent = 'Anderen Ordner wählen';
-  }
-  ablageZustand().then(z => {
-    if (!feld.isConnected) return;
-    if (!z.moeglich) {
-      feld.innerHTML = '<span class="einst-ablage-aus">Dieser Browser kann nicht in Ordner schreiben. '
-        + 'In Chrome oder Edge funktioniert es.</span>';
-      return;
-    }
-    if (!z.gewaehlt) {
-      feld.innerHTML = '<span class="einst-ablage-aus">Noch kein Ordner gewählt — '
-        + 'Dokumente werden nur gedruckt, nicht abgelegt.</span>';
-      if (knopf) knopf.textContent = 'Ordner wählen';
-      return;
-    }
-    if (knopf) knopf.textContent = 'Anderen Ordner wählen';
-    feld.innerHTML = `Ordner <span class="einst-ablage-ordner">${escHtml(z.name)}</span> `
-      + (z.bereit
-        ? '<span class="einst-ablage-bereit">· bereit</span>'
-        : '<span class="einst-ablage-aus">· Zugriff wird beim ersten Ablegen einmal bestätigt</span>')
-      + '<div class="einst-ablage-aus" style="margin-top:4px;">'
-      + 'Den vollständigen Pfad gibt der Browser aus Sicherheitsgründen nicht preis. '
-      + 'Zum Wiedererkennen liegt im Ordner die Datei <em>ABLAGE-Schulungsplaner.txt</em>.'
-      + '</div>';
-  }).catch(e => { feld.textContent = 'Zustand nicht feststellbar: ' + e.message; });
-}
-
-function einstellungenAblageWaehlen() {
-  einstellungenTexteLesen();
-  ablageOrdnerWaehlen().then(handle => {
-    if (!handle) return;
-    schliesseDialog();
-    oeffneEinstellungenDialog();
-  });
-}
-
-// Legt den Datenbestand ab und dazu die Dokumente aller Termine, die
-// abgeschlossen sind - so ist nach einem Klick alles gesichert, was fertig ist.
-function einstellungenSicherungJetzt() {
-  const abgeschlossene = window.STATE.kurse
-    .flatMap(k => k.termine)
-    .filter(t => t.abschluss);
-
-  const frage = abgeschlossene.length
-    ? `Datenbestand sichern und die Dokumente von ${abgeschlossene.length} abgeschlossenen Termin(en) ablegen?\n\n`
-      + 'Dabei werden fehlende Bescheinigungen erzeugt und ihre Nummern vergeben.'
-    : 'Datenbestand jetzt im Ablageordner sichern?';
-  if (!confirm(frage)) return;
-
-  ablageSicherung().then(async ergebnis => {
-    if (!ergebnis.abgelegt) {
-      alert('Sicherung nicht abgelegt (' + ergebnis.grund + ').\n'
-        + 'Über „Exportieren" in der Seitenleiste geht es weiterhin als Download.');
-      return;
-    }
-    let dateien = 0;
-    const fehler = [];
-    for (const termin of abgeschlossene) {
-      try {
-        const r = await ablageAlleDokumente(termin.id);
-        dateien += r.erledigt.length;
-        fehler.push(...r.fehler);
-      } catch (e) {
-        fehler.push(e.message);
-      }
-    }
-    const zeilen = ['Datensicherung: ' + ergebnis.pfad];
-    if (abgeschlossene.length) zeilen.push(`${dateien} Dokument(e) abgelegt.`);
-    if (fehler.length) zeilen.push('\nNicht abgelegt:\n' + fehler.join('\n'));
-    alert(zeilen.join('\n'));
-  }).catch(e => alert('Sicherung fehlgeschlagen: ' + e.message));
 }
 
 // Die Bilder werden sofort beim Auswaehlen uebernommen (mit Verkleinerung),

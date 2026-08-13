@@ -597,7 +597,7 @@ function detailSpeichereAbschluss(ev, terminId) {
   try {
     terminAbschliessen(terminId, felder.vorkommnisse);
     schliesseDialog();
-    detailNachAbschlussSichern(terminId);
+    detailNachAbschlussSichern();
   } catch (e) {
     alert(e.message);
   }
@@ -605,32 +605,16 @@ function detailSpeichereAbschluss(ev, terminId) {
 }
 
 // Der Abschluss ist der Moment, in dem die Nachweise vollstaendig sind - und
-// damit der wichtigste Zeitpunkt, alles wegzuschreiben. Ist ein Ablageordner
-// eingerichtet, landen Liste, Bericht, Arbeitgebernachweise, alle
-// Bescheinigungen und die Datensicherung in einem Zug dort. Ohne Ordner bleibt
-// es beim Download der Sicherung.
-function detailNachAbschlussSichern(terminId) {
-  ablageZustand().then(z => {
-    if (z.moeglich && z.gewaehlt) {
-      if (!confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
-        + 'Jetzt alle Dokumente und die Datensicherung im Ablageordner speichern?\n'
-        + 'Dabei werden auch die Bescheinigungen erzeugt und ihre Nummern vergeben.')) return;
-      ablageAlleDokumente(terminId).then(r => {
-        const zeilen = [`${r.erledigt.length} Datei(en) abgelegt.`];
-        if (r.sicherung.abgelegt) zeilen.push('Datensicherung: ' + r.sicherung.pfad);
-        if (r.fehler.length) zeilen.push('\nNicht abgelegt:\n' + r.fehler.join('\n'));
-        alert(zeilen.join('\n'));
-      }).catch(e => alert('Ablage fehlgeschlagen: ' + e.message));
-      return;
-    }
-    if (confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
-      + 'Jetzt eine Datensicherung herunterladen? Die Daten liegen nur in diesem Browser – '
-      + 'die Sicherung ist die einzige Kopie außerhalb.\n\n'
-      + 'Tipp: Unter „Unterschrift & Stempel" lässt sich ein Ablageordner wählen; '
-      + 'dann werden künftig alle Dokumente automatisch dort gespeichert.')) {
-      exportiereJSON();
-    }
-  });
+// damit ein guter Zeitpunkt fuer eine zusaetzliche Sicherung als Download.
+// Der laufende Stand liegt ohnehin automatisch in der Cloud (siehe
+// graph-sync.js); dieser Download ist eine zusaetzliche, unabhaengige Kopie.
+function detailNachAbschlussSichern() {
+  if (confirm('Schulung ist abgeschlossen und festgeschrieben.\n\n'
+    + 'Zusätzlich eine Datensicherung herunterladen? Der aktuelle Stand ist '
+    + 'ohnehin automatisch in der Cloud gespeichert – der Download ist eine '
+    + 'zusätzliche, unabhängige Kopie.')) {
+    exportiereJSON();
+  }
 }
 
 function detailWiedereroeffnen(terminId) {

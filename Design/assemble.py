@@ -44,7 +44,7 @@ for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-
 # Gemeinsame Druckvorlagen (Bescheinigung/Bericht) und der Einstellungsdialog -
 # keine Seiten-Fragmente, werden aber wie welche eingebettet, damit alle Seiten
 # sie nutzen koennen.
-for extra in ["druck-vorlagen", "einstellungen", "ablage"]:
+for extra in ["druck-vorlagen", "einstellungen"]:
     extra_js = read(FRAGMENTS / f"{extra}.js")
     if extra_js.strip():
         page_js_parts.insert(0, f"// ---- {extra}.js ----\n{extra_js}")

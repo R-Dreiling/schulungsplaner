@@ -836,10 +836,38 @@ git commit -m "feat: Anmelde-Bildschirm vor der App-Oberflaeche einbauen"
 
 ## Task 10: Alte Ablage-Anbindung entfernen
 
+> **Nachtrag aus der Umsetzung:** Beim tatsächlichen Ausführen dieses Tasks
+> zeigte sich, dass `ablageDokument()`, `ablageZustand()` und
+> `ablageAlleDokumente()` **ungeschützt** (kein `typeof`-Check) noch an vier
+> weiteren Stellen aufgerufen wurden, die dieser Plan ursprünglich nicht
+> aufgeführt hatte: allen vier Druckfunktionen in `druck-vorlagen.js`
+> (`druckeZertifikat`, `druckeAnwesenheitsliste`, `druckeFirmenNachweis`,
+> `druckeAbschlussbericht`) sowie `detailNachAbschlussSichern()` in
+> `page-schulungdetail.js`. Ohne Korrektur hätte das Löschen von `ablage.js`
+> **jeden Ausdruck einer Bescheinigung/Anwesenheitsliste/eines Berichts zum
+> Absturz gebracht** (die try/catch-Blöcke dort fangen den entstehenden
+> `ReferenceError` ab und verhindern damit den Druck komplett, statt ihn
+> durchzulassen). Ergänzend zu den Schritten unten wurden daher auch
+> entfernt:
+> - in `druck-vorlagen.js`: die vier `ablageDokument(...)`-Aufrufe direkt vor
+>   dem jeweiligen `druckeInhalt(...)` — der Druck selbst bleibt unverändert.
+> - in `page-schulungdetail.js`: `detailNachAbschlussSichern()` komplett
+>   vereinfacht auf die Sicherungs-Download-Nachfrage (kein Ablage-Zweig
+>   mehr, kein `terminId`-Parameter mehr nötig); Aufruf in
+>   `detailSpeichereAbschluss()` entsprechend ohne Argument angepasst.
+>
+> Wer diesen Plan nachträglich noch einmal ausführt (z. B. in einer anderen
+> Kopie des Projekts), sollte vor Step 4 (Bauen) einmal
+> `grep -rn "ablageDokument\|ablageZustand\|ablageAlleDokumente" Design/`
+> laufen lassen, um sicherzugehen, dass keine weiteren ungeschützten
+> Aufrufstellen existieren.
+
 **Files:**
 - Delete: `Design/fragments/ablage.js`
 - Modify: `Design/assemble.py`
 - Modify: `Design/fragments/einstellungen.js:69-83`
+- Modify: `Design/fragments/druck-vorlagen.js` (vier `ablageDokument(...)`-Aufrufe entfernt)
+- Modify: `Design/fragments/page-schulungdetail.js` (`detailNachAbschlussSichern` vereinfacht)
 
 **Interfaces:**
 - Consumes: `graphAngemeldeterName()`, `graphAbmelden()` (Task 6).
@@ -974,8 +1002,13 @@ assert 'showDirectoryPicker' not in html, 'alte Ablage-Logik noch im Build'
 assert 'einstellungenAblageWaehlen' not in html
 assert 'einstellungenSicherungJetzt' not in html, 'verwaiste Ablage-Sicherungsfunktion noch im Build'
 assert 'ablageSicherung' not in html
+assert 'ablageDokument(' not in html, 'unguarded ablageDokument-Aufruf noch im Build (siehe Nachtrag oben)'
+assert 'ablageZustand' not in html
+assert 'ablageAlleDokumente' not in html
 assert 'graphAbmelden' in html
-print('OK: Ablage-Logik vollstaendig entfernt, Cloud-Status im Einstellungsdialog')
+assert 'function druckeZertifikat' in html
+assert 'function detailNachAbschlussSichern' in html
+print('OK: Ablage-Logik vollstaendig entfernt (inkl. Druckvorlagen + Abschluss-Dialog), Cloud-Status im Einstellungsdialog')
 "
 ```
 
