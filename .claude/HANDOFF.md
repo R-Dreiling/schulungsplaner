@@ -37,22 +37,28 @@ hierher übertragen (nicht der Architekturentwurf selbst):
 | Desktop-Verknüpfung `Schulungsplaner.lnk` zeigte noch auf das alte, jetzt endgültig überflüssige Desktop-Verzeichnis — auf diesen Ordner umgebogen, inkl. neuem Icon | (außerhalb des Repos, Windows-Verknüpfung) |
 
 **Das alte Verzeichnis unter `Desktop\Persönlich\Claude Code\Projekt-Systeme\Schulungsplanner`
-ist damit endgültig ohne Funktion** — nichts zeigt mehr darauf, alle
-brauchbaren Änderungen daraus sind hier eingepflegt. Es enthält allerdings noch
-einen eigenständigen Design-Entwurf für den verworfenen Graph-API-Ansatz
-(`Design/design-spec-cloud-sync.md`) als Dokumentation der Diskussion, falls
-der Bedarf sich später doch einmal in Richtung „echter Mehrbenutzerbetrieb mit
-Login von jedem beliebigen Gerät" verschiebt. Löschen kann die Nutzerin es
-selbst, sobald sie möchte — nicht automatisch von einer Session aus erledigt.
+wurde auf Wunsch der Nutzerin gelöscht** (Inhalt vollständig entfernt; die leere
+Ordnerhülle selbst hing noch kurz am Bash-Prozess der löschenden Session fest —
+verschwindet spätestens mit deren Ende). Der darin enthaltene
+Graph-API-Architekturentwurf ist damit weg; die Begründung, warum dieser Weg
+verworfen wurde, steht oben und reicht als Dokumentation, falls der Bedarf sich
+später doch einmal in Richtung „echter Mehrbenutzerbetrieb mit Login von jedem
+beliebigen Gerät" verschiebt.
+
+**Zugriff der Kolleginnen bestätigt:** Die Nutzerin hat rückgemeldet, dass die
+2–4 anderen Personen bereits Zugriff auf den aktuellen OneDrive-Ordner haben
+(Freigabe erledigt). Ob der Ablageordner-Workflow (`showDirectoryPicker()` +
+gemeinsamer Datenbestand) bei ihnen auch tatsächlich funktioniert, wenn sie ihn
+zum ersten Mal in der App auswählen, ist damit noch nicht geprüft — das bleibt
+der nächste sinnvolle Test.
 
 **Projektpfad seit dem Umzug:**
 `C:\Hinschg\OneDrive - HinSchG Meldungen GbR\Claude-tribeta-Tools\Schulungsplaner`
 
 Das alte Verzeichnis unter `Desktop\Persönlich\Claude Code\Projekt-Systeme\Schulungsplanner`
-existiert noch als Rückfallebene und **kann gelöscht werden**, sobald OneDrive
-einmal durchsynchronisiert hat. Die Wurzel-`CLAUDE.md` mit den tribeta-Designregeln
-liegt weiterhin am alten Ort und gilt hier **nicht mehr automatisch** — die
-relevanten Regeln stehen in der projektlokalen `CLAUDE.md`.
+ist gelöscht (siehe oben). Die Wurzel-`CLAUDE.md` mit den tribeta-Designregeln
+lag dort und gilt hier **nicht automatisch** — die relevanten Regeln stehen in
+der projektlokalen `CLAUDE.md`.
 
 ## Was das ist
 
@@ -113,9 +119,10 @@ Pflicht, eigenes Browserprofil je Lauf ebenfalls.
   wurde angeboten, aber noch nicht geschrieben.
 - **Handelsregisternummer und USt-IdNr.** fehlen im Fuß der Bescheinigung —
   sobald die Eintragung durch ist, im Dialog „Unterschrift & Stempel" ergänzen.
-- Vom Nutzer noch nicht rückgemeldet: ob die Partner sich mit dem gemeinsamen
-  Ordner verbinden können und ob beim Abschluss alle Dokumente im richtigen
-  Unterordner landen.
+- Zugriffsfreigabe für die Kolleginnen ist laut Nutzerin erledigt (siehe oben).
+  Noch nicht geprüft: ob sich der Ordner bei ihnen tatsächlich über
+  `showDirectoryPicker()` verbinden lässt und ob beim Abschluss alle Dokumente
+  im richtigen Unterordner landen.
 
 ## Feste Regeln (Auszug, vollständig in CLAUDE.md)
 
