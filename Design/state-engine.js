@@ -30,10 +30,10 @@ function speichereState(zaehlen = true) {
     sicherungZaehlen();
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(window.STATE));
-  // Ist ein Ablageordner eingerichtet, ist die Datei dort der gemeinsame
-  // Stand; der localStorage bleibt die schnelle lokale Kopie.
-  if (zaehlen && typeof ablageDatenSpaeterSchreiben === 'function') {
-    ablageDatenSpaeterSchreiben();
+  // Der gemeinsame Datenbestand liegt in der Cloud (siehe graph-sync.js);
+  // localStorage bleibt die schnelle lokale Zwischenkopie.
+  if (zaehlen && typeof graphDatenSpaeterSchreiben === 'function') {
+    graphDatenSpaeterSchreiben();
   }
   if (typeof window.renderAll === 'function') {
     window.renderAll();

@@ -633,9 +633,11 @@ python Design/assemble.py
 ```bash
 python -c "
 html = open('Berichte/index.html', encoding='utf-8').read()
-assert 'ablageDatenSpaeterSchreiben' not in html, 'alter Ablage-Aufruf noch vorhanden'
+# Nur der Aufruf, nicht die Funktionsdefinition selbst - die steht bis
+# Task 10 (ablage.js loeschen) noch im Build, nur ungenutzt.
+assert 'ablageDatenSpaeterSchreiben();' not in html, 'alter Ablage-Aufruf noch vorhanden'
 assert 'graphDatenSpaeterSchreiben()' in html
-print('OK: speichereState() ruft graphDatenSpaeterSchreiben()')
+print('OK: speichereState() ruft graphDatenSpaeterSchreiben(), kein Aufruf von ablageDatenSpaeterSchreiben() mehr')
 "
 ```
 
