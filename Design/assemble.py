@@ -31,7 +31,7 @@ for name in ["page-uebersicht", "page-schulungen", "page-schulungdetail", "page-
 page_css = "\n\n".join(page_css_parts)
 
 core_js_parts = []
-for name in ["state-engine", "file-store", "ui-helpers"]:
+for name in ["graph-config", "graph-auth", "graph-sync", "state-engine", "file-store", "ui-helpers"]:
     js = read(BASE / f"{name}.js")
     core_js_parts.append(f"// ---- {name}.js ----\n{js}")
 core_js = "\n\n".join(core_js_parts)
