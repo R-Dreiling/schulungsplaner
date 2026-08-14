@@ -1,7 +1,11 @@
 # HANDOFF — Schulungsplaner
 
 Stand: Cloud-Sync-Migration abgeschlossen und mit echtem Kollegen-Test
-verifiziert. Branch `feature/kurs-termin-buchung`, Arbeitsbaum sauber.
+verifiziert. Hosting zusätzlich auf Cloudflare Pages umgezogen (Nutzerinwunsch,
+nicht wegen eines Hosting-Problems — GitHub Pages lief die ganze Zeit
+fehlerfrei; die tatsächlichen Ursachen der Login-/Sync-Probleme waren eine
+fehlende OneDrive-Freigabe und zwei Code-Bugs, siehe unten). Branch
+`feature/kurs-termin-buchung`, Arbeitsbaum sauber.
 
 ## Was das ist
 
@@ -21,14 +25,21 @@ echten Test mit einem Kollegen: weder sah er die vorhandenen Daten, noch kamen
 neue Einträge bei der anderen Seite an. Die jetzige, dritte Lösung wurde
 ebenfalls mit einem echten Kollegen-Test verifiziert und funktioniert:
 
-1. **Code liegt öffentlich auf GitHub Pages.** Repo:
-   `https://github.com/R-Dreiling/schulungsplaner` (öffentlich, unbedenklich,
-   da nur App-Code drin liegt, keine Nachweisdaten). Live-URL:
-   **`https://r-dreiling.github.io/schulungsplaner/`**. GitHub Pages
-   unterstützt nur `/ (root)` oder `/docs` als Quelle — deshalb schreibt
-   `assemble.py` die gebaute App **zweimal**: nach `Berichte/index.html` (der
-   kanonische Build, für den lokalen/OneDrive-Gebrauch) und zusätzlich nach
-   `docs/index.html` (identischer Inhalt, nur für GitHub Pages). Bei jeder
+1. **Code liegt öffentlich auf GitHub, ausgeliefert über Cloudflare Pages.**
+   Repo: `https://github.com/R-Dreiling/schulungsplaner` (öffentlich,
+   unbedenklich, da nur App-Code drin liegt, keine Nachweisdaten). Cloudflare
+   Pages ist mit diesem Repo verbunden (Branch `main`, Ausgabeordner `docs`,
+   kein Build-Kommando) und deployt automatisch bei jedem Push — der
+   Arbeitsablauf (`git push origin HEAD:main`) bleibt unverändert.
+   **Aktuelle/kanonische Live-URL: `https://schulungsplaner.pages.dev/`**
+   (Cloudflare-Konto `Dreiling@tribeta-group.de`). Die frühere GitHub-Pages-URL
+   `https://r-dreiling.github.io/schulungsplaner/` läuft parallel weiter (als
+   Rückfallebene, nicht abgeschaltet) und bleibt daher auch als zweite
+   Redirect-URI in Azure AD eingetragen. GitHub Pages unterstützt nur
+   `/ (root)` oder `/docs` als Quelle — deshalb schreibt `assemble.py` die
+   gebaute App **zweimal**: nach `Berichte/index.html` (der kanonische Build,
+   für den lokalen/OneDrive-Gebrauch) und zusätzlich nach `docs/index.html`
+   (identischer Inhalt, von beiden Hosting-Anbietern genutzt). Bei jeder
    Änderung **beide** committen und pushen — `assemble.py` erledigt das
    Schreiben automatisch, git-Add/Push bleibt manuell.
 2. **Anmeldung über das tribeta-Microsoft-Konto** (Azure AD / Microsoft Entra
@@ -37,7 +48,10 @@ ebenfalls mit einem echten Kollegen-Test verifiziert und funktioniert:
    tenantId `473ae1a6-c24a-4f5e-a00b-1dc5ef3f4793`). MSAL.js (vendored unter
    `Design/vendor/msal-browser.min.js`) übernimmt Login/Token. Jede Person
    meldet sich mit ihrem eigenen Konto an (Single Sign-on, falls im Browser
-   schon angemeldet — sonst einmalig Konto auswählen).
+   schon angemeldet — sonst einmalig Konto auswählen). **Beide** Live-URLs
+   (Cloudflare und GitHub Pages) stehen als Redirect-URI in der
+   App-Registrierung — wird eine der beiden URLs stillgelegt, die zugehörige
+   Redirect-URI dort ebenfalls entfernen.
 3. **Der gemeinsame Datenbestand liegt als einzelne JSON-Datei
    (`schulungsdaten.json`) im OneDrive von `info@tribeta-group.de`**, Ordner
    `Claude-tribeta-Tools/Schulungsplaner`. Zugriff läuft über Microsoft Graph
@@ -78,9 +92,9 @@ benutzen — sonst bekommen sie denselben 403-Fehler.
   `/users/info@tribeta-group.de/drive?$select=id`).
 - OneDrive-Ordner-Freigabe wie oben beschrieben.
 - Desktop-Verknüpfung `Schulungsplaner.lnk` (auf dem Rechner der Nutzerin)
-  zeigt jetzt auf die GitHub-Pages-URL statt auf die lokale Datei (Chrome im
-  App-Modus: `--app="https://r-dreiling.github.io/schulungsplaner/"`) — die
-  Anmeldung ist an eine feste, registrierte Web-Adresse gebunden, `file://`
+  zeigt jetzt auf die Cloudflare-URL statt auf die lokale Datei (Chrome im
+  App-Modus: `--app="https://schulungsplaner.pages.dev/"`) — die Anmeldung
+  ist an eine feste, registrierte Web-Adresse gebunden, `file://`
   funktioniert dafür nicht. Kolleg:innen richten sich das über Chromes
   eigene Funktion „Als App installieren" ein (Adressleiste bzw.
   Drei-Punkte-Menü), sobald sie auf der Live-URL angemeldet sind.
