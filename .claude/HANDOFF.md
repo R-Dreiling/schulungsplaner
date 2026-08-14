@@ -1,11 +1,31 @@
 # HANDOFF — Schulungsplaner
 
-Stand: Cloud-Sync-Migration abgeschlossen und mit echtem Kollegen-Test
-verifiziert. Hosting zusätzlich auf Cloudflare Pages umgezogen (Nutzerinwunsch,
-nicht wegen eines Hosting-Problems — GitHub Pages lief die ganze Zeit
-fehlerfrei; die tatsächlichen Ursachen der Login-/Sync-Probleme waren eine
-fehlende OneDrive-Freigabe und zwei Code-Bugs, siehe unten). Branch
-`feature/kurs-termin-buchung`, Arbeitsbaum sauber.
+Stand: **Architektur nochmal gewechselt** — nicht mehr Microsoft-Login +
+OneDrive/Graph-API, sondern **Cloudflare Access (E-Mail-Zugriffsliste) + R2**
+(siehe `Design/design-spec-cloudflare-native.md` und
+`Design/implementation-plan-cloudflare-native.md`, 18 Tasks). Grund: die
+Nutzerin wollte eine Zugriffsliste, die sie komplett selbst kontrolliert,
+unabhängig von anderen Administrator:innen im tribeta-Microsoft-Tenant — das
+ist mit einem firmengebundenen Microsoft-Login strukturell nicht möglich.
+
+**Code-Migration abgeschlossen (Tasks 1–12), Solo-Test und Konflikttest
+bestanden (Tasks 13–14). Task 15 (gemeinsamer Test mit einer zweiten
+zugelassenen Adresse, `fuetterer@tribeta-group.de` oder
+`finocchietti@tribeta-group.de`) ist NOCH OFFEN** — die Nutzerin wollte
+vorher noch ein paar visuelle Änderungen an der App vornehmen (in einer neuen
+Session, um dieses lange Chat-Fenster zu entlasten). **Nächster Schritt nach
+den visuellen Änderungen: Task 15 nachholen**, dann Task 16
+(Negativtest: nicht zugelassene Adresse) und Task 17/18 (Azure-AD-App als
+nicht mehr benötigt vermerken, dieses HANDOFF nochmal finalisieren).
+
+Live-URL: `https://schulungsplaner.pages.dev/` — Zugriffsliste aktuell:
+`dreiling@tribeta-group.de`, `fuetterer@tribeta-group.de`,
+`finocchietti@tribeta-group.de` (Cloudflare Zero Trust → Access →
+Applications → „schulungsplaner.pages.dev" → Policy „Zugelassene Personen").
+
+Branch `feature/kurs-termin-buchung`, Arbeitsbaum sauber (bis auf
+unveränderte Alt-Testdateien in `Ablage/`, die bewusst nicht angefasst
+wurden).
 
 ## Was das ist
 
@@ -17,13 +37,20 @@ fällige Auffrischungen, Sammelbuchung, PDF-Erzeugung. Technisch eine einzige
 aber **kein reines Einzelplatz-Werkzeug mehr** — der Datenbestand liegt
 gemeinsam in der Cloud, mehrere Personen arbeiten gleichzeitig daran.
 
-## Architektur: gehostet + Microsoft-Login + Graph API
+## ÜBERHOLT: vorherige Architektur (Microsoft-Login + Graph API)
 
-Frühere Ansätze (lokaler `localStorage`, dann ein per `showDirectoryPicker()`
-gewählter Ablageordner) sind **beide gescheitert** — Letzterer erst nach einem
-echten Test mit einem Kollegen: weder sah er die vorhandenen Daten, noch kamen
-neue Einträge bei der anderen Seite an. Die jetzige, dritte Lösung wurde
-ebenfalls mit einem echten Kollegen-Test verifiziert und funktioniert:
+**Der komplette Abschnitt unten beschreibt einen Zwischenstand, der nicht
+mehr im Code steckt** — MSAL, Azure AD, `graph-*.js` sind vollständig entfernt
+(siehe oben, "Cloudflare Access + R2" ist der aktuelle Stand). Stehen
+gelassen als Kontext, warum dieser Umweg gemacht wurde: die erste
+Cloud-Lösung überhaupt (lokaler `localStorage`, dann ein per
+`showDirectoryPicker()` gewählter Ablageordner) war **beide Male
+gescheitert** — Letzterer erst nach einem echten Test mit einem Kollegen:
+weder sah er die vorhandenen Daten, noch kamen neue Einträge bei der anderen
+Seite an. Die Microsoft-Login-Lösung danach wurde mit einem echten
+Kollegen-Test verifiziert und funktionierte technisch einwandfrei — wurde
+aber trotzdem abgelöst, weil die Nutzerin eine von ihr selbst kontrollierte
+Zugriffsliste wollte (siehe oben).
 
 1. **Code liegt öffentlich auf GitHub, ausgeliefert über Cloudflare Pages.**
    Repo: `https://github.com/R-Dreiling/schulungsplaner` (öffentlich,
