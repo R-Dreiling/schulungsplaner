@@ -161,6 +161,8 @@ button { font-family: var(--font-body); cursor: pointer; }
   color: var(--ink);
   margin: 0 0 12px 0;
 }
+.section-title svg { width: 17px; height: 17px; stroke: var(--teal-deep); vertical-align: -3px; margin-right: 7px; flex: none; }
+.page-header-text h1 svg { width: 21px; height: 21px; stroke: var(--teal-deep); vertical-align: -4px; margin-right: 9px; flex: none; }
 
 /* Badges */
 .badge {
