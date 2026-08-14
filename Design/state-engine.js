@@ -702,6 +702,20 @@ async function alleDatenLeeren() {
     return;
   }
 
+  // Zweite, bewusst hoehere Huerde als bei anderen destruktiven Aktionen:
+  // Diese Funktion loescht den gemeinsamen Cloud-Datenbestand fuer alle
+  // angemeldeten Personen unwiderruflich, ein einzelnes OK/Abbrechen reicht
+  // dafuer nicht.
+  const bestaetigungswort = 'LÖSCHEN';
+  const eingabe = prompt(
+    `Letzte Sicherheitsabfrage: Tippe „${bestaetigungswort}“ (in Großbuchstaben) `
+    + 'ein, um das endgültige Löschen zu bestätigen.'
+  );
+  if (eingabe !== bestaetigungswort) {
+    alert('Abgebrochen — Eingabe stimmte nicht überein. Es wurde nichts gelöscht.');
+    return;
+  }
+
   if (typeof alleDateienLoeschen === 'function') {
     try {
       await alleDateienLoeschen();
