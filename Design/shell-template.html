@@ -99,22 +99,11 @@
   <div id="dialog-container" class="dialog"></div>
 </div>
 
-<div id="anmelde-bildschirm" class="anmelde-bildschirm">
-  <div class="anmelde-karte">
-    <h1>Schulungsplaner</h1>
-    <p id="anmelde-text">Anmeldung wird geprüft …</p>
-    <button id="anmelde-knopf" class="btn btn-primary" style="display:none" onclick="anmeldeStarten()">Mit Microsoft anmelden</button>
-  </div>
-</div>
-
 <!-- Wird nur beim Drucken sichtbar (siehe @media print in styles.css) und
      vorher per druckeInhalt() befuellt. So entstehen Bescheinigung und
      Abschlussbericht ohne zweites Fenster und ohne Zusatzbibliothek. -->
 <div id="druck-bereich"></div>
 
-<script>
-{{MSAL_JS}}
-</script>
 <script>
 window.SEED_DATA = {{DATA_JSON}};
 </script>
@@ -204,53 +193,10 @@ function renderAll() {
 }
 window.renderAll = renderAll;
 
-// Status-Automatik laeuft erst NACH dem Laden des gemeinsamen Standes
-// (siehe anmeldeLadeUndZeige) - vorher wuerde sie auf dem gleich wieder
-// verworfenen lokalen Zwischenstand rechnen.
-
-// Erst anmelden und den gemeinsamen Stand laden, dann rendern - vorher
-// zeigt die App bewusst nichts (siehe design-spec-cloud-sync.md, Abschnitt
-// "Anmeldung": "Ohne gueltige Anmeldung: ausschliesslich der
-// Anmelde-Bildschirm, keine Daten, keine Formulare").
-async function anmeldeLadeUndZeige() {
-  document.getElementById('anmelde-text').textContent = 'Daten werden geladen …';
-  await graphBeimStartLaden();
-  if (typeof statusAutomatikAnwenden === 'function') statusAutomatikAnwenden();
-  renderAll();
-  document.getElementById('anmelde-bildschirm').style.display = 'none';
-}
-
-async function anmeldeAblauf() {
-  const text = document.getElementById('anmelde-text');
-  const knopf = document.getElementById('anmelde-knopf');
-  text.textContent = 'Anmeldung wird geprüft …';
-  const still = await graphSilentAnmeldung().catch(() => null);
-  if (!still) {
-    text.textContent = 'Bitte mit dem tribeta-Microsoft-Konto anmelden.';
-    knopf.style.display = '';
-    return;
-  }
-  await anmeldeLadeUndZeige();
-}
-
-// Nur aus diesem Klick-Handler heraus interaktiv anmelden - Popups ohne
-// direkte Nutzeraktion werden vom Browser blockiert.
-async function anmeldeStarten() {
-  const text = document.getElementById('anmelde-text');
-  const knopf = document.getElementById('anmelde-knopf');
-  knopf.style.display = 'none';
-  text.textContent = 'Anmeldung läuft …';
-  try {
-    await graphInteraktiveAnmeldung();
-    await anmeldeLadeUndZeige();
-  } catch (e) {
-    console.warn('Anmeldung fehlgeschlagen:', e);
-    text.textContent = 'Anmeldung fehlgeschlagen oder abgebrochen.';
-    knopf.style.display = '';
-  }
-}
-
-anmeldeAblauf();
+// Cloudflare Access schuetzt die gesamte Seite bereits, bevor dieser Code
+// ueberhaupt laeuft - kein eigener Anmelde-Ablauf mehr noetig (siehe
+// design-spec-cloudflare-native.md).
+cfBeimStartLaden();
 
 // Deep-Link ueber URL-Hash, z.B. index.html#schulungen oder index.html#detail-s1
 (function () {

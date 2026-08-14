@@ -66,18 +66,6 @@ function oeffneEinstellungenDialog() {
         <div class="field-hint">Eine Zeile je Angabe. Sobald die Gesellschaft im Handelsregister eingetragen ist, gehören Registernummer und USt-IdNr. hier ergänzt.</div>
       </div>
 
-      <div class="field">
-        <label>Cloud-Verbindung</label>
-        <div class="einst-ablage">Angemeldet als <strong>${escHtml(graphAngemeldeterName() || 'unbekannt')}</strong></div>
-        <div class="einst-bildaktionen" style="margin-top:8px;">
-          <button type="button" class="btn btn-ghost-red" onclick="graphAbmelden()">Abmelden</button>
-        </div>
-        <div class="field-hint">
-          Kurse, Termine, Buchungen und Teilnehmer liegen automatisch im gemeinsamen
-          OneDrive-Ordner. Jede angemeldete Person sieht denselben Stand — kein
-          manuelles Verbinden nötig.
-        </div>
-      </div>
     </div>
     <div class="dialog-foot">
       <button type="button" class="btn" onclick="schliesseDialog()">Schließen</button>

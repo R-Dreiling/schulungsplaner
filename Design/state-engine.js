@@ -30,10 +30,10 @@ function speichereState(zaehlen = true) {
     sicherungZaehlen();
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(window.STATE));
-  // Der gemeinsame Datenbestand liegt in der Cloud (siehe graph-sync.js);
+  // Der gemeinsame Datenbestand liegt in der Cloud (siehe cf-sync.js);
   // localStorage bleibt die schnelle lokale Zwischenkopie.
-  if (zaehlen && typeof graphDatenSpaeterSchreiben === 'function') {
-    graphDatenSpaeterSchreiben();
+  if (zaehlen && typeof cfDatenSpaeterSchreiben === 'function') {
+    cfDatenSpaeterSchreiben();
   }
   if (typeof window.renderAll === 'function') {
     window.renderAll();
