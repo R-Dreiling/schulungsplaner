@@ -756,7 +756,7 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
      stattdessen im Padding von .druck-seite. */
   @page { size: A4; margin: 0; }
   body { display: block; padding: 0; background: #fff; min-height: 0; }
-  .app-window, #dialog-overlay, #anmelde-bildschirm { display: none !important; }
+  .app-window, #dialog-overlay { display: none !important; }
   #druck-bereich { display: block; }
   .druck-seite { page-break-after: always; }
   .druck-seite:last-child { page-break-after: auto; }
@@ -767,33 +767,3 @@ table.bericht-tabelle td.negativ { color: var(--status-red-fg); font-weight: 600
   .al-bestaetigung, .al-signatur { page-break-inside: avoid; }
 }
 
-/* ---- Anmelde-Bildschirm (Microsoft-Login) ---- */
-.anmelde-bildschirm {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-}
-.anmelde-karte {
-  background: var(--card-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-pop);
-  padding: 40px 48px;
-  text-align: center;
-  max-width: 360px;
-}
-.anmelde-karte h1 {
-  font-family: var(--font-display);
-  color: var(--ink);
-  font-size: 22px;
-  margin: 0 0 12px;
-}
-.anmelde-karte p {
-  font-family: var(--font-body);
-  color: var(--text);
-  margin: 0 0 20px;
-}
